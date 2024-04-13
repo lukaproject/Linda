@@ -23,13 +23,12 @@ type HeartBeatFromServer struct {
 	SeqId int64
 
 	ScheduledTaskIds []string
+
+	IsHeartBeatEnd bool
+	HeartBeatEnd   HeartBeatEnd
 }
 
 type HeartBeatEnd struct {
 	// 是否等待node上所有的任务都结束
 	WaitingForAllTasksComplete bool
-}
-
-type HeartBeatEndResponse struct {
-	Result string
 }

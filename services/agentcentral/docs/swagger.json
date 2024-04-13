@@ -12,5 +12,19 @@
         "version": "0.dev"
     },
     "basePath": "/api",
-    "paths": {}
+    "paths": {
+        "/healthcheck": {
+            "post": {
+                "description": "health check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "health check",
+                "responses": {}
+            }
+        }
+    }
 }

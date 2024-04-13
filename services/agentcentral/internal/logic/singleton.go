@@ -1,6 +1,6 @@
 package logic
 
-import "Linda/services/agentcentral/logic/agents"
+import "Linda/services/agentcentral/internal/logic/agents"
 
 var (
 	agentsMgr agents.Mgr
@@ -11,4 +11,5 @@ func AgentsMgr() agents.Mgr {
 }
 
 func InitAgentsMgr() {
+	agentsMgr = agents.NewMgr()
 }

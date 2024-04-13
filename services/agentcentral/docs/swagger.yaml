@@ -8,5 +8,14 @@ info:
   termsOfService: http://swagger.io/terms/
   title: AgentCentral API
   version: 0.dev
-paths: {}
+paths:
+  /healthcheck:
+    post:
+      consumes:
+      - application/json
+      description: health check
+      produces:
+      - text/plain
+      responses: {}
+      summary: health check
 swagger: "2.0"
