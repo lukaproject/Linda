@@ -1,0 +1,12 @@
+basePath: /api
+info:
+  contact: {}
+  description: This is agent central swagger API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: AgentCentral API
+  version: 0.dev
+paths: {}
+swagger: "2.0"
