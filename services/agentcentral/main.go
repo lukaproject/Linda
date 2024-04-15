@@ -22,6 +22,9 @@ import (
 // @BasePath		/api
 func main() {
 	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger").Handler(
 		httpSwagger.Handler()).Methods(http.MethodGet)
@@ -29,5 +32,8 @@ func main() {
 	apis.EnableHeartBeat(r)
 	apis.EnableHealthCheck(r)
 	logic.InitAgentsMgr()
-	logrus.Fatal(http.ListenAndServe(":5883", r))
+
+	port := ":5883"
+	logrus.Infof("serve in %s", port)
+	logrus.Fatal(http.ListenAndServe(port, r))
 }

@@ -1,8 +1,8 @@
 package agents
 
 import (
+	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
-	"errors"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -11,6 +11,7 @@ import (
 )
 
 type Agent interface {
+	// 启动 Agent 守护协程，维持与 agent 的心跳
 	StartServe()
 }
 
@@ -23,6 +24,8 @@ type agentHolder struct {
 	lastSeqId  int64
 
 	hbAgent chan *models.HeartBeatFromAgent
+
+	mgr Mgr
 }
 
 func (ah *agentHolder) StartServe() {
@@ -36,16 +39,21 @@ func (ah *agentHolder) serveLoop() {
 		case msg := <-ah.hbAgent:
 			{
 				logrus.Infof("seqid %d", msg.SeqId)
+				ah.lastSeqId = msg.SeqId
+				ah.lastHBTime = time.Now()
+
 				xerr.Must0(
-					ah.conn.WriteMessage(
-						websocket.BinaryMessage,
-						models.Serialize(&models.HeartBeatFromServer{
+					hbconn.WriteMessage(
+						ah.conn,
+						&models.HeartBeatFromServer{
 							SeqId: msg.SeqId,
-						})))
+						}),
+				)
 			}
 		case <-tick.C:
 			{
 				logrus.Errorf("hb timeout, nodeId %s", ah.nodeId)
+				ah.mgr.RemoveNode(ah.nodeId)
 				return
 			}
 		}
@@ -54,50 +62,37 @@ func (ah *agentHolder) serveLoop() {
 
 func (ah *agentHolder) readHBLoop() {
 	for {
-		msgType, body, err := ah.conn.ReadMessage()
-
-		if err != nil {
-			logrus.Error(err)
-			break
-		}
-		if msgType != websocket.BinaryMessage {
-			logrus.Errorf("msgType is invalid, %d", msgType)
-			return
-		}
-
 		hb := &models.HeartBeatFromAgent{}
-		models.Deserialize(body, hb)
+
+		if err := hbconn.ReadMessage(ah.conn, hb); err != nil {
+			logrus.Error(err)
+			continue
+		}
+
 		ah.hbAgent <- hb
 	}
 }
 
-func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
+func NewAgent(nodeId string, conn *websocket.Conn, mgr Mgr) (Agent, error) {
 	ah := &agentHolder{
 		conn:      conn,
 		nodeId:    nodeId,
 		hbAgent:   make(chan *models.HeartBeatFromAgent, 1),
 		lastSeqId: -1,
+		mgr:       mgr,
 	}
-
-	msgType, body, err := ah.conn.ReadMessage()
+	hbStart := &models.HeartBeatStart{}
+	err := hbconn.ReadMessage(ah.conn, hbStart)
 	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
-
-	if msgType != websocket.BinaryMessage {
-		return nil, errors.New("msgType is not binary")
-	}
-
-	hbStart := &models.HeartBeatStart{}
-	models.Deserialize(body, hbStart)
 	logrus.Debugf("nodeId %s, BagId %s", nodeId, hbStart.Node.BagId)
 	ah.bagId = hbStart.Node.BagId
 	ah.lastHBTime = time.Now()
-	err = ah.conn.WriteMessage(
-		websocket.BinaryMessage,
-		models.Serialize(&models.HeartBeatStartResponse{
-			Result: models.OK,
-		}))
+	err = hbconn.WriteMessage(ah.conn, &models.HeartBeatStartResponse{
+		Result: models.OK,
+	})
 	if err != nil {
 		return nil, err
 	}

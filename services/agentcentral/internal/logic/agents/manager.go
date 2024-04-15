@@ -19,6 +19,7 @@ var upgrader = websocket.Upgrader{
 
 type Mgr interface {
 	NewNode(nodeId string, w http.ResponseWriter, r *http.Request)
+	RemoveNode(nodeId string) error
 }
 
 type agentsmgr struct {
@@ -52,7 +53,7 @@ func (mgr *agentsmgr) NewNode(nodeId string, w http.ResponseWriter, r *http.Requ
 		if _, exist := mgr.agents[nodeId]; exist {
 			panic(errors.New("nodeId exists"))
 		}
-		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
+		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)), mgr)
 		if err != nil {
 			logrus.Error(err)
 			return
@@ -60,7 +61,14 @@ func (mgr *agentsmgr) NewNode(nodeId string, w http.ResponseWriter, r *http.Requ
 		mgr.agents[nodeId] = agent
 	}
 	agent.StartServe()
+}
 
+func (mgr *agentsmgr) RemoveNode(nodeId string) error {
+	mgr.agentsRWMut.Lock()
+	defer mgr.agentsRWMut.Unlock()
+	delete(mgr.agents, nodeId)
+	logrus.Debugf("node %s removed", nodeId)
+	return nil
 }
 
 func NewMgr() Mgr {
