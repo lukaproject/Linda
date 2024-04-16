@@ -1,8 +1,8 @@
 package client
 
 import (
+	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
-	"errors"
 	"io"
 	"net/http"
 
@@ -16,47 +16,25 @@ type Client struct {
 }
 
 func (c *Client) HeartBeat(agentHB *models.HeartBeatFromAgent) (serverHB *models.HeartBeatFromServer, err error) {
-	if err = c.conn.WriteMessage(
-		websocket.BinaryMessage,
-		models.Serialize(agentHB),
-	); err != nil {
-		return
-	}
-	body, err := c.fetchResponse()
-	if err != nil {
+	if err = hbconn.WriteMessage(c.conn, agentHB); err != nil {
 		return
 	}
 	serverHB = &models.HeartBeatFromServer{}
-	models.Deserialize(body, serverHB)
+	if err = hbconn.ReadMessage(c.conn, serverHB); err != nil {
+		return
+	}
 	return
 }
 
 func (c *Client) HeartBeatStart(req *models.HeartBeatStart) (resp *models.HeartBeatStartResponse, err error) {
-	if err = c.conn.WriteMessage(
-		websocket.BinaryMessage,
-		models.Serialize(req),
-	); err != nil {
+	if err = hbconn.WriteMessage(c.conn, req); err != nil {
 		return
 	}
-	body, err := c.fetchResponse()
-	if err != nil {
-		return
-	}
-
 	resp = &models.HeartBeatStartResponse{}
-	models.Deserialize(body, resp)
+	if err = hbconn.ReadMessage(c.conn, resp); err != nil {
+		return
+	}
 	return
-}
-
-func (c *Client) fetchResponse() ([]byte, error) {
-	msgType, body, err := c.conn.ReadMessage()
-	if err != nil {
-		return nil, err
-	}
-	if msgType != websocket.BinaryMessage {
-		return nil, errors.New("msgType is not binary message")
-	}
-	return body, nil
 }
 
 func (c *Client) Close() {
@@ -87,5 +65,5 @@ func HealthCheck(url string) bool {
 		return false
 	}
 
-	return string(b) == "OK"
+	return string(b) == models.OK
 }

@@ -32,3 +32,7 @@ type HeartBeatEnd struct {
 	// 是否等待node上所有的任务都结束
 	WaitingForAllTasksComplete bool
 }
+
+type HeartBeatEndResponse struct {
+	Result string
+}

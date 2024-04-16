@@ -3,6 +3,7 @@ package agents
 import (
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
+	"runtime/debug"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -13,6 +14,9 @@ import (
 type Agent interface {
 	// 启动 Agent 守护协程，维持与 agent 的心跳
 	StartServe()
+
+	// 安排task
+	AssignTask(taskId string) error
 }
 
 type agentHolder struct {
@@ -24,16 +28,19 @@ type agentHolder struct {
 	lastSeqId  int64
 
 	hbAgent chan *models.HeartBeatFromAgent
-
-	mgr Mgr
 }
 
 func (ah *agentHolder) StartServe() {
 	go ah.serveLoop()
 }
 
+func (ah *agentHolder) AssignTask(taskId string) (err error) {
+	return
+}
+
 func (ah *agentHolder) serveLoop() {
-	tick := time.NewTicker(5 * time.Second)
+	defer ah.recoverWSPanic()
+
 	for {
 		select {
 		case msg := <-ah.hbAgent:
@@ -50,10 +57,10 @@ func (ah *agentHolder) serveLoop() {
 						}),
 				)
 			}
-		case <-tick.C:
+		case <-time.After(5 * time.Second):
 			{
 				logrus.Errorf("hb timeout, nodeId %s", ah.nodeId)
-				ah.mgr.RemoveNode(ah.nodeId)
+				mgrInstance.RemoveNode(ah.nodeId)
 				return
 			}
 		}
@@ -61,25 +68,28 @@ func (ah *agentHolder) serveLoop() {
 }
 
 func (ah *agentHolder) readHBLoop() {
+	defer ah.recoverWSPanic()
+
 	for {
 		hb := &models.HeartBeatFromAgent{}
-
-		if err := hbconn.ReadMessage(ah.conn, hb); err != nil {
-			logrus.Error(err)
-			continue
-		}
-
+		xerr.Must0(hbconn.ReadMessage(ah.conn, hb))
 		ah.hbAgent <- hb
 	}
 }
 
-func NewAgent(nodeId string, conn *websocket.Conn, mgr Mgr) (Agent, error) {
+func (ah *agentHolder) recoverWSPanic() {
+	if err := recover(); err != nil {
+		logrus.Error(string(debug.Stack()), err)
+		mgrInstance.RemoveNode(ah.nodeId)
+	}
+}
+
+func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	ah := &agentHolder{
 		conn:      conn,
 		nodeId:    nodeId,
 		hbAgent:   make(chan *models.HeartBeatFromAgent, 1),
 		lastSeqId: -1,
-		mgr:       mgr,
 	}
 	hbStart := &models.HeartBeatStart{}
 	err := hbconn.ReadMessage(ah.conn, hbStart)

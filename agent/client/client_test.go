@@ -5,6 +5,7 @@ import (
 	"Linda/protocol/models"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -26,12 +27,16 @@ func (s *agentCentralClientTestSuite) TestNormal() {
 	s.Nil(err)
 	s.Equal(models.OK, resp.Result)
 
-	serverHB, err := cli.HeartBeat(&models.HeartBeatFromAgent{
-		SeqId: 0,
-	})
+	for i := 0; i < 10; i++ {
+		serverHB, err := cli.HeartBeat(&models.HeartBeatFromAgent{
+			SeqId: int64(i),
+		})
 
-	s.Nil(err)
-	s.Equal(int64(0), serverHB.SeqId)
+		s.Nil(err)
+		s.Equal(int64(i), serverHB.SeqId)
+		<-time.After(3 * time.Second)
+	}
+
 	cli.Close()
 }
 
