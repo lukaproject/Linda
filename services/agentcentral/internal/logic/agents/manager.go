@@ -28,25 +28,31 @@ type agentsmgr struct {
 }
 
 func (mgr *agentsmgr) NewNode(nodeId string, w http.ResponseWriter, r *http.Request) {
-	var (
-		agent Agent = nil
-		err   error = nil
-	)
-
-	{
-		mgr.agentsRWMut.Lock()
-		defer mgr.agentsRWMut.Unlock()
-		if _, exist := mgr.agents[nodeId]; exist {
-			panic(errors.New("nodeId exists"))
-		}
-		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
-		if err != nil {
-			logrus.Error(err)
-			return
-		}
-		mgr.agents[nodeId] = agent
+	if agent, err := mgr.addNewNodeToMem(nodeId, w, r); err != nil {
+		logrus.Error(err)
+		return
+	} else {
+		agent.StartServe()
 	}
-	agent.StartServe()
+}
+
+func (mgr *agentsmgr) addNewNodeToMem(
+	nodeId string,
+	w http.ResponseWriter,
+	r *http.Request,
+) (agent Agent, err error) {
+	mgr.agentsRWMut.Lock()
+	defer mgr.agentsRWMut.Unlock()
+	if _, exist := mgr.agents[nodeId]; exist {
+		panic(errors.New("nodeId exists"))
+	}
+	agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+	mgr.agents[nodeId] = agent
+	return
 }
 
 func (mgr *agentsmgr) RemoveNode(nodeId string) error {
