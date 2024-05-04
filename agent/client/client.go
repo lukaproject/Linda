@@ -10,6 +10,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type IClient interface {
+	HeartBeat(*models.HeartBeatFromAgent) (*models.HeartBeatFromServer, error)
+	HeartBeatStart(*models.HeartBeatStart) (*models.HeartBeatStartResponse, error)
+}
+
 // 请注意，这并不是一个协程安全的client
 type Client struct {
 	conn *websocket.Conn
