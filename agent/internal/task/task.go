@@ -27,6 +27,8 @@ type TaskData struct {
 	TaskDir string
 }
 
+type TaskMetrics struct{}
+
 type Task interface {
 	GetName() string
 	GetBag() string
@@ -41,6 +43,7 @@ type Task interface {
 
 type task struct {
 	TaskData
+	TaskMetrics
 	isFinished bool
 	cmd        *exec.Cmd
 

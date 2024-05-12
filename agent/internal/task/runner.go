@@ -1,7 +1,6 @@
 package task
 
 import (
-	"errors"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -36,12 +35,12 @@ func (r *runner) CountRunningTasks() int {
 
 func (r *runner) AddTask(t Task) (err error) {
 	if int(r.ResourceCount.Load())+t.GetResource() > r.MaxResourceCount {
-		return errors.New("have no enough resource, retry later")
+		return ErrNoEnoughResource
 	}
 	r.runningTasksMapMut.Lock()
 	defer r.runningTasksMapMut.Unlock()
 	if _, ok := r.runningTasksMap[t.GetName()]; ok {
-		return errors.New("task exist now")
+		return ErrTaskExist
 	}
 	r.runningTasksMap[t.GetName()] = t
 	if err = t.Start(); err != nil {
@@ -50,6 +49,17 @@ func (r *runner) AddTask(t Task) (err error) {
 	r.ResourceCount.Add(int32(t.GetResource()))
 	go r.taskRunningCallback(t)
 	return
+}
+
+func (r *runner) GetTask(taskName string) (t Task, err error) {
+	r.runningTasksMapMut.RLock()
+	defer r.runningTasksMapMut.RUnlock()
+	var ok bool
+	t, ok = r.runningTasksMap[taskName]
+	if !ok {
+		return nil, ErrTaskNotExist
+	}
+	return t, nil
 }
 
 func (r *runner) taskRunningCallback(t Task) {
