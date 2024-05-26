@@ -8,7 +8,7 @@ import (
 )
 
 func EnableHealthCheck(r *mux.Router) {
-	r.HandleFunc("/api/healthcheck", healthCheck)
+	r.HandleFunc("/api/healthcheck", healthCheck).Methods(http.MethodPost)
 }
 
 // healthCheck godoc
@@ -19,10 +19,6 @@ func EnableHealthCheck(r *mux.Router) {
 //	@Produce		plain
 //	@Router			/healthcheck [post]
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
 	logrus.Debug("health check success!")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,7 +11,13 @@ import (
 
 	"Linda/services/agentcentral/apis"
 	_ "Linda/services/agentcentral/docs"
+	"Linda/services/agentcentral/internal/config"
+	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic"
+)
+
+var (
+	configfile = flag.String("f", "etc/agentcentral.json", "agent central config file")
 )
 
 // @title			AgentCentral API
@@ -21,19 +29,27 @@ import (
 // @license.url	http://www.apache.org/licenses/LICENSE-2.0.html
 // @BasePath		/api
 func main() {
+	flag.Parse()
+	config.Initial(*configfile)
+
 	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp: true,
 	})
+
+	db.InitialWithDSN(config.Instance().PGSQL_DSN)
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger").Handler(
 		httpSwagger.Handler()).Methods(http.MethodGet)
 
 	apis.EnableHeartBeat(r)
 	apis.EnableHealthCheck(r)
-	logic.InitAgentsMgr()
+	apis.EnableBags(r)
 
-	port := ":5883"
+	logic.InitAgentsMgr()
+	logic.InitTasksMgr()
+
+	port := fmt.Sprintf(":%d", config.Instance().Port)
 	logrus.Infof("serve in %s", port)
 	logrus.Fatal(http.ListenAndServe(port, r))
 }

@@ -1,4 +1,11 @@
 basePath: /api
+definitions:
+  apis.AddBagReq:
+    properties:
+      bagDisplayName:
+        example: test-bagDisplayName
+        type: string
+    type: object
 info:
   contact: {}
   description: This is agent central swagger API
@@ -9,6 +16,59 @@ info:
   title: AgentCentral API
   version: 0.dev
 paths:
+  /bags:
+    get:
+      consumes:
+      - application/json
+      description: get bag
+      produces:
+      - application/json
+      responses: {}
+      summary: get bag
+    post:
+      consumes:
+      - application/json
+      description: create a new bag
+      parameters:
+      - description: bag's request
+        in: body
+        name: bag
+        required: true
+        schema:
+          $ref: '#/definitions/apis.AddBagReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: add bag
+  /bags/{bagName}:
+    delete:
+      consumes:
+      - application/json
+      description: get bag
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: get bag
+    get:
+      consumes:
+      - application/json
+      description: get bag
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: get bag
   /healthcheck:
     post:
       consumes:

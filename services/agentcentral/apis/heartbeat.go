@@ -9,7 +9,7 @@ import (
 )
 
 func EnableHeartBeat(r *mux.Router) {
-	r.HandleFunc("/api/agent/heartbeat/{nodeId}", heartbeat)
+	r.HandleFunc("/api/agent/heartbeat/{nodeId}", heartbeat).Methods(http.MethodGet)
 }
 
 func heartbeat(w http.ResponseWriter, r *http.Request) {

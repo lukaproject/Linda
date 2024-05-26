@@ -2,9 +2,11 @@ package apis
 
 import (
 	"Linda/protocol/models"
+	"errors"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 // 用于放在各种 handlerFunc 中，对抛出的异常进行处理
@@ -13,11 +15,7 @@ func httpRecover(w http.ResponseWriter, _ *http.Request) {
 		switch err := e.(type) {
 		case error:
 			{
-				logrus.Error(err)
-				w.WriteHeader(http.StatusInternalServerError)
-				w.Write(models.Serialize(map[string]any{
-					"errormsg": err.Error(),
-				}))
+				processError(w, err)
 			}
 		default:
 			{
@@ -25,4 +23,17 @@ func httpRecover(w http.ResponseWriter, _ *http.Request) {
 			}
 		}
 	}
+}
+
+func processError(w http.ResponseWriter, err error) {
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		logrus.Debugf("record not found, write 404 NotFound, err is %v", err)
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	logrus.Error(err)
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write(models.Serialize(map[string]any{
+		"errormsg": err.Error(),
+	}))
 }

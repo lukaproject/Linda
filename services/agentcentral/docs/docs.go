@@ -20,6 +20,83 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/bags": {
+            "get": {
+                "description": "get bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get bag",
+                "responses": {}
+            },
+            "post": {
+                "description": "create a new bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "add bag",
+                "parameters": [
+                    {
+                        "description": "bag's request",
+                        "name": "bag",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddBagReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/bags/{bagName}": {
+            "get": {
+                "description": "get bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get bag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "description": "get bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get bag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/healthcheck": {
             "post": {
                 "description": "health check",
@@ -31,6 +108,17 @@ const docTemplate = `{
                 ],
                 "summary": "health check",
                 "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "apis.AddBagReq": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string",
+                    "example": "test-bagDisplayName"
+                }
             }
         }
     }

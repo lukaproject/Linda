@@ -1,6 +1,9 @@
 package logic
 
-import "Linda/services/agentcentral/internal/logic/agents"
+import (
+	"Linda/services/agentcentral/internal/logic/agents"
+	"Linda/services/agentcentral/internal/logic/tasks"
+)
 
 func AgentsMgr() agents.Mgr {
 	return agents.GetMgrInstance()
@@ -8,4 +11,8 @@ func AgentsMgr() agents.Mgr {
 
 func InitAgentsMgr() {
 	agents.InitMgrInstance()
+}
+
+func InitTasksMgr() {
+	tasks.InitMgrInstance()
 }

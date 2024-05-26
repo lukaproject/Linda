@@ -3,12 +3,13 @@ module Linda/protocol
 go 1.20
 
 require (
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.1
-	github.com/lukaproject/xerr v0.0.0-20240408154052-bb955a4d46a7
+	github.com/lukaproject/xerr v0.0.0-20240421043813-1557d9ea0e4d
 	github.com/sirupsen/logrus v1.9.3
 )
 
 require (
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 )
