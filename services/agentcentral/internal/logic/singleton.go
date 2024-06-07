@@ -14,5 +14,5 @@ func InitAgentsMgr() {
 }
 
 func InitTasksMgr() {
-	tasks.InitMgrInstance()
+	tasks.InitBagsMgrInstance()
 }

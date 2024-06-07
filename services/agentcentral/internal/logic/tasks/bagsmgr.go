@@ -7,22 +7,24 @@ import (
 	"github.com/lukaproject/xerr"
 )
 
-// Mgr
-// 这是用来管理tasks和bags的Mgr
-type Mgr interface {
+// BagsMgr
+// 这是用来管理bags的BagsMgr
+type BagsMgr interface {
 	AddBag(bag *models.Bag)
 	GetBag(bagName string) (*models.Bag, error)
 	DeleteBag(bagName string) error
+
+	GetTasksMgr(bagName string) TasksMgr
 }
 
-type manager struct{}
+type bagsManager struct{}
 
-func (mgr *manager) AddBag(bag *models.Bag) {
+func (mgr *bagsManager) AddBag(bag *models.Bag) {
 	dbi := db.Instance()
 	xerr.Must0(dbi.Save(bag).Error)
 }
 
-func (mgr *manager) GetBag(bagName string) (bag *models.Bag, err error) {
+func (mgr *bagsManager) GetBag(bagName string) (bag *models.Bag, err error) {
 	dbi := db.Instance()
 	bag = &models.Bag{
 		BagName: bagName,
@@ -31,6 +33,12 @@ func (mgr *manager) GetBag(bagName string) (bag *models.Bag, err error) {
 	return
 }
 
-func (mgr *manager) DeleteBag(bagName string) (err error) {
+func (mgr *bagsManager) DeleteBag(bagName string) (err error) {
 	return db.Instance().Delete(&models.Bag{BagName: bagName}).Error
+}
+
+func (mgr *bagsManager) GetTasksMgr(bagName string) TasksMgr {
+	return &tasksManager{
+		BagName: bagName,
+	}
 }

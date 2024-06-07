@@ -1,11 +1,11 @@
 package tasks
 
-var mgrInstance Mgr
+var bagsMgrInstance BagsMgr
 
-func GetMgrInstance() Mgr {
-	return mgrInstance
+func GetBagsMgrInstance() BagsMgr {
+	return bagsMgrInstance
 }
 
-func InitMgrInstance() {
-	mgrInstance = &manager{}
+func InitBagsMgrInstance() {
+	bagsMgrInstance = &bagsManager{}
 }

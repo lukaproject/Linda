@@ -28,4 +28,5 @@ func InitialWithDSN(dsn string) {
 
 	dbi = xerr.Must(gorm.Open(postgres.Open(dsn), &gorm.Config{}))
 	xerr.Must0(dbi.AutoMigrate(&models.Bag{}))
+	xerr.Must0(dbi.AutoMigrate(&models.Task{}))
 }

@@ -20,7 +20,7 @@ func EnableBags(r *mux.Router) {
 //
 //	@Summary		add bag
 //	@Description	create a new bag
-//	@Param			bag	body	apis.AddBagReq	true	"bag's request"
+//	@Param			addBagReq	body	apis.AddBagReq	true	"bag's request"
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags [post]
@@ -29,7 +29,7 @@ func addBag(w http.ResponseWriter, r *http.Request) {
 	bag := &AddBagReq{}
 	models.ReadJSON(r, bag)
 	bagModel := models.NewBag(bag.BagDisplayName)
-	tasks.GetMgrInstance().AddBag(bagModel)
+	tasks.GetBagsMgrInstance().AddBag(bagModel)
 	w.Write(models.Serialize(bagModel))
 }
 
@@ -44,7 +44,7 @@ func addBag(w http.ResponseWriter, r *http.Request) {
 func getBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
-	bagModel := xerr.Must(tasks.GetMgrInstance().GetBag(bagName))
+	bagModel := xerr.Must(tasks.GetBagsMgrInstance().GetBag(bagName))
 	w.Write(models.Serialize(bagModel))
 }
 
@@ -59,7 +59,7 @@ func getBag(w http.ResponseWriter, r *http.Request) {
 func deleteBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
-	xerr.Must0(tasks.GetMgrInstance().DeleteBag(bagName))
+	xerr.Must0(tasks.GetBagsMgrInstance().DeleteBag(bagName))
 }
 
 // list Bag godoc

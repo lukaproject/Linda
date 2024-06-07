@@ -44,7 +44,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "bag's request",
-                        "name": "bag",
+                        "name": "addBagReq",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -97,6 +97,66 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/bags/{bagName}/tasks": {
+            "post": {
+                "description": "add task",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "add task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "add tasks's request",
+                        "name": "addTaskReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddTaskReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/bags/{bagName}/tasks/{taskName}": {
+            "get": {
+                "description": "get task",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "task's name",
+                        "name": "taskName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/healthcheck": {
             "post": {
                 "description": "health check",
@@ -118,6 +178,23 @@ const docTemplate = `{
                 "bagDisplayName": {
                     "type": "string",
                     "example": "test-bagDisplayName"
+                }
+            }
+        },
+        "apis.AddTaskReq": {
+            "type": "object",
+            "properties": {
+                "scriptPath": {
+                    "type": "string",
+                    "example": "/bin/test.sh"
+                },
+                "taskDisplayName": {
+                    "type": "string",
+                    "example": "test-taskDisplayName"
+                },
+                "workingDir": {
+                    "type": "string",
+                    "example": "/bin/testWorkingDir/working"
                 }
             }
         }

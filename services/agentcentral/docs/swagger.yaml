@@ -6,6 +6,18 @@ definitions:
         example: test-bagDisplayName
         type: string
     type: object
+  apis.AddTaskReq:
+    properties:
+      scriptPath:
+        example: /bin/test.sh
+        type: string
+      taskDisplayName:
+        example: test-taskDisplayName
+        type: string
+      workingDir:
+        example: /bin/testWorkingDir/working
+        type: string
+    type: object
 info:
   contact: {}
   description: This is agent central swagger API
@@ -32,7 +44,7 @@ paths:
       parameters:
       - description: bag's request
         in: body
-        name: bag
+        name: addBagReq
         required: true
         schema:
           $ref: '#/definitions/apis.AddBagReq'
@@ -69,6 +81,47 @@ paths:
       - application/json
       responses: {}
       summary: get bag
+  /bags/{bagName}/tasks:
+    post:
+      consumes:
+      - application/json
+      description: add task
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      - description: add tasks's request
+        in: body
+        name: addTaskReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.AddTaskReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: add task
+  /bags/{bagName}/tasks/{taskName}:
+    get:
+      consumes:
+      - application/json
+      description: get task
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      - description: task's name
+        in: path
+        name: taskName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses: {}
+      summary: get task
   /healthcheck:
     post:
       consumes:

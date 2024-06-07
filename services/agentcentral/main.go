@@ -45,6 +45,7 @@ func main() {
 	apis.EnableHeartBeat(r)
 	apis.EnableHealthCheck(r)
 	apis.EnableBags(r)
+	apis.EnableTasks(r)
 
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()

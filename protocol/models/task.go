@@ -11,11 +11,18 @@ type Task struct {
 	TaskDisplayName string
 	BagName         string `gorm:"index"`
 	ScriptPath      string
+	Priority        int16
 	WorkingDir      string
-	AccessKey       string
 	CreateTimeMs    int64
 	FinishTimeMs    int64
 	ScheduledTimeMs int64
+
+	TaskBusiness
+}
+
+type TaskBusiness struct {
+	AccessKey string
+	OrderId   uint32 `gorm:"not null"`
 }
 
 func NewTask(taskDisplayName, bagName, scriptPath, workingDir string) (t *Task) {
