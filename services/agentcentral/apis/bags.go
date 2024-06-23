@@ -28,7 +28,7 @@ func addBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	bag := &AddBagReq{}
 	models.ReadJSON(r, bag)
-	bagModel := models.NewBag(bag.BagDisplayName)
+	bagModel := &models.Bag{BagDisplayName: bag.BagDisplayName}
 	tasks.GetBagsMgrInstance().AddBag(bagModel)
 	w.Write(models.Serialize(bagModel))
 }

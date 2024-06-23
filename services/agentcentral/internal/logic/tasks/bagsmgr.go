@@ -3,6 +3,7 @@ package tasks
 import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
+	"Linda/services/agentcentral/internal/logic/comm"
 
 	"github.com/lukaproject/xerr"
 )
@@ -17,24 +18,29 @@ type BagsMgr interface {
 	GetTasksMgr(bagName string) TasksMgr
 }
 
-type bagsManager struct{}
+type bagsManager struct {
+}
 
 func (mgr *bagsManager) AddBag(bag *models.Bag) {
-	dbi := db.Instance()
-	xerr.Must0(dbi.Save(bag).Error)
+	db.NewDBOperations().AddBag(bag)
+	comm.GetAsyncWorksInstance().AddBag(bag.BagName)
 }
 
 func (mgr *bagsManager) GetBag(bagName string) (bag *models.Bag, err error) {
-	dbi := db.Instance()
-	bag = &models.Bag{
-		BagName: bagName,
-	}
-	err = dbi.First(bag).Error
+	func() {
+		xerr.Recover(&err)
+		bag = db.NewDBOperations().GetBagByBagName(bagName)
+	}()
 	return
 }
 
 func (mgr *bagsManager) DeleteBag(bagName string) (err error) {
-	return db.Instance().Delete(&models.Bag{BagName: bagName}).Error
+	func() {
+		xerr.Recover(&err)
+		db.NewDBOperations().DeleteBagByBagName(bagName)
+		comm.GetAsyncWorksInstance().DeleteBag(bagName)
+	}()
+	return
 }
 
 func (mgr *bagsManager) GetTasksMgr(bagName string) TasksMgr {

@@ -49,6 +49,7 @@ func main() {
 
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()
+	logic.InitAsyncWorks()
 
 	port := fmt.Sprintf(":%d", config.Instance().Port)
 	logrus.Infof("serve in %s", port)

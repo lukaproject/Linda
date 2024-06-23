@@ -29,7 +29,7 @@
 |ScriptPath| string | 需要执行的脚本的位置 |
 |WorkingDir| string | 脚本的运行位置 |
 |Priority| int16 | 任务的优先级（默认为1, 最大限制为10000） |
-|OrderId| uint32 | 任务创建的顺序Id（从1开始，表示是当前bag的第几个任务） |
+|OrderId| uint32 | 任务入队的顺序Id |
 |AccessKey | string | 访问权限密钥 |
 |CreateTimeMs|int64| Task创建的时间 |
 |FinishTimeMs|int64| Task结束的时间 |

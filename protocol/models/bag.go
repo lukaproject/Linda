@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Bag struct {
@@ -13,12 +14,15 @@ type Bag struct {
 	UpdateTimeMs   int64
 }
 
-func NewBag(bagDisplayName string) *Bag {
+func (b *Bag) BeforeCreate(tx *gorm.DB) (err error) {
+	b.BagName = uuid.NewString()
 	createTimeMs := time.Now().UnixMilli()
-	return &Bag{
-		BagName:        uuid.NewString(),
-		BagDisplayName: bagDisplayName,
-		CreateTimeMs:   createTimeMs,
-		UpdateTimeMs:   createTimeMs,
-	}
+	b.CreateTimeMs = createTimeMs
+	b.UpdateTimeMs = createTimeMs
+	return
+}
+
+func (b *Bag) BeforeSave(tx *gorm.DB) (err error) {
+	b.UpdateTimeMs = time.Now().UnixMilli()
+	return
 }

@@ -2,6 +2,7 @@ package logic
 
 import (
 	"Linda/services/agentcentral/internal/logic/agents"
+	"Linda/services/agentcentral/internal/logic/comm"
 	"Linda/services/agentcentral/internal/logic/tasks"
 )
 
@@ -15,4 +16,8 @@ func InitAgentsMgr() {
 
 func InitTasksMgr() {
 	tasks.InitBagsMgrInstance()
+}
+
+func InitAsyncWorks() {
+	comm.InitAsyncWorksInstance()
 }

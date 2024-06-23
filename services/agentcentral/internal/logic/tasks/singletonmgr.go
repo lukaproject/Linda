@@ -1,6 +1,8 @@
 package tasks
 
-var bagsMgrInstance BagsMgr
+var (
+	bagsMgrInstance BagsMgr
+)
 
 func GetBagsMgrInstance() BagsMgr {
 	return bagsMgrInstance

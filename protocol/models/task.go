@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Task struct {
@@ -22,18 +23,11 @@ type Task struct {
 
 type TaskBusiness struct {
 	AccessKey string
-	OrderId   uint32 `gorm:"not null"`
+	OrderId   uint32
 }
 
-func NewTask(taskDisplayName, bagName, scriptPath, workingDir string) (t *Task) {
-	createTimeMs := time.Now().UnixMilli()
-	t = &Task{
-		TaskName:        uuid.NewString(),
-		TaskDisplayName: taskDisplayName,
-		BagName:         bagName,
-		ScriptPath:      scriptPath,
-		WorkingDir:      workingDir,
-		CreateTimeMs:    createTimeMs,
-	}
+func (t *Task) BeforeCreate(tx *gorm.DB) (err error) {
+	t.CreateTimeMs = time.Now().UnixMilli()
+	t.TaskName = uuid.NewString()
 	return
 }

@@ -3,8 +3,7 @@ package tasks
 import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
-
-	"github.com/lukaproject/xerr"
+	"Linda/services/agentcentral/internal/logic/comm"
 )
 
 type TasksMgr interface {
@@ -17,15 +16,11 @@ type tasksManager struct {
 }
 
 func (m *tasksManager) AddTask(task *models.Task) {
-	dbi := db.Instance()
-	xerr.Must0(dbi.Save(task).Error)
+	db.NewDBOperations().AddTask(task)
+	go comm.GetAsyncWorksInstance().TaskEnque(task.TaskName, task.BagName)
 }
 
 func (m *tasksManager) GetTask(taskName string) (task *models.Task) {
-	dbi := db.Instance()
-	task = &models.Task{
-		TaskName: taskName,
-	}
-	xerr.Must0(dbi.First(task).Error)
+	task = db.NewDBOperations().GetTaskByTaskNameAndBagName(taskName, m.BagName)
 	return
 }

@@ -28,12 +28,12 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 	bagName := mux.Vars(r)["bagName"]
 	addTaskReq := &AddTaskReq{}
 	models.ReadJSON(r, addTaskReq)
-	task := models.NewTask(
-		addTaskReq.TaskDisplayName,
-		bagName,
-		addTaskReq.ScriptPath,
-		addTaskReq.WorkingDir,
-	)
+	task := &models.Task{
+		TaskDisplayName: addTaskReq.TaskDisplayName,
+		BagName:         bagName,
+		ScriptPath:      addTaskReq.ScriptPath,
+		WorkingDir:      addTaskReq.WorkingDir,
+	}
 
 	tasks.
 		GetBagsMgrInstance().
