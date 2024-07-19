@@ -1,6 +1,7 @@
 package agents
 
 import (
+	"Linda/services/agentcentral/internal/logic/comm"
 	"errors"
 	"net/http"
 	"sync"
@@ -41,17 +42,17 @@ func (mgr *agentsmgr) addNewNodeToMem(
 	w http.ResponseWriter,
 	r *http.Request,
 ) (agent Agent, err error) {
-	mgr.agentsRWMut.Lock()
-	defer mgr.agentsRWMut.Unlock()
-	if _, exist := mgr.agents[nodeId]; exist {
-		panic(errors.New("nodeId exists"))
-	}
-	agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
-	if err != nil {
-		logrus.Error(err)
-		return
-	}
-	mgr.agents[nodeId] = agent
+	comm.NewRLocker(&mgr.agentsRWMut).Run(func() {
+		if _, exist := mgr.agents[nodeId]; exist {
+			panic(errors.New("nodeId exists"))
+		}
+		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
+		if err != nil {
+			logrus.Error(err)
+			return
+		}
+		mgr.agents[nodeId] = agent
+	})
 	return
 }
 

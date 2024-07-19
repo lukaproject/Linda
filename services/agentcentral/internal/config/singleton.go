@@ -29,5 +29,10 @@ func defaultConfig() *Config {
 	return &Config{
 		PGSQL_DSN: "host=localhost user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai",
 		Port:      5883,
+		Redis: &RedisConfig{
+			Addrs:    []string{"localhost:16379"},
+			Db:       1,
+			Password: "123456",
+		},
 	}
 }

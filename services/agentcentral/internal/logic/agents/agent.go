@@ -3,6 +3,8 @@ package agents
 import (
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/config"
+	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 	"runtime/debug"
 	"time"
 
@@ -24,10 +26,12 @@ type agentHolder struct {
 	nodeId string
 	bagId  string
 
-	lastHBTime time.Time
-	lastSeqId  int64
+	lastHBTime      time.Time
+	lastSeqId       int64
+	maxRunningTasks int
 
-	hbAgent chan *models.HeartBeatFromAgent
+	hbAgent     chan *models.HeartBeatFromAgent
+	tasksClient taskqueueclient.Client
 }
 
 func (ah *agentHolder) StartServe() {
@@ -48,14 +52,8 @@ func (ah *agentHolder) serveLoop() {
 				logrus.Infof("seqid %d", msg.SeqId)
 				ah.lastSeqId = msg.SeqId
 				ah.lastHBTime = time.Now()
-
-				xerr.Must0(
-					hbconn.WriteMessage(
-						ah.conn,
-						&models.HeartBeatFromServer{
-							SeqId: msg.SeqId,
-						}),
-				)
+				hbFromServer := ah.packHeartBeatResponse(msg)
+				xerr.Must0(hbconn.WriteMessage(ah.conn, hbFromServer))
 			}
 		case <-time.After(5 * time.Second):
 			{
@@ -84,12 +82,20 @@ func (ah *agentHolder) recoverWSPanic() {
 	}
 }
 
+func (ah *agentHolder) packHeartBeatResponse(hbFromAgent *models.HeartBeatFromAgent) (hb *models.HeartBeatFromServer) {
+	hb = &models.HeartBeatFromServer{
+		SeqId: hbFromAgent.SeqId,
+	}
+	return hb
+}
+
 func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	ah := &agentHolder{
-		conn:      conn,
-		nodeId:    nodeId,
-		hbAgent:   make(chan *models.HeartBeatFromAgent, 1),
-		lastSeqId: -1,
+		conn:        conn,
+		nodeId:      nodeId,
+		hbAgent:     make(chan *models.HeartBeatFromAgent, 1),
+		lastSeqId:   -1,
+		tasksClient: taskqueueclient.NewRedisTaskQueueClient(config.TestConfig().Redis),
 	}
 	hbStart := &models.HeartBeatStart{}
 	err := hbconn.ReadMessage(ah.conn, hbStart)
@@ -100,6 +106,7 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	logrus.Debugf("nodeId %s, BagId %s", nodeId, hbStart.Node.BagId)
 	ah.bagId = hbStart.Node.BagId
 	ah.lastHBTime = time.Now()
+	ah.maxRunningTasks = max(hbStart.Node.MaxRunningTasks, 1)
 	err = hbconn.WriteMessage(ah.conn, &models.HeartBeatStartResponse{
 		Result: models.OK,
 	})

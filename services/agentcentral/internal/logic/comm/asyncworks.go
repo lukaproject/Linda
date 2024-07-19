@@ -32,10 +32,6 @@ func (aw *AsyncWorks) TaskEnque(
 		})
 }
 
-func (aw *AsyncWorks) TaskDeque() {
-
-}
-
 // operations for locks, so it is not a async method.
 
 // bags locks CURD.

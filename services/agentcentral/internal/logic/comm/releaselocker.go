@@ -3,10 +3,10 @@ package comm
 import "sync"
 
 type ReleaseLocker struct {
-	Mut *sync.Mutex
+	Mut sync.Locker
 }
 
-func NewRLocker(mut *sync.Mutex) *ReleaseLocker {
+func NewRLocker(mut sync.Locker) *ReleaseLocker {
 	return &ReleaseLocker{Mut: mut}
 }
 

@@ -22,7 +22,7 @@ type HeartBeatFromAgent struct {
 type HeartBeatFromServer struct {
 	SeqId int64
 
-	ScheduledTaskIds []string
+	ScheduledTaskNames []string
 
 	IsHeartBeatEnd bool
 	HeartBeatEnd   HeartBeatEnd

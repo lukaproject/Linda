@@ -1,0 +1,1 @@
+alias gonow='go1.21.12'

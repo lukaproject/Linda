@@ -4,15 +4,20 @@ import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
+	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 )
 
 type TasksMgr interface {
+	// 新增一个task
 	AddTask(task *models.Task)
+
+	// 读取task内容
 	GetTask(taskName string) *models.Task
 }
 
 type tasksManager struct {
 	BagName string
+	queCli  taskqueueclient.Client
 }
 
 func (m *tasksManager) AddTask(task *models.Task) {
