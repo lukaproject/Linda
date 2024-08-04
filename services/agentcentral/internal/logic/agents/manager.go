@@ -43,6 +43,7 @@ func (mgr *agentsmgr) addNewNodeToMem(
 	r *http.Request,
 ) (agent Agent, err error) {
 	comm.NewRLocker(&mgr.agentsRWMut).Run(func() {
+		// logrus.Infof("validate new node %s", nodeId)
 		if _, exist := mgr.agents[nodeId]; exist {
 			panic(errors.New("nodeId exists"))
 		}

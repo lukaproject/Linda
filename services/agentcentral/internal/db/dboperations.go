@@ -35,7 +35,7 @@ func (dbo *DBOperations) GetBagEnqueuedTaskNumber(bagName string) uint32 {
 		Table("tasks").
 		Select("COUNT(*)").
 		Where("bag_name = ?", bagName).
-		Where("order_id is not NULL").
+		Where("order_id IS NOT NULL").
 		Where("order_id != 0").
 		Scan(&countType).Error)
 	return countType.Count
@@ -52,6 +52,30 @@ func (dbo *DBOperations) AddTask(task *models.Task) {
 	xerr.Must0(dbo.dbi.Create(task).Error)
 }
 
+func (dbo *DBOperations) UpdateTasksFinishTime(bagName string, taskNames []string, finishTimeMs int64) {
+	xerr.Must0(dbo.dbi.
+		Model(&models.Task{}).
+		Where("task_name IN ?", taskNames).
+		Where("order_id IS NOT NULL").
+		Where("order_id != 0").
+		Update("finish_time_ms", finishTimeMs).
+		Error)
+}
+
+func (dbo *DBOperations) UpdateTasksScheduledTime(bagName string, taskNames []string, nodeId string, scheduledTimeMs int64) {
+	xerr.Must0(dbo.dbi.
+		Model(&models.Task{}).
+		Where("task_name IN ?", taskNames).
+		Where("order_id IS NOT NULL").
+		Where("order_id != 0").
+		Where("finish_time_ms IS NOT NULL").
+		Updates(map[string]any{
+			"scheduled_time_ms": scheduledTimeMs,
+			"node_id":           nodeId,
+		}).
+		Error)
+}
+
 func (dbo *DBOperations) GetTaskByTaskNameAndBagName(taskName string, bagName string) (task *models.Task) {
 	task = &models.Task{}
 	xerr.Must0(dbo.dbi.
@@ -65,7 +89,7 @@ func (dbo *DBOperations) GetTaskByMultiFields(fieldsMap map[string]any) (tasksRe
 	tasksResult = make([]*models.Task, 0)
 	xerr.Must0(dbo.dbi.
 		Where(fieldsMap).
-		Find(tasksResult).Error)
+		Find(&tasksResult).Error)
 	return
 }
 

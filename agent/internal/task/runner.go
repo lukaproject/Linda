@@ -10,8 +10,10 @@ import (
 
 type runner struct {
 	FinishedTasksCount atomic.Int32
-	ResourceCount      atomic.Int32
-	MaxResourceCount   int
+	// 完成的任务会被塞入这个channel中
+	FinishedTaskChan chan string
+	ResourceCount    atomic.Int32
+	MaxResourceCount int
 
 	runningTasksMapMut sync.RWMutex
 	// 任务名字与任务的映射
@@ -22,6 +24,7 @@ func NewRunner(initer RunnerIniter) *runner {
 	runner := &runner{
 		runningTasksMap:  make(map[string]Task),
 		MaxResourceCount: initer.MaxResourceCount,
+		FinishedTaskChan: make(chan string, 32),
 	}
 	runner.initial()
 	return runner

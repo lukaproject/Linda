@@ -31,6 +31,7 @@
 |Priority| int16 | 任务的优先级（默认为1, 最大限制为10000, Priority越小，优先级越高） |
 |OrderId| uint32 | 任务入队的顺序Id |
 |AccessKey | string | 访问权限密钥 |
+|NodeId | string | 任务执行的node的id |
 |CreateTimeMs|int64| Task创建的时间 |
 |FinishTimeMs|int64| Task结束的时间 |
 |ScheduledTimeMs|int64| Task被调度的时间 |

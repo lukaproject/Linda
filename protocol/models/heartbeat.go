@@ -13,8 +13,8 @@ type HeartBeatStartResponse struct {
 type HeartBeatFromAgent struct {
 	SeqId int64
 
-	RunningTaskIds  []string
-	FinishedTaskIds []string
+	RunningTaskNames  []string
+	FinishedTaskNames []string
 
 	Memory MemoryInfo
 }

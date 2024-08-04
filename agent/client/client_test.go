@@ -21,7 +21,7 @@ func (s *agentCentralClientTestSuite) TestNormal() {
 	s.Nil(err)
 	resp, err := cli.HeartBeatStart(&models.HeartBeatStart{
 		Node: models.NodeInfo{
-			BagId: "testbagid",
+			BagName: "testbagid",
 		},
 	})
 	s.Nil(err)

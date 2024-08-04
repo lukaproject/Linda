@@ -17,6 +17,7 @@ type Task struct {
 	CreateTimeMs    int64
 	FinishTimeMs    int64
 	ScheduledTimeMs int64
+	NodeId          string
 
 	TaskBusiness
 }

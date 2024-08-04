@@ -27,7 +27,7 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 
 	bagName := mux.Vars(r)["bagName"]
 	addTaskReq := &AddTaskReq{}
-	models.ReadJSON(r, addTaskReq)
+	models.ReadJSON(r.Body, addTaskReq)
 	task := &models.Task{
 		TaskDisplayName: addTaskReq.TaskDisplayName,
 		BagName:         bagName,

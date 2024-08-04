@@ -6,4 +6,5 @@ use (
 	./services/agentcentral
 	./baselibs/abstractions
 	./baselibs/codes
+	./baselibs/testcommon
 )

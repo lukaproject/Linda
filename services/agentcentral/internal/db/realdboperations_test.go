@@ -6,6 +6,7 @@ import (
 	"Linda/services/agentcentral/internal/db"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
@@ -90,6 +91,46 @@ func (s *realDBOperationsTestSuite) TestGetBagEnqueuedTaskNumber() {
 	for i := 0; i < n; i++ {
 		task := dbo.GetTaskByTaskNameAndBagName(taskNames[i], bagName)
 		s.Equal(uint32(i)+1, task.OrderId)
+	}
+}
+
+func (s *realDBOperationsTestSuite) TestTaskScheduledAndFinishScenario() {
+	dbo := db.NewDBOperations()
+	n := 10
+	taskNames := make([]string, n)
+	bagName := "test-task-scheduled-finished-scenario"
+	for i := 0; i < n; i++ {
+		task := &models.Task{
+			TaskDisplayName: fmt.Sprintf("testtask-%d", i),
+			BagName:         bagName,
+			ScriptPath:      "/bin/task.sh",
+			WorkingDir:      "bin/workingdir",
+		}
+		dbo.AddTask(task)
+		s.NotNil(task.TaskName)
+		s.True(task.CreateTimeMs != 0)
+		taskNames[i] = task.TaskName
+	}
+	for i := 0; i < n; i++ {
+		dbo.UpdateTaskOrderId(
+			bagName,
+			taskNames[i],
+			dbo.GetBagEnqueuedTaskNumber(bagName)+1,
+		)
+	}
+	nodeId := "test-bag-nodeid"
+	scheduledTime := time.Now().UnixMilli()
+	finishTime := time.Now().UnixMilli()
+	dbo.UpdateTasksScheduledTime(bagName, taskNames, nodeId, scheduledTime)
+	dbo.UpdateTasksFinishTime(bagName, taskNames, finishTime)
+	taskResults := dbo.GetTaskByMultiFields(map[string]any{
+		"bag_name": bagName,
+		"node_id":  nodeId,
+	})
+	s.Len(taskResults, n)
+	for _, task := range taskResults {
+		s.Equal(finishTime, task.FinishTimeMs)
+		s.Equal(scheduledTime, task.ScheduledTimeMs)
 	}
 }
 

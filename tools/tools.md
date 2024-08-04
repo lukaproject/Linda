@@ -9,9 +9,15 @@ go1.21.12 download
 ```
 
 ## ENV
+### build ENV
+
 - go version 1.21+, 目前是 go1.21.12
 - 使用installswag.sh 安装 swag
 - run
 ```bash
 source .profile
 ```
+
+### external dependencies
+
+需要docker环境，docker中安装pgsql / redis. 目前使用的pgsql版本为15，redis版本为7.0

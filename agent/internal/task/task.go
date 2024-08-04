@@ -2,6 +2,7 @@ package task
 
 import (
 	"Linda/agent/internal/utils"
+	"Linda/protocol/models"
 	"errors"
 	"os"
 	"os/exec"
@@ -25,6 +26,14 @@ type TaskData struct {
 	WorkingDir string
 	// task data located dir, such as stdout / stderr or others.
 	TaskDir string
+}
+
+func (t *TaskData) FromTaskModel(taskModel *models.Task) {
+	t.Bag = taskModel.BagName
+	t.Name = taskModel.TaskName
+	t.PathToScript = taskModel.ScriptPath
+	t.WorkingDir = taskModel.WorkingDir
+	t.Resource = 1
 }
 
 type TaskMetrics struct{}

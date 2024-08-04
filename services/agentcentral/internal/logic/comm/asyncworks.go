@@ -3,6 +3,7 @@ package comm
 import (
 	"Linda/services/agentcentral/internal/db"
 	"sync"
+	"time"
 
 	"github.com/lukaproject/xerr"
 	"github.com/sirupsen/logrus"
@@ -30,6 +31,14 @@ func (aw *AsyncWorks) TaskEnque(
 			dbo.UpdateTaskOrderId(bagName, taskName, uint32(count)+1)
 			logrus.Infof("bag %s, task %s, enque success", bagName, taskName)
 		})
+}
+
+func (aw *AsyncWorks) PersistFinishedTasks(bagName string, taskNames []string) {
+	db.NewDBOperations().UpdateTasksFinishTime(bagName, taskNames, time.Now().UnixMilli())
+}
+
+func (aw *AsyncWorks) PersistScheduledTasks(bagName string, taskNames []string, nodeId string) {
+	db.NewDBOperations().UpdateTasksScheduledTime(bagName, taskNames, nodeId, time.Now().UnixMilli())
 }
 
 // operations for locks, so it is not a async method.
