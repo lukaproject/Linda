@@ -1,21 +1,23 @@
 package config
 
-import "fmt"
-
 type Config struct {
-	AgentCentralUrlFormat string
+	AgentCentralUrlPrefix string
 	BagName               string
+	NodeId                string
 }
 
 func (c *Config) AgentCentralUrl() string {
-	return fmt.Sprintf(c.AgentCentralUrlFormat, c.BagName)
+	return c.AgentCentralUrlPrefix + c.NodeId
 }
 
 func (c *Config) Merge(other *Config) {
-	if other.AgentCentralUrlFormat != "" {
-		c.AgentCentralUrlFormat = other.AgentCentralUrlFormat
+	if other.AgentCentralUrlPrefix != "" {
+		c.AgentCentralUrlPrefix = other.AgentCentralUrlPrefix
 	}
 	if other.BagName != "" {
 		c.BagName = other.BagName
+	}
+	if other.NodeId != "" {
+		c.NodeId = other.NodeId
 	}
 }

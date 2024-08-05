@@ -2,6 +2,7 @@ package client_test
 
 import (
 	"Linda/agent/client"
+	"Linda/baselibs/testcommon/testenv"
 	"Linda/protocol/models"
 	"fmt"
 	"testing"
@@ -42,7 +43,7 @@ func (s *agentCentralClientTestSuite) TestNormal() {
 
 func TestAgentCentralClient(t *testing.T) {
 
-	if !client.HealthCheck("http://localhost:5883/api/healthcheck") {
+	if !testenv.HealthCheck("http://localhost:5883/api/healthcheck") {
 		// skip e2e tests
 		t.Skip("dev-env is not available, skip")
 		return

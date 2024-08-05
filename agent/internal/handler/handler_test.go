@@ -1,10 +1,11 @@
 package handler_test
 
 import (
-	"Linda/agent/client"
 	"Linda/agent/internal/config"
 	"Linda/agent/internal/handler"
+	"Linda/baselibs/testcommon/testenv"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -15,11 +16,12 @@ type testHandlerSuite struct {
 
 func (s *testHandlerSuite) TestNormal() {
 	h := handler.NewHandler(config.TestConfig())
-	h.Run()
+	h.Start()
+	<-time.After(20 * time.Second)
 }
 
 func TestHandler(t *testing.T) {
-	if !client.HealthCheck("http://localhost:5883/api/healthcheck") {
+	if !testenv.HealthCheck("http://localhost:5883/api/healthcheck") {
 		// skip e2e tests
 		t.Skip("dev-env is not available, skip")
 		return

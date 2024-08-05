@@ -27,6 +27,6 @@ func Initial(configfile string) {
 
 func defaultConfig() *Config {
 	return &Config{
-		AgentCentralUrlFormat: "localhost:5883",
+		AgentCentralUrlPrefix: "ws://localhost:5883/api/agent/heartbeat/",
 	}
 }
