@@ -1,6 +1,7 @@
 package config
 
 import (
+	"Linda/baselibs/abstractions/defaultor"
 	"encoding/json"
 	"io"
 	"os"
@@ -8,7 +9,7 @@ import (
 	"github.com/lukaproject/xerr"
 )
 
-var c *Config = defaultConfig()
+var c *Config = defaultor.New[Config]()
 
 func Instance() *Config {
 	return c
@@ -22,17 +23,5 @@ func Initial(configfile string) {
 			xerr.Must(os.Open(configfile)),
 		)), &fromfile)
 		c.Merge(&fromfile)
-	}
-}
-
-func defaultConfig() *Config {
-	return &Config{
-		PGSQL_DSN: "host=localhost user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai",
-		Port:      5883,
-		Redis: &RedisConfig{
-			Addrs:    []string{"localhost:16379"},
-			Db:       1,
-			Password: "123456",
-		},
 	}
 }
