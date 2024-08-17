@@ -35,7 +35,7 @@ func (m *Mgr) fetchTaskDataByTaskName(taskName string) (data TaskData) {
 	resp := xerr.Must(http.Get(
 		fmt.Sprintf(
 			"http://%s/bags/%s/tasks/%s",
-			config.Instance().AgentCentralUrlPrefix, config.Instance().BagName, taskName)))
+			config.Instance().AgentCentralEndPoint, config.Instance().BagName, taskName)))
 	t := &models.Task{}
 	models.ReadJSON(resp.Body, t)
 	data.FromTaskModel(t)

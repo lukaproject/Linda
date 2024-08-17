@@ -4,14 +4,14 @@ import (
 	"reflect"
 )
 
-// walkFuncType
-// params:
-// for each one reflect items, the params's means:
-// fieldName 	string
-// fieldTag 	reflect.StructTag
-// type 		reflect.Type
-// value 		reflect.Value
-type walkFuncType = func(string, reflect.StructTag, reflect.Type, reflect.Value)
+type WalkFuncInput struct {
+	FieldName string
+	FieldTag  reflect.StructTag
+	Type      reflect.Type
+	Value     reflect.Value
+}
+
+type walkFuncType = func(WalkFuncInput)
 
 // WalkVaules
 // 递归遍历x及其参数的所有参数，对每一个参数执行walkFunc
@@ -24,7 +24,7 @@ func WalkValues(x any, walkFunc walkFuncType) {
 }
 
 func walkValuesImpl(fieldName string, tags reflect.StructTag, t reflect.Type, v reflect.Value, walkFunc walkFuncType) {
-	walkFunc(fieldName, tags, t, v)
+	walkFunc(WalkFuncInput{fieldName, tags, t, v})
 	if v.Kind() == reflect.Ptr {
 		if v.IsNil() {
 			v.Set(reflect.New(t.Elem()))

@@ -1,0 +1,14 @@
+version: '3'
+# use this compose to start a test agents cluster.
+services:
+  agents-cluster:
+    image: linda-agent:latest
+    restart: always
+    environment:
+      - 'LINDA_AGENT_CENTRAL_ENDPOINT={{ Agent central endpoint }}'
+      - 'LINDA_BAG_NAME={{ bag name }}'
+      - 'LINDA_NODE_ID={{ node id }}'
+    deploy:
+      resources:
+        limits:
+          memory: 512M

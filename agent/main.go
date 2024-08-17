@@ -6,7 +6,6 @@ import (
 )
 
 func main() {
-	config.Initial()
 	h := handler.NewHandler(config.Instance())
 	h.Run()
 }

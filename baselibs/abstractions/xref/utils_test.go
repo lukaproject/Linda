@@ -24,13 +24,14 @@ func (s *testXrefUtilsSuite) TestWalk() {
 	}
 
 	testStruct := &TestStruct{}
-	xref.WalkValues(testStruct, func(fieldName string, tags reflect.StructTag, t reflect.Type, v reflect.Value) {
+	xref.WalkValues(testStruct, func(input xref.WalkFuncInput) {
+		f, tags, v := input.FieldName, input.FieldTag, input.Value
 		tagValue, ok := tags.Lookup("xenv")
 		if ok {
-			if fieldName == "A" {
+			if f == "A" {
 				s.Equal("linda_test_rp", tagValue)
 			}
-			if fieldName == "X" {
+			if f == "X" {
 				s.Equal("inner_x", tagValue)
 			}
 		}

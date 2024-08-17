@@ -7,8 +7,8 @@ import (
 
 func TestConfig() *Config {
 	return &Config{
-		AgentCentralUrlPrefix: "ws://localhost:5883/api/agent/heartbeat/",
-		BagName:               "test-bagname",
-		NodeId:                "test-bagname-" + strconv.Itoa(rand.Int()),
+		AgentCentralEndPoint: "localhost:5883",
+		BagName:              "test-bagname",
+		NodeId:               "test-bagname-" + strconv.Itoa(rand.Int()),
 	}
 }

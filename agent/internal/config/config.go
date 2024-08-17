@@ -1,18 +1,20 @@
 package config
 
+import "fmt"
+
 type Config struct {
-	AgentCentralUrlPrefix string
-	BagName               string
-	NodeId                string
+	AgentCentralEndPoint string `xdefault:"localhost:5883" xenv:"LINDA_AGENT_CENTRAL_ENDPOINT"`
+	BagName              string `xdefault:"testbag" xenv:"LINDA_BAG_NAME"`
+	NodeId               string `xdefault:"testnodeid-1" xenv:"LINDA_NODE_ID"`
 }
 
 func (c *Config) AgentCentralUrl() string {
-	return c.AgentCentralUrlPrefix + c.NodeId
+	return fmt.Sprintf("ws://%s/api/agent/heartbeat/%s", c.AgentCentralEndPoint, c.NodeId)
 }
 
 func (c *Config) Merge(other *Config) {
-	if other.AgentCentralUrlPrefix != "" {
-		c.AgentCentralUrlPrefix = other.AgentCentralUrlPrefix
+	if other.AgentCentralEndPoint != "" {
+		c.AgentCentralEndPoint = other.AgentCentralEndPoint
 	}
 	if other.BagName != "" {
 		c.BagName = other.BagName
