@@ -9,6 +9,11 @@ import (
 	"github.com/lukaproject/xerr"
 )
 
+type IMgr interface {
+	AddTask(taskName string)
+	PopFinishedTasks() (finishedTaskNames []string)
+}
+
 type Mgr struct {
 	taskRunner *runner
 }
@@ -42,7 +47,7 @@ func (m *Mgr) fetchTaskDataByTaskName(taskName string) (data TaskData) {
 	return
 }
 
-func NewMgr() *Mgr {
+func NewMgr() IMgr {
 	runnerIniter := RunnerIniter{
 		MaxResourceCount: 1,
 	}

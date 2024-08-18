@@ -15,7 +15,7 @@ type Handler struct {
 	cli     client.IClient
 	seqId   int64
 	bagName string
-	taskMgr *task.Mgr
+	taskMgr task.IMgr
 }
 
 func (h *Handler) Start() {
