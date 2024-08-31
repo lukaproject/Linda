@@ -1,5 +1,10 @@
+//go:generate swag init
 package main
 
+// generate swagger:
+// gonow generate ./...
+// build dist:
+// gonow build -o bin/agentcentral
 import (
 	"flag"
 	"fmt"
@@ -10,6 +15,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
 	"Linda/services/agentcentral/apis"
+	"Linda/services/agentcentral/apis/middlewares"
 	_ "Linda/services/agentcentral/docs"
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
@@ -46,6 +52,7 @@ func main() {
 	apis.EnableHealthCheck(r)
 	apis.EnableBags(r)
 	apis.EnableTasks(r)
+	r.Use(middlewares.SetHeaderJSON)
 
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()

@@ -1,0 +1,11 @@
+version: '3'
+# use this compose to start a test agentcentral.
+services:
+  agentcentral:
+    image: linda-agentcentral:latest
+    restart: always
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          memory: 1024M

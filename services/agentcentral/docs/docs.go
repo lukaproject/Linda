@@ -22,15 +22,22 @@ const docTemplate = `{
     "paths": {
         "/bags": {
             "get": {
-                "description": "get bag",
+                "description": "list bag",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get bag",
-                "responses": {}
+                "summary": "list bag [no implementation]",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.ListBagsResp"
+                        }
+                    }
+                }
             },
             "post": {
                 "description": "create a new bag",
@@ -52,7 +59,14 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddBagResp"
+                        }
+                    }
+                }
             }
         },
         "/bags/{bagName}": {
@@ -74,17 +88,24 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.GetBagResp"
+                        }
+                    }
+                }
             },
             "delete": {
-                "description": "get bag",
+                "description": "delete bag",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "get bag",
+                "summary": "delete bag",
                 "parameters": [
                     {
                         "type": "string",
@@ -94,7 +115,14 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.DeleteBagResp"
+                        }
+                    }
+                }
             }
         },
         "/bags/{bagName}/tasks": {
@@ -125,7 +153,14 @@ const docTemplate = `{
                         }
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddTaskResp"
+                        }
+                    }
+                }
             }
         },
         "/bags/{bagName}/tasks/{taskName}": {
@@ -154,7 +189,14 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
-                "responses": {}
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.GetTaskResp"
+                        }
+                    }
+                }
             }
         },
         "/healthcheck": {
@@ -181,6 +223,23 @@ const docTemplate = `{
                 }
             }
         },
+        "apis.AddBagResp": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string"
+                },
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "updateTimeMs": {
+                    "type": "integer"
+                }
+            }
+        },
         "apis.AddTaskReq": {
             "type": "object",
             "properties": {
@@ -195,6 +254,129 @@ const docTemplate = `{
                 "workingDir": {
                     "type": "string",
                     "example": "/bin/testWorkingDir/working"
+                }
+            }
+        },
+        "apis.AddTaskResp": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "finishTimeMs": {
+                    "type": "integer"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "scheduledTimeMs": {
+                    "type": "integer"
+                },
+                "scriptPath": {
+                    "type": "string"
+                },
+                "taskDisplayName": {
+                    "type": "string"
+                },
+                "taskName": {
+                    "type": "string"
+                },
+                "workingDir": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.Bag": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string"
+                },
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "updateTimeMs": {
+                    "type": "integer"
+                }
+            }
+        },
+        "apis.DeleteBagResp": {
+            "type": "object",
+            "properties": {
+                "errorMsg": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.GetBagResp": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string"
+                },
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "updateTimeMs": {
+                    "type": "integer"
+                }
+            }
+        },
+        "apis.GetTaskResp": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "finishTimeMs": {
+                    "type": "integer"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "scheduledTimeMs": {
+                    "type": "integer"
+                },
+                "scriptPath": {
+                    "type": "string"
+                },
+                "taskDisplayName": {
+                    "type": "string"
+                },
+                "taskName": {
+                    "type": "string"
+                },
+                "workingDir": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.ListBagsResp": {
+            "type": "object",
+            "properties": {
+                "bags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/apis.Bag"
+                    }
                 }
             }
         }

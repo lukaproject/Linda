@@ -1,6 +1,8 @@
 package task
 
 import (
+	"Linda/agent/internal/utils"
+	"io/fs"
 	"runtime"
 	"sync"
 	"sync/atomic"
@@ -37,6 +39,7 @@ func (r *runner) CountRunningTasks() int {
 }
 
 func (r *runner) AddTask(t Task) (err error) {
+	r.createWorkingDir(t)
 	if int(r.ResourceCount.Load())+t.GetResource() > r.MaxResourceCount {
 		return ErrNoEnoughResource
 	}
@@ -47,6 +50,7 @@ func (r *runner) AddTask(t Task) (err error) {
 	}
 	r.runningTasksMap[t.GetName()] = t
 	if err = t.Start(); err != nil {
+		logrus.Errorf("error=%v, taskName=%s", err, t.GetName())
 		return err
 	}
 	r.ResourceCount.Add(int32(t.GetResource()))
@@ -76,6 +80,11 @@ func (r *runner) taskRunningCallback(t Task) {
 	}()
 	r.ResourceCount.Add(int32(-t.GetResource()))
 	r.FinishedTasksCount.Add(1)
+}
+
+func (r *runner) createWorkingDir(t Task) (err error) {
+	utils.MkdirAll(t.GetWorkingDir(), fs.ModePerm)
+	return
 }
 
 func (r *runner) initial() {

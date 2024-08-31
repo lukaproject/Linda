@@ -20,4 +20,18 @@ source .profile
 
 ### external dependencies
 
+[给docker配置网络代理](https://www.cnblogs.com/Chary/p/18096678)
+
 需要docker环境，docker中安装pgsql / redis. 目前使用的pgsql版本为15，redis版本为7.0
+
+### swagger codegen
+```bash
+docker pull swaggerapi/swagger-codegen-cli-v3
+```
+在根目录下使用下面这个命令生成swagger client
+```bash
+docker run --rm -v ${PWD}:/local swaggerapi/swagger-codegen-cli-v3:latest generate \
+    -i /local/services/agentcentral/docs/swagger.yaml \
+    -l go \
+    -o /local/out/go
+```

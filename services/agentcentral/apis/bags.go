@@ -23,14 +23,18 @@ func EnableBags(r *mux.Router) {
 //	@Param			addBagReq	body	apis.AddBagReq	true	"bag's request"
 //	@Accept			json
 //	@Produce		json
+//	@Success		200	{object}	apis.AddBagResp
 //	@Router			/bags [post]
 func addBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
-	bag := &AddBagReq{}
-	models.ReadJSON(r.Body, bag)
+	bag := AddBagReq{}
+	models.ReadJSON(r.Body, &bag)
 	bagModel := &models.Bag{BagDisplayName: bag.BagDisplayName}
 	tasks.GetBagsMgrInstance().AddBag(bagModel)
-	w.Write(models.Serialize(bagModel))
+
+	resp := AddBagResp{}
+	FromBagModelToBag(bagModel, &resp.Bag)
+	w.Write(models.Serialize(resp))
 }
 
 // getBag godoc
@@ -40,22 +44,26 @@ func addBag(w http.ResponseWriter, r *http.Request) {
 //	@Param			bagName	path	string	true	"bag's name"
 //	@Accept			json
 //	@Produce		json
+//	@Success		200	{object}	apis.GetBagResp
 //	@Router			/bags/{bagName} [get]
 func getBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
 	bagModel := xerr.Must(tasks.GetBagsMgrInstance().GetBag(bagName))
-	w.Write(models.Serialize(bagModel))
+	resp := GetBagResp{}
+	FromBagModelToBag(bagModel, &resp.Bag)
+	w.Write(models.Serialize(resp))
 }
 
 // delete Bag godoc
 //
-//	@Summary		get bag
-//	@Description	get bag
+//	@Summary		delete bag
+//	@Description	delete bag
 //	@Param			bagName	path	string	true	"bag's name"
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags/{bagName} [delete]
+//	@Success		200 {object}	apis.DeleteBagResp
 func deleteBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
@@ -64,11 +72,12 @@ func deleteBag(w http.ResponseWriter, r *http.Request) {
 
 // list Bag godoc
 //
-//	@Summary		get bag
-//	@Description	get bag
+//	@Summary		list bag [no implementation]
+//	@Description	list bag
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags [get]
+//	@Success		200 {object}	apis.ListBagsResp
 func listBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	// TODO

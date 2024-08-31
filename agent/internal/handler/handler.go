@@ -69,11 +69,14 @@ func (h *Handler) packReq() (req *models.HeartBeatFromAgent) {
 }
 
 func NewHandler(c *config.Config) *Handler {
+	if c == nil {
+		c = config.Instance()
+	}
 	h := &Handler{
 		seqId:   0,
 		bagName: c.BagName,
 		taskMgr: task.NewMgr(),
 	}
-	h.cli = xerr.Must(client.New(c.AgentCentralUrl()))
+	h.cli = xerr.Must(client.New(c.AgentHeartBeatUrl()))
 	return h
 }

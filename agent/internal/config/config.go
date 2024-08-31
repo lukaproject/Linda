@@ -8,8 +8,12 @@ type Config struct {
 	NodeId               string `xdefault:"testnodeid-1" xenv:"LINDA_NODE_ID"`
 }
 
-func (c *Config) AgentCentralUrl() string {
+func (c *Config) AgentHeartBeatUrl() string {
 	return fmt.Sprintf("ws://%s/api/agent/heartbeat/%s", c.AgentCentralEndPoint, c.NodeId)
+}
+
+func (c *Config) AgentAPIUrl(protocol string) string {
+	return protocol + "://" + c.AgentCentralEndPoint + "/api"
 }
 
 func (c *Config) Merge(other *Config) {

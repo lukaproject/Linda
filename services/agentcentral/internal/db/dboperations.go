@@ -41,6 +41,47 @@ func (dbo *DBOperations) GetBagEnqueuedTaskNumber(bagName string) uint32 {
 	return countType.Count
 }
 
+func (dbo *DBOperations) ListBagNames() (ret []string) {
+	ret = make([]string, 0)
+	lst := ""
+	for {
+		part := make([]string, 0)
+		xerr.Must0(dbo.dbi.
+			Model(&models.Bag{}).
+			Order("bag_name").
+			Select("bag_name").
+			Where("bag_name > ?", lst).
+			Limit(10).
+			Scan(&part).Error)
+		if len(part) == 0 {
+			break
+		}
+		ret = append(ret, part...)
+		lst = part[len(part)-1]
+	}
+	return
+}
+
+func (dbo *DBOperations) ListBags() (ret []*models.Bag) {
+	ret = make([]*models.Bag, 0)
+	lst := ""
+	for {
+		part := make([]*models.Bag, 0)
+		xerr.Must0(dbo.dbi.
+			Model(&models.Bag{}).
+			Order("bag_name").
+			Where("bag_name > ?", lst).
+			Limit(10).
+			Scan(&part).Error)
+		if len(part) == 0 {
+			break
+		}
+		ret = append(ret, part...)
+		lst = part[len(part)-1].BagName
+	}
+	return
+}
+
 func (dbo *DBOperations) UpdateTaskOrderId(bagName string, taskName string, orderId uint32) {
 	xerr.Must0(dbo.dbi.
 		Model(&models.Task{}).

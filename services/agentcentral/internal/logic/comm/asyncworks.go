@@ -2,6 +2,7 @@ package comm
 
 import (
 	"Linda/services/agentcentral/internal/db"
+	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 	"sync"
 	"time"
 
@@ -11,12 +12,14 @@ import (
 
 type AsyncWorks struct {
 	bagsLocks *sync.Map
+	cli       taskqueueclient.Client
 }
 
 // 同一时刻对于每一个bag，只能有一个task入队
 func (aw *AsyncWorks) TaskEnque(
 	taskName string,
 	bagName string,
+	priority uint16,
 ) {
 	defer func() {
 		if err := recover(); err != nil {
@@ -28,7 +31,8 @@ func (aw *AsyncWorks) TaskEnque(
 			logrus.Infof("bag %s, task %s, enque start", bagName, taskName)
 			dbo := db.NewDBOperations()
 			count := dbo.GetBagEnqueuedTaskNumber(bagName)
-			dbo.UpdateTaskOrderId(bagName, taskName, uint32(count)+1)
+			dbo.UpdateTaskOrderId(bagName, taskName, count+1)
+			xerr.Must0(aw.cli.Enque(taskName, bagName, priority, count+1))
 			logrus.Infof("bag %s, task %s, enque success", bagName, taskName)
 		})
 }

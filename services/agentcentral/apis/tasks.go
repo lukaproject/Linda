@@ -21,13 +21,14 @@ func EnableTasks(r *mux.Router) {
 //	@Param			addTaskReq	body	apis.AddTaskReq	true	"add tasks's request"
 //	@Accept			json
 //	@Produce		json
+//	@Success		200	{object}	apis.AddTaskResp
 //	@Router			/bags/{bagName}/tasks [post]
 func addTask(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 
 	bagName := mux.Vars(r)["bagName"]
-	addTaskReq := &AddTaskReq{}
-	models.ReadJSON(r.Body, addTaskReq)
+	addTaskReq := AddTaskReq{}
+	models.ReadJSON(r.Body, &addTaskReq)
 	task := &models.Task{
 		TaskDisplayName: addTaskReq.TaskDisplayName,
 		BagName:         bagName,
@@ -45,7 +46,9 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 		GetTasksMgr(bagName).
 		GetTask(task.TaskName)
 
-	w.Write(models.Serialize(taskModel))
+	resp := AddTaskResp{}
+	FromTaskModelToTask(taskModel, &resp.Task)
+	w.Write(models.Serialize(resp))
 }
 
 // getTask godoc
@@ -56,6 +59,7 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 //	@Param			taskName	path	string	true	"task's name"
 //	@Accept			json
 //	@Produce		json
+//	@Success		200	{object}	apis.GetTaskResp
 //	@Router			/bags/{bagName}/tasks/{taskName} [get]
 func getTask(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
@@ -64,5 +68,7 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 	taskModel := tasks.
 		GetBagsMgrInstance().
 		GetTasksMgr(bagName).GetTask(taskName)
-	w.Write(models.Serialize(taskModel))
+	resp := GetTaskResp{}
+	FromTaskModelToTask(taskModel, &resp.Task)
+	w.Write(models.Serialize(resp))
 }

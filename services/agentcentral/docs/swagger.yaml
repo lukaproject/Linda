@@ -6,6 +6,17 @@ definitions:
         example: test-bagDisplayName
         type: string
     type: object
+  apis.AddBagResp:
+    properties:
+      bagDisplayName:
+        type: string
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      updateTimeMs:
+        type: integer
+    type: object
   apis.AddTaskReq:
     properties:
       scriptPath:
@@ -17,6 +28,86 @@ definitions:
       workingDir:
         example: /bin/testWorkingDir/working
         type: string
+    type: object
+  apis.AddTaskResp:
+    properties:
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      finishTimeMs:
+        type: integer
+      nodeId:
+        type: string
+      priority:
+        type: integer
+      scheduledTimeMs:
+        type: integer
+      scriptPath:
+        type: string
+      taskDisplayName:
+        type: string
+      taskName:
+        type: string
+      workingDir:
+        type: string
+    type: object
+  apis.Bag:
+    properties:
+      bagDisplayName:
+        type: string
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      updateTimeMs:
+        type: integer
+    type: object
+  apis.DeleteBagResp:
+    properties:
+      errorMsg:
+        type: string
+    type: object
+  apis.GetBagResp:
+    properties:
+      bagDisplayName:
+        type: string
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      updateTimeMs:
+        type: integer
+    type: object
+  apis.GetTaskResp:
+    properties:
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      finishTimeMs:
+        type: integer
+      nodeId:
+        type: string
+      priority:
+        type: integer
+      scheduledTimeMs:
+        type: integer
+      scriptPath:
+        type: string
+      taskDisplayName:
+        type: string
+      taskName:
+        type: string
+      workingDir:
+        type: string
+    type: object
+  apis.ListBagsResp:
+    properties:
+      bags:
+        items:
+          $ref: '#/definitions/apis.Bag'
+        type: array
     type: object
 info:
   contact: {}
@@ -32,11 +123,15 @@ paths:
     get:
       consumes:
       - application/json
-      description: get bag
+      description: list bag
       produces:
       - application/json
-      responses: {}
-      summary: get bag
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.ListBagsResp'
+      summary: list bag [no implementation]
     post:
       consumes:
       - application/json
@@ -50,13 +145,17 @@ paths:
           $ref: '#/definitions/apis.AddBagReq'
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.AddBagResp'
       summary: add bag
   /bags/{bagName}:
     delete:
       consumes:
       - application/json
-      description: get bag
+      description: delete bag
       parameters:
       - description: bag's name
         in: path
@@ -65,8 +164,12 @@ paths:
         type: string
       produces:
       - application/json
-      responses: {}
-      summary: get bag
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.DeleteBagResp'
+      summary: delete bag
     get:
       consumes:
       - application/json
@@ -79,7 +182,11 @@ paths:
         type: string
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.GetBagResp'
       summary: get bag
   /bags/{bagName}/tasks:
     post:
@@ -100,7 +207,11 @@ paths:
           $ref: '#/definitions/apis.AddTaskReq'
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.AddTaskResp'
       summary: add task
   /bags/{bagName}/tasks/{taskName}:
     get:
@@ -120,7 +231,11 @@ paths:
         type: string
       produces:
       - application/json
-      responses: {}
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.GetTaskResp'
       summary: get task
   /healthcheck:
     post:

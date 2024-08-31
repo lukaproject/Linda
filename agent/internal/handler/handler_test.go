@@ -15,7 +15,8 @@ type testHandlerSuite struct {
 }
 
 func (s *testHandlerSuite) TestNormal() {
-	h := handler.NewHandler(config.TestConfig())
+	config.SetInstance(config.TestConfig())
+	h := handler.NewHandler(nil)
 	h.Start()
 	<-time.After(20 * time.Second)
 }

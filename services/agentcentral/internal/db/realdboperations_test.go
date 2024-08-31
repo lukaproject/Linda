@@ -5,6 +5,7 @@ import (
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
 	"fmt"
+	"sort"
 	"testing"
 	"time"
 
@@ -131,6 +132,27 @@ func (s *realDBOperationsTestSuite) TestTaskScheduledAndFinishScenario() {
 	for _, task := range taskResults {
 		s.Equal(finishTime, task.FinishTimeMs)
 		s.Equal(scheduledTime, task.ScheduledTimeMs)
+	}
+}
+
+func (s *realDBOperationsTestSuite) TestListBagNames() {
+	dbo := db.NewDBOperations()
+	n := 55
+	bags := make([]*models.Bag, n)
+	for i := 0; i < n; i++ {
+		bags[i] = &models.Bag{
+			BagDisplayName: fmt.Sprintf("test-bag-%d", i),
+		}
+		dbo.AddBag(bags[i])
+	}
+
+	result := dbo.ListBagNames()
+	s.Len(bags, len(result))
+	sort.Slice(bags, func(i, j int) bool {
+		return bags[i].BagName < bags[j].BagName
+	})
+	for i := 0; i < n; i++ {
+		s.Equal(result[i], bags[i].BagName)
 	}
 }
 

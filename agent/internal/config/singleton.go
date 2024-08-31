@@ -1,8 +1,8 @@
 package config
 
-import "Linda/baselibs/abstractions/xconfig"
+import "Linda/baselibs/abstractions/defaultor"
 
-var c *Config = xconfig.NewFromOSEnv[Config]()
+var c *Config = defaultor.New[Config]()
 
 func Instance() *Config {
 	return c
