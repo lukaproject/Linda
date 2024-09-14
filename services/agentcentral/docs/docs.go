@@ -20,6 +20,131 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/agents/free/{nodeId}": {
+            "post": {
+                "description": "free node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "free node",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Node free request",
+                        "name": "nodeFreeReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.NodeFreeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/info/{nodeId}": {
+            "get": {
+                "description": "get node info",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "get node info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.NodeInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/join/{nodeId}": {
+            "post": {
+                "description": "join free node to a bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "join free node to a bag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Node join request",
+                        "name": "nodeJoinReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.NodeJoinReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/bagnodes/{bagName}": {
+            "get": {
+                "description": "list all node ids which belong to this node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "list bag nodes [no implementation]",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.ListBagNodesResp"
+                        }
+                    }
+                }
+            }
+        },
         "/bags": {
             "get": {
                 "description": "list bag",
@@ -369,6 +494,17 @@ const docTemplate = `{
                 }
             }
         },
+        "apis.ListBagNodesResp": {
+            "type": "object",
+            "properties": {
+                "nodeIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "apis.ListBagsResp": {
             "type": "object",
             "properties": {
@@ -377,6 +513,25 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/apis.Bag"
                     }
+                }
+            }
+        },
+        "apis.NodeFreeReq": {
+            "type": "object"
+        },
+        "apis.NodeInfo": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.NodeJoinReq": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
                 }
             }
         }

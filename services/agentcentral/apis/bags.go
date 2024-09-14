@@ -14,6 +14,7 @@ func EnableBags(r *mux.Router) {
 	r.HandleFunc("/api/bags", listBag).Methods(http.MethodGet)
 	r.HandleFunc("/api/bags/{bagName}", getBag).Methods(http.MethodGet)
 	r.HandleFunc("/api/bags/{bagName}", deleteBag).Methods(http.MethodDelete)
+	r.HandleFunc("/api/bagnodes/{bagName}", listBagNodes).Methods(http.MethodGet)
 }
 
 // addBag godoc
@@ -63,7 +64,7 @@ func getBag(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags/{bagName} [delete]
-//	@Success		200 {object}	apis.DeleteBagResp
+//	@Success		200	{object}	apis.DeleteBagResp
 func deleteBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
@@ -77,8 +78,21 @@ func deleteBag(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags [get]
-//	@Success		200 {object}	apis.ListBagsResp
+//	@Success		200	{object}	apis.ListBagsResp
 func listBag(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	// TODO
+}
+
+// list bag nodes godoc
+//
+//	@Summary		list bag nodes [no implementation]
+//	@Description	list all node ids which belong to this node
+//	@Accept			json
+//	@Produce		json
+//	@Router			/bagnodes/{bagName} [get]
+//	@Success		200	{object}	apis.ListBagNodesResp
+func listBagNodes(w http.ResponseWriter, r *http.Request) {
+	defer httpRecover(w, r)
+	_ = mux.Vars(r)["bagName"]
 }

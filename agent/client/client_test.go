@@ -20,11 +20,7 @@ type agentCentralClientTestSuite struct {
 func (s *agentCentralClientTestSuite) TestNormal() {
 	cli, err := client.New(fmt.Sprintf(s.localAgentURLFormat, "12121212"))
 	s.Nil(err)
-	resp, err := cli.HeartBeatStart(&models.HeartBeatStart{
-		Node: models.NodeInfo{
-			BagName: "testbagid",
-		},
-	})
+	resp, err := cli.HeartBeatStart(&models.HeartBeatStart{})
 	s.Nil(err)
 	s.Equal(models.OK, resp.Result)
 

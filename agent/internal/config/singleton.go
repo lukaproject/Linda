@@ -1,8 +1,6 @@
 package config
 
-import "Linda/baselibs/abstractions/defaultor"
-
-var c *Config = defaultor.New[Config]()
+var c *Config = nil
 
 func Instance() *Config {
 	return c

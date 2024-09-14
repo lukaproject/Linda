@@ -1,8 +1,9 @@
 package agents
 
 import (
+	"Linda/baselibs/codes/errno"
+	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/logic/comm"
-	"errors"
 	"net/http"
 	"sync"
 
@@ -21,6 +22,10 @@ var (
 type Mgr interface {
 	NewNode(nodeId string, w http.ResponseWriter, r *http.Request)
 	RemoveNode(nodeId string) error
+	AddNodeToBag(nodeId, bagName string)
+	FreeNode(nodeId string)
+
+	GetNodeInfo(nodeId string) *models.NodeInfo
 }
 
 type agentsmgr struct {
@@ -43,9 +48,8 @@ func (mgr *agentsmgr) addNewNodeToMem(
 	r *http.Request,
 ) (agent Agent, err error) {
 	comm.NewRLocker(&mgr.agentsRWMut).Run(func() {
-		// logrus.Infof("validate new node %s", nodeId)
 		if _, exist := mgr.agents[nodeId]; exist {
-			panic(errors.New("nodeId exists"))
+			panic(errno.ErrNodeIdExists)
 		}
 		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
 		if err != nil {
@@ -62,6 +66,31 @@ func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	defer mgr.agentsRWMut.Unlock()
 	delete(mgr.agents, nodeId)
 	logrus.Debugf("node %s removed", nodeId)
+	return nil
+}
+
+func (mgr *agentsmgr) AddNodeToBag(nodeId, bagName string) {
+	mgr.agentsRWMut.Lock()
+	defer mgr.agentsRWMut.Unlock()
+	if agent, exist := mgr.agents[nodeId]; exist {
+		agent.Join(bagName)
+	}
+}
+
+func (mgr *agentsmgr) FreeNode(nodeId string) {
+	mgr.agentsRWMut.Lock()
+	defer mgr.agentsRWMut.Unlock()
+	if agent, exist := mgr.agents[nodeId]; exist {
+		agent.Free()
+	}
+}
+
+func (mgr *agentsmgr) GetNodeInfo(nodeId string) *models.NodeInfo {
+	mgr.agentsRWMut.Lock()
+	defer mgr.agentsRWMut.Unlock()
+	if agent, exist := mgr.agents[nodeId]; exist {
+		return agent.GetInfo()
+	}
 	return nil
 }
 

@@ -16,7 +16,7 @@ type HeartBeatFromAgent struct {
 	RunningTaskNames  []string
 	FinishedTaskNames []string
 
-	Memory MemoryInfo
+	Node NodeInfo
 }
 
 type HeartBeatFromServer struct {
@@ -24,8 +24,9 @@ type HeartBeatFromServer struct {
 
 	ScheduledTaskNames []string
 
-	IsHeartBeatEnd bool
-	HeartBeatEnd   HeartBeatEnd
+	HeartBeatEnd *HeartBeatEnd
+	JoinBag      *JoinBag
+	FreeNode     *FreeNode
 }
 
 type HeartBeatEnd struct {
@@ -35,4 +36,12 @@ type HeartBeatEnd struct {
 
 type HeartBeatEndResponse struct {
 	Result string
+}
+
+type FreeNode struct {
+	BagName string
+}
+
+type JoinBag struct {
+	BagName string
 }

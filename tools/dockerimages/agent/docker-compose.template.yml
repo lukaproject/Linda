@@ -1,4 +1,3 @@
-version: '3'
 # use this compose to start a test agents cluster.
 services:
   agents-cluster:
@@ -6,8 +5,8 @@ services:
     restart: always
     environment:
       - 'LINDA_AGENT_CENTRAL_ENDPOINT={{ Agent central endpoint }}'
-      - 'LINDA_BAG_NAME={{ bag name }}'
       - 'LINDA_NODE_ID={{ node id }}'
+      - 'LINDA_HB_PERIOD_MS=5000'
     deploy:
       resources:
         limits:

@@ -10,13 +10,13 @@ import (
 
 // 将内容写入读取 websocket conn
 // 传入时请保证 conn, v 非nil
-func WriteMessage[T any](conn *websocket.Conn, v *T) error {
+func WriteMessage[T any](conn IWSConn, v *T) error {
 	return conn.WriteMessage(websocket.BinaryMessage, models.Serialize(v))
 }
 
 // 读取 websocket conn中的内容
 // 传入时请保证 conn, v 非nil
-func ReadMessage[T any](conn *websocket.Conn, v *T) error {
+func ReadMessage[T any](conn IWSConn, v *T) error {
 	msgType, body, err := conn.ReadMessage()
 	if err != nil {
 		return err

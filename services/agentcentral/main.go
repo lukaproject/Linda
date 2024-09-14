@@ -52,6 +52,7 @@ func main() {
 	apis.EnableHealthCheck(r)
 	apis.EnableBags(r)
 	apis.EnableTasks(r)
+	apis.EnableAgents(r)
 	r.Use(middlewares.SetHeaderJSON)
 
 	logic.InitAgentsMgr()

@@ -2,9 +2,11 @@ go 1.21
 
 use (
 	./agent
-	./protocol
-	./services/agentcentral
 	./baselibs/abstractions
+	./baselibs/apiscall
 	./baselibs/codes
 	./baselibs/testcommon
+	./protocol
+	./services/agentcentral
+	./services/integrationtest
 )

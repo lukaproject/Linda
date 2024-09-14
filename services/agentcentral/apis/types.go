@@ -53,3 +53,19 @@ type DeleteBagResp struct {
 type ListBagsResp struct {
 	Bags []Bag
 }
+
+type ListBagNodesResp struct {
+	NodeIds []string
+}
+
+type NodeJoinReq struct {
+	BagName string
+}
+
+type NodeFreeReq struct {
+}
+
+type NodeInfo struct {
+	BagName         string
+	MaxRunningTasks int
+}

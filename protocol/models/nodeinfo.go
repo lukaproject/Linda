@@ -1,7 +1,7 @@
 package models
 
 type NodeInfo struct {
-	// 属于哪个tvms集群
+	// 属于哪个bag name集群
 	BagName         string
 	MaxRunningTasks int
 }

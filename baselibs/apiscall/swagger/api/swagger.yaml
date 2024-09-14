@@ -1,0 +1,428 @@
+openapi: 3.0.1
+info:
+  title: AgentCentral API
+  description: This is agent central swagger API
+  termsOfService: http://swagger.io/terms/
+  contact: {}
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 0.dev
+servers:
+- url: /api
+paths:
+  /agents/free/{nodeId}:
+    post:
+      summary: free node
+      description: free node
+      parameters:
+      - name: nodeId
+        in: path
+        description: node id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Node free request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/apis.NodeFreeReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.NodeFreeResp'
+      x-codegen-request-body-name: nodeFreeReq
+  /agents/info/{nodeId}:
+    get:
+      summary: get node info
+      description: get node info
+      parameters:
+      - name: nodeId
+        in: path
+        description: node id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.NodeInfo'
+  /agents/join/{nodeId}:
+    post:
+      summary: join free node to a bag
+      description: join free node to a bag
+      parameters:
+      - name: nodeId
+        in: path
+        description: node id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Node join request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/apis.NodeJoinReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.NodeJoinResp'
+      x-codegen-request-body-name: nodeJoinReq
+  /bagnodes/{bagName}:
+    get:
+      summary: "list bag nodes [no implementation]"
+      description: list all node ids which belong to this node
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.ListBagNodesResp'
+  /bags:
+    get:
+      summary: "list bag [no implementation]"
+      description: list bag
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.ListBagsResp'
+    post:
+      summary: add bag
+      description: create a new bag
+      requestBody:
+        description: bag's request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/apis.AddBagReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.AddBagResp'
+      x-codegen-request-body-name: addBagReq
+  /bags/{bagName}:
+    get:
+      summary: get bag
+      description: get bag
+      parameters:
+      - name: bagName
+        in: path
+        description: bag's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.GetBagResp'
+    delete:
+      summary: delete bag
+      description: delete bag
+      parameters:
+      - name: bagName
+        in: path
+        description: bag's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.DeleteBagResp'
+  /bags/{bagName}/tasks:
+    post:
+      summary: add task
+      description: add task
+      parameters:
+      - name: bagName
+        in: path
+        description: bag's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: add tasks's request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/apis.AddTaskReq'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.AddTaskResp'
+      x-codegen-request-body-name: addTaskReq
+  /bags/{bagName}/tasks/{taskName}:
+    get:
+      summary: get task
+      description: get task
+      parameters:
+      - name: bagName
+        in: path
+        description: bag's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: taskName
+        in: path
+        description: task's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/apis.GetTaskResp'
+  /healthcheck:
+    post:
+      summary: health check
+      description: health check
+components:
+  schemas:
+    apis.AddBagReq:
+      type: object
+      properties:
+        bagDisplayName:
+          type: string
+          example: test-bagDisplayName
+    apis.AddBagResp:
+      type: object
+      properties:
+        bagDisplayName:
+          type: string
+        bagName:
+          type: string
+        createTimeMs:
+          type: integer
+        updateTimeMs:
+          type: integer
+      example:
+        updateTimeMs: 6
+        bagName: bagName
+        bagDisplayName: bagDisplayName
+        createTimeMs: 0
+    apis.AddTaskReq:
+      type: object
+      properties:
+        scriptPath:
+          type: string
+          example: /bin/test.sh
+        taskDisplayName:
+          type: string
+          example: test-taskDisplayName
+        workingDir:
+          type: string
+          example: /bin/testWorkingDir/working
+    apis.AddTaskResp:
+      type: object
+      properties:
+        bagName:
+          type: string
+        createTimeMs:
+          type: integer
+        finishTimeMs:
+          type: integer
+        nodeId:
+          type: string
+        priority:
+          type: integer
+        scheduledTimeMs:
+          type: integer
+        scriptPath:
+          type: string
+        taskDisplayName:
+          type: string
+        taskName:
+          type: string
+        workingDir:
+          type: string
+      example:
+        finishTimeMs: 6
+        scriptPath: scriptPath
+        scheduledTimeMs: 5
+        workingDir: workingDir
+        bagName: bagName
+        taskName: taskName
+        priority: 1
+        nodeId: nodeId
+        createTimeMs: 0
+        taskDisplayName: taskDisplayName
+    apis.Bag:
+      type: object
+      properties:
+        bagDisplayName:
+          type: string
+        bagName:
+          type: string
+        createTimeMs:
+          type: integer
+        updateTimeMs:
+          type: integer
+      example:
+        updateTimeMs: 6
+        bagName: bagName
+        bagDisplayName: bagDisplayName
+        createTimeMs: 0
+    apis.DeleteBagResp:
+      type: object
+      properties:
+        errorMsg:
+          type: string
+      example:
+        errorMsg: errorMsg
+    apis.GetBagResp:
+      type: object
+      properties:
+        bagDisplayName:
+          type: string
+        bagName:
+          type: string
+        createTimeMs:
+          type: integer
+        updateTimeMs:
+          type: integer
+      example:
+        updateTimeMs: 6
+        bagName: bagName
+        bagDisplayName: bagDisplayName
+        createTimeMs: 0
+    apis.GetTaskResp:
+      type: object
+      properties:
+        bagName:
+          type: string
+        createTimeMs:
+          type: integer
+        finishTimeMs:
+          type: integer
+        nodeId:
+          type: string
+        priority:
+          type: integer
+        scheduledTimeMs:
+          type: integer
+        scriptPath:
+          type: string
+        taskDisplayName:
+          type: string
+        taskName:
+          type: string
+        workingDir:
+          type: string
+      example:
+        finishTimeMs: 6
+        scriptPath: scriptPath
+        scheduledTimeMs: 5
+        workingDir: workingDir
+        bagName: bagName
+        taskName: taskName
+        priority: 1
+        nodeId: nodeId
+        createTimeMs: 0
+        taskDisplayName: taskDisplayName
+    apis.ListBagNodesResp:
+      type: object
+      properties:
+        nodeIds:
+          type: array
+          items:
+            type: string
+      example:
+        nodeIds:
+        - nodeIds
+        - nodeIds
+    apis.ListBagsResp:
+      type: object
+      properties:
+        bags:
+          type: array
+          items:
+            $ref: '#/components/schemas/apis.Bag'
+      example:
+        bags:
+        - updateTimeMs: 6
+          bagName: bagName
+          bagDisplayName: bagDisplayName
+          createTimeMs: 0
+        - updateTimeMs: 6
+          bagName: bagName
+          bagDisplayName: bagDisplayName
+          createTimeMs: 0
+    apis.NodeFreeReq:
+      type: object
+    apis.NodeFreeResp:
+      type: object
+      properties:
+        errorMsg:
+          type: string
+      example:
+        errorMsg: errorMsg
+    apis.NodeInfo:
+      type: object
+      properties:
+        bagName:
+          type: string
+      example:
+        bagName: bagName
+    apis.NodeJoinReq:
+      type: object
+      properties:
+        bagName:
+          type: string
+    apis.NodeJoinResp:
+      type: object
+      properties:
+        errorMsg:
+          type: string
+      example:
+        errorMsg: errorMsg
+x-original-swagger-version: "2.0"

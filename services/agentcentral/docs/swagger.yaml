@@ -102,12 +102,31 @@ definitions:
       workingDir:
         type: string
     type: object
+  apis.ListBagNodesResp:
+    properties:
+      nodeIds:
+        items:
+          type: string
+        type: array
+    type: object
   apis.ListBagsResp:
     properties:
       bags:
         items:
           $ref: '#/definitions/apis.Bag'
         type: array
+    type: object
+  apis.NodeFreeReq:
+    type: object
+  apis.NodeInfo:
+    properties:
+      bagName:
+        type: string
+    type: object
+  apis.NodeJoinReq:
+    properties:
+      bagName:
+        type: string
     type: object
 info:
   contact: {}
@@ -119,6 +138,88 @@ info:
   title: AgentCentral API
   version: 0.dev
 paths:
+  /agents/free/{nodeId}:
+    post:
+      consumes:
+      - application/json
+      description: free node
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: Node free request
+        in: body
+        name: nodeFreeReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.NodeFreeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: free node
+  /agents/info/{nodeId}:
+    get:
+      consumes:
+      - application/json
+      description: get node info
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.NodeInfo'
+      summary: get node info
+  /agents/join/{nodeId}:
+    post:
+      consumes:
+      - application/json
+      description: join free node to a bag
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: Node join request
+        in: body
+        name: nodeJoinReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.NodeJoinReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: join free node to a bag
+  /bagnodes/{bagName}:
+    get:
+      consumes:
+      - application/json
+      description: list all node ids which belong to this node
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.ListBagNodesResp'
+      summary: list bag nodes [no implementation]
   /bags:
     get:
       consumes:

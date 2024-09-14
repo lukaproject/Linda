@@ -2,6 +2,7 @@ package task
 
 import (
 	"Linda/agent/internal/config"
+	"Linda/agent/internal/localdb"
 	"Linda/protocol/models"
 	"net/http"
 	"strings"
@@ -49,12 +50,13 @@ func (m *Mgr) PopFinishedTasks() (finishedTaskNames []string) {
 func (m *Mgr) fetchTaskDataByTaskName(taskName string) (data TaskData, err error) {
 	func() {
 		defer xerr.Recover(&err)
-		taskUrl := m.getTaskUrl(taskName)
+		bagName := xerr.Must(localdb.Instance().Get(localdb.BagNameKey))
+		taskUrl := m.getTaskUrl(bagName, taskName)
 		resp := xerr.Must(http.Get(taskUrl))
 		if resp.StatusCode != http.StatusOK {
 			logrus.Errorf(
 				"can not to fetch task body, task name %s, bag name %s, status %s",
-				taskName, config.Instance().BagName, resp.Status)
+				taskName, bagName, resp.Status)
 			return
 		}
 		t := &models.Task{}
@@ -64,12 +66,12 @@ func (m *Mgr) fetchTaskDataByTaskName(taskName string) (data TaskData, err error
 	return
 }
 
-func (m *Mgr) getTaskUrl(taskName string) string {
+func (m *Mgr) getTaskUrl(bagName, taskName string) string {
 	return strings.Join(
 		[]string{
 			config.Instance().AgentAPIUrl("http"),
 			"bags",
-			config.Instance().BagName,
+			bagName,
 			"tasks",
 			taskName,
 		}, "/")

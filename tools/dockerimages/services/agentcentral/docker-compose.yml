@@ -1,4 +1,3 @@
-version: '3'
 # use this compose to start a test agentcentral.
 services:
   agentcentral:
