@@ -2,14 +2,20 @@ package config
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"time"
+
+	"github.com/lukaproject/xerr"
+	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
 	AgentCentralEndPoint string `xdefault:"localhost:5883" xenv:"LINDA_AGENT_CENTRAL_ENDPOINT"`
-	NodeId               string `xdefault:"testnodeid-1" xenv:"LINDA_NODE_ID"`
+	NodeId               string `xdefault:"" xenv:"LINDA_NODE_ID"`
 	LocalDBDir           string `xdefault:"/tmp/linda-agent/db" xenv:"LINDA_LOCAL_DB_DIR"`
 	HeartbeatPeriodMs    int    `xdefault:"50" xenv:"LINDA_HB_PERIOD_MS"`
+	NodeName             string `xdefault:"test-node-name" xenv:"LINDA_NODE_NAME"`
 }
 
 func (c *Config) AgentHeartBeatUrl() string {
@@ -36,5 +42,22 @@ func (c *Config) Merge(other *Config) {
 	}
 	if other.HeartbeatPeriodMs != 0 {
 		c.HeartbeatPeriodMs = other.HeartbeatPeriodMs
+	}
+	if other.NodeName != "" {
+		c.NodeName = other.NodeName
+	}
+}
+
+func (c *Config) getNodeId() {
+	url := c.AgentAPIUrl("http") + "/agent/innercall/nodeidgen"
+	resp := xerr.Must(http.Get(url))
+	c.NodeId = string(xerr.Must(io.ReadAll(resp.Body)))
+	logrus.Infof("get node id from service, id = %s", c.NodeId)
+}
+
+func (c *Config) Setup() {
+	if c.NodeId == "" {
+		logrus.Warn("didn't set env variable LINDA_NODE_ID yet, ask for node id from service.")
+		c.getNodeId()
 	}
 }

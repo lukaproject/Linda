@@ -17,6 +17,7 @@ func EnableTasks(r *mux.Router) {
 //
 //	@Summary		add task
 //	@Description	add task
+//	@Tags			tasks
 //	@Param			bagName		path	string			true	"bag's name"
 //	@Param			addTaskReq	body	apis.AddTaskReq	true	"add tasks's request"
 //	@Accept			json
@@ -55,6 +56,7 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		get task
 //	@Description	get task
+//	@Tags			tasks
 //	@Param			bagName		path	string	true	"bag's name"
 //	@Param			taskName	path	string	true	"task's name"
 //	@Accept			json

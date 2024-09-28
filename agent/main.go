@@ -9,6 +9,7 @@ import (
 
 func main() {
 	config.SetInstance(xconfig.NewFromOSEnv[config.Config]())
+	config.Instance().Setup()
 	localdb.Initial()
 	h := handler.NewHandler(nil)
 	h.Run()

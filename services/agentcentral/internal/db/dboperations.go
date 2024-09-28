@@ -134,6 +134,10 @@ func (dbo *DBOperations) GetTaskByMultiFields(fieldsMap map[string]any) (tasksRe
 	return
 }
 
+func (dbo *DBOperations) AddNodeInfo(nodeInfo *models.NodeInfo) {
+	xerr.Must0(dbo.dbi.Create(nodeInfo).Error)
+}
+
 func NewDBOperations() *DBOperations {
 	return &DBOperations{
 		dbi: Instance(),

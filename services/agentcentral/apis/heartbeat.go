@@ -1,3 +1,5 @@
+// this is a inner call api,
+// only be used between agent and agentcentral
 package apis
 
 import (

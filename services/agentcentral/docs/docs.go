@@ -29,6 +29,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "agents"
+                ],
                 "summary": "free node",
                 "parameters": [
                     {
@@ -67,6 +70,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "agents"
+                ],
                 "summary": "get node info",
                 "parameters": [
                     {
@@ -95,6 +101,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "agents"
                 ],
                 "summary": "join free node to a bag",
                 "parameters": [
@@ -125,6 +134,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/agents/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "list nodes, return all node ids",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/bagnodes/{bagName}": {
             "get": {
                 "description": "list all node ids which belong to this node",
@@ -133,6 +167,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "bags"
                 ],
                 "summary": "list bag nodes [no implementation]",
                 "responses": {
@@ -154,6 +191,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "bags"
+                ],
                 "summary": "list bag [no implementation]",
                 "responses": {
                     "200": {
@@ -171,6 +211,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "bags"
                 ],
                 "summary": "add bag",
                 "parameters": [
@@ -203,6 +246,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "bags"
+                ],
                 "summary": "get bag",
                 "parameters": [
                     {
@@ -229,6 +275,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "bags"
                 ],
                 "summary": "delete bag",
                 "parameters": [
@@ -258,6 +307,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "tasks"
                 ],
                 "summary": "add task",
                 "parameters": [
@@ -296,6 +348,9 @@ const docTemplate = `{
                 ],
                 "produces": [
                     "application/json"
+                ],
+                "tags": [
+                    "tasks"
                 ],
                 "summary": "get task",
                 "parameters": [
@@ -524,6 +579,9 @@ const docTemplate = `{
             "properties": {
                 "bagName": {
                     "type": "string"
+                },
+                "maxRunningTasks": {
+                    "type": "integer"
                 }
             }
         },

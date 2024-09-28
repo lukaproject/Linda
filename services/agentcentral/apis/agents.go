@@ -12,12 +12,14 @@ func EnableAgents(r *mux.Router) {
 	r.HandleFunc("/api/agents/join/{nodeId}", nodeJoin).Methods(http.MethodPost)
 	r.HandleFunc("/api/agents/free/{nodeId}", nodeFree).Methods(http.MethodPost)
 	r.HandleFunc("/api/agents/info/{nodeId}", nodeInfo).Methods(http.MethodGet)
+	r.HandleFunc("/api/agents/list", listNodes).Methods(http.MethodGet)
 }
 
 // node join godoc
 //
 //	@Summary		join free node to a bag
 //	@Description	join free node to a bag
+//	@Tags			agents
 //	@Param			nodeId		path	string				true	"node id"
 //	@Param			nodeJoinReq	body	apis.NodeJoinReq	true	"Node join request"
 //	@Accept			json
@@ -36,6 +38,7 @@ func nodeJoin(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		free node
 //	@Description	free node
+//	@Tags			agents
 //	@Param			nodeId		path	string				true	"node id"
 //	@Param			nodeFreeReq	body	apis.NodeFreeReq	true	"Node free request"
 //	@Accept			json
@@ -54,6 +57,7 @@ func nodeFree(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		get node info
 //	@Description	get node info
+//	@Tags			agents
 //	@Param			nodeId	path	string	true	"node id"
 //	@Accept			json
 //	@Produce		json
@@ -69,4 +73,16 @@ func nodeInfo(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusNotFound)
 	}
+}
+
+// nodes list godoc
+//
+//	@Summary	list nodes, return all node ids
+//	@Tags		agents
+//	@Accept		json
+//	@Produce	json
+//	@Success	200	{object}	[]string
+//	@Router		/agents/list [get]
+func listNodes(w http.ResponseWriter, r *http.Request) {
+	w.Write(models.Serialize(agents.GetMgrInstance().ListNodeIds()))
 }

@@ -26,6 +26,8 @@ type Mgr interface {
 	FreeNode(nodeId string)
 
 	GetNodeInfo(nodeId string) *models.NodeInfo
+
+	ListNodeIds() []string
 }
 
 type agentsmgr struct {
@@ -64,8 +66,12 @@ func (mgr *agentsmgr) addNewNodeToMem(
 func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	mgr.agentsRWMut.Lock()
 	defer mgr.agentsRWMut.Unlock()
-	delete(mgr.agents, nodeId)
-	logrus.Debugf("node %s removed", nodeId)
+	if _, ok := mgr.agents[nodeId]; ok {
+		delete(mgr.agents, nodeId)
+		logrus.Debugf("node %s removed", nodeId)
+	} else {
+		logrus.Debugf("node %s has been removed yet", nodeId)
+	}
 	return nil
 }
 
@@ -92,6 +98,16 @@ func (mgr *agentsmgr) GetNodeInfo(nodeId string) *models.NodeInfo {
 		return agent.GetInfo()
 	}
 	return nil
+}
+
+func (mgr *agentsmgr) ListNodeIds() (ret []string) {
+	ret = make([]string, 0, len(mgr.agents))
+	mgr.agentsRWMut.RLock()
+	defer mgr.agentsRWMut.RUnlock()
+	for k := range mgr.agents {
+		ret = append(ret, k)
+	}
+	return
 }
 
 func NewMgr() Mgr {

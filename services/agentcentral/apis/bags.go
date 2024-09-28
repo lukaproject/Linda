@@ -2,6 +2,7 @@ package apis
 
 import (
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/logic/agents"
 	"Linda/services/agentcentral/internal/logic/tasks"
 	"net/http"
 
@@ -11,7 +12,7 @@ import (
 
 func EnableBags(r *mux.Router) {
 	r.HandleFunc("/api/bags", addBag).Methods(http.MethodPost)
-	r.HandleFunc("/api/bags", listBag).Methods(http.MethodGet)
+	r.HandleFunc("/api/bags", listBags).Methods(http.MethodGet)
 	r.HandleFunc("/api/bags/{bagName}", getBag).Methods(http.MethodGet)
 	r.HandleFunc("/api/bags/{bagName}", deleteBag).Methods(http.MethodDelete)
 	r.HandleFunc("/api/bagnodes/{bagName}", listBagNodes).Methods(http.MethodGet)
@@ -21,6 +22,7 @@ func EnableBags(r *mux.Router) {
 //
 //	@Summary		add bag
 //	@Description	create a new bag
+//	@Tags			bags
 //	@Param			addBagReq	body	apis.AddBagReq	true	"bag's request"
 //	@Accept			json
 //	@Produce		json
@@ -42,6 +44,7 @@ func addBag(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		get bag
 //	@Description	get bag
+//	@Tags			bags
 //	@Param			bagName	path	string	true	"bag's name"
 //	@Accept			json
 //	@Produce		json
@@ -60,6 +63,7 @@ func getBag(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		delete bag
 //	@Description	delete bag
+//	@Tags			bags
 //	@Param			bagName	path	string	true	"bag's name"
 //	@Accept			json
 //	@Produce		json
@@ -73,26 +77,30 @@ func deleteBag(w http.ResponseWriter, r *http.Request) {
 
 // list Bag godoc
 //
-//	@Summary		list bag [no implementation]
-//	@Description	list bag
+//	@Summary		list bags [no implementation]
+//	@Description	list bags
+//	@Tags			bags
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags [get]
 //	@Success		200	{object}	apis.ListBagsResp
-func listBag(w http.ResponseWriter, r *http.Request) {
+func listBags(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
 	// TODO
 }
 
 // list bag nodes godoc
 //
-//	@Summary		list bag nodes [no implementation]
+//	@Summary		list bag nodes
 //	@Description	list all node ids which belong to this node
+//	@Tags			bags
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bagnodes/{bagName} [get]
 //	@Success		200	{object}	apis.ListBagNodesResp
 func listBagNodes(w http.ResponseWriter, r *http.Request) {
 	defer httpRecover(w, r)
-	_ = mux.Vars(r)["bagName"]
+	bagName := mux.Vars(r)["bagName"]
+	bn := &agents.BagNodes{}
+	bn.ListByBagName(bagName)
 }

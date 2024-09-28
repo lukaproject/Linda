@@ -122,6 +122,8 @@ definitions:
     properties:
       bagName:
         type: string
+      maxRunningTasks:
+        type: integer
     type: object
   apis.NodeJoinReq:
     properties:
@@ -163,6 +165,8 @@ paths:
           schema:
             type: string
       summary: free node
+      tags:
+      - agents
   /agents/info/{nodeId}:
     get:
       consumes:
@@ -182,6 +186,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.NodeInfo'
       summary: get node info
+      tags:
+      - agents
   /agents/join/{nodeId}:
     post:
       consumes:
@@ -207,6 +213,24 @@ paths:
           schema:
             type: string
       summary: join free node to a bag
+      tags:
+      - agents
+  /agents/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: list nodes, return all node ids
+      tags:
+      - agents
   /bagnodes/{bagName}:
     get:
       consumes:
@@ -220,6 +244,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.ListBagNodesResp'
       summary: list bag nodes [no implementation]
+      tags:
+      - bags
   /bags:
     get:
       consumes:
@@ -233,6 +259,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.ListBagsResp'
       summary: list bag [no implementation]
+      tags:
+      - bags
     post:
       consumes:
       - application/json
@@ -252,6 +280,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.AddBagResp'
       summary: add bag
+      tags:
+      - bags
   /bags/{bagName}:
     delete:
       consumes:
@@ -271,6 +301,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.DeleteBagResp'
       summary: delete bag
+      tags:
+      - bags
     get:
       consumes:
       - application/json
@@ -289,6 +321,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.GetBagResp'
       summary: get bag
+      tags:
+      - bags
   /bags/{bagName}/tasks:
     post:
       consumes:
@@ -314,6 +348,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.AddTaskResp'
       summary: add task
+      tags:
+      - tasks
   /bags/{bagName}/tasks/{taskName}:
     get:
       consumes:
@@ -338,6 +374,8 @@ paths:
           schema:
             $ref: '#/definitions/apis.GetTaskResp'
       summary: get task
+      tags:
+      - tasks
   /healthcheck:
     post:
       consumes:

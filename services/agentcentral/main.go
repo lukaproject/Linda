@@ -53,6 +53,7 @@ func main() {
 	apis.EnableBags(r)
 	apis.EnableTasks(r)
 	apis.EnableAgents(r)
+	apis.EnableInnerCall(r)
 	r.Use(middlewares.SetHeaderJSON)
 
 	logic.InitAgentsMgr()

@@ -1,6 +1,7 @@
 package models
 
 type NodeInfo struct {
+	NodeId string `gorm:"primaryKey"`
 	// 属于哪个bag name集群
 	BagName         string
 	MaxRunningTasks int
