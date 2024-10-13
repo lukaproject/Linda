@@ -152,6 +152,33 @@
                 }
             }
         },
+        "/agents/uploadfiles": {
+            "post": {
+                "description": "upload files to nodes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "upload files to nodes",
+                "parameters": [
+                    {
+                        "description": "upload files request",
+                        "name": "uploadFilesReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.UploadFilesReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
         "/bagnodes/{bagName}": {
             "get": {
                 "description": "list all node ids which belong to this node",
@@ -164,7 +191,7 @@
                 "tags": [
                     "bags"
                 ],
-                "summary": "list bag nodes [no implementation]",
+                "summary": "list bag nodes",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -177,7 +204,7 @@
         },
         "/bags": {
             "get": {
-                "description": "list bag",
+                "description": "list bags",
                 "consumes": [
                     "application/json"
                 ],
@@ -187,7 +214,7 @@
                 "tags": [
                     "bags"
                 ],
-                "summary": "list bag [no implementation]",
+                "summary": "list bags [no implementation]",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -367,6 +394,84 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/apis.GetTaskResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/files/download/{block}/{fileName}": {
+            "get": {
+                "description": "download file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "download file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "fileName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "block name",
+                        "name": "block",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/files/upload": {
+            "post": {
+                "description": "Upload file",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Upload file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "fileName",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "file block",
+                        "name": "block",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "this is a file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -583,6 +688,34 @@
             "properties": {
                 "bagName": {
                     "type": "string"
+                }
+            }
+        },
+        "apis.UploadFilesReq": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "locationPath": {
+                                "description": "the location of file",
+                                "type": "string"
+                            },
+                            "uri": {
+                                "description": "File's URI",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "nodes": {
+                    "description": "nodes list which will receive these files.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         }

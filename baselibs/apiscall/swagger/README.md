@@ -21,17 +21,20 @@ All URIs are relative to */api*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**AgentsFreeNodeIdPost**](docs/DefaultApi.md#agentsfreenodeidpost) | **Post** /agents/free/{nodeId} | free node
-*DefaultApi* | [**AgentsInfoNodeIdGet**](docs/DefaultApi.md#agentsinfonodeidget) | **Get** /agents/info/{nodeId} | get node info
-*DefaultApi* | [**AgentsJoinNodeIdPost**](docs/DefaultApi.md#agentsjoinnodeidpost) | **Post** /agents/join/{nodeId} | join free node to a bag
-*DefaultApi* | [**BagnodesBagNameGet**](docs/DefaultApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes [no implementation]
-*DefaultApi* | [**BagsBagNameDelete**](docs/DefaultApi.md#bagsbagnamedelete) | **Delete** /bags/{bagName} | delete bag
-*DefaultApi* | [**BagsBagNameGet**](docs/DefaultApi.md#bagsbagnameget) | **Get** /bags/{bagName} | get bag
-*DefaultApi* | [**BagsBagNameTasksPost**](docs/DefaultApi.md#bagsbagnametaskspost) | **Post** /bags/{bagName}/tasks | add task
-*DefaultApi* | [**BagsBagNameTasksTaskNameGet**](docs/DefaultApi.md#bagsbagnametaskstasknameget) | **Get** /bags/{bagName}/tasks/{taskName} | get task
-*DefaultApi* | [**BagsGet**](docs/DefaultApi.md#bagsget) | **Get** /bags | list bag [no implementation]
-*DefaultApi* | [**BagsPost**](docs/DefaultApi.md#bagspost) | **Post** /bags | add bag
+*AgentsApi* | [**AgentsFreeNodeIdPost**](docs/AgentsApi.md#agentsfreenodeidpost) | **Post** /agents/free/{nodeId} | free node
+*AgentsApi* | [**AgentsInfoNodeIdGet**](docs/AgentsApi.md#agentsinfonodeidget) | **Get** /agents/info/{nodeId} | get node info
+*AgentsApi* | [**AgentsJoinNodeIdPost**](docs/AgentsApi.md#agentsjoinnodeidpost) | **Post** /agents/join/{nodeId} | join free node to a bag
+*AgentsApi* | [**AgentsListGet**](docs/AgentsApi.md#agentslistget) | **Get** /agents/list | list nodes, return all node ids
+*BagsApi* | [**BagnodesBagNameGet**](docs/BagsApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes
+*BagsApi* | [**BagsBagNameDelete**](docs/BagsApi.md#bagsbagnamedelete) | **Delete** /bags/{bagName} | delete bag
+*BagsApi* | [**BagsBagNameGet**](docs/BagsApi.md#bagsbagnameget) | **Get** /bags/{bagName} | get bag
+*BagsApi* | [**BagsGet**](docs/BagsApi.md#bagsget) | **Get** /bags | list bags [no implementation]
+*BagsApi* | [**BagsPost**](docs/BagsApi.md#bagspost) | **Post** /bags | add bag
 *DefaultApi* | [**HealthcheckPost**](docs/DefaultApi.md#healthcheckpost) | **Post** /healthcheck | health check
+*FilesApi* | [**FilesDownloadBlockFileNameGet**](docs/FilesApi.md#filesdownloadblockfilenameget) | **Get** /files/download/{block}/{fileName} | download file
+*FilesApi* | [**FilesUploadPost**](docs/FilesApi.md#filesuploadpost) | **Post** /files/upload | Upload file
+*TasksApi* | [**BagsBagNameTasksPost**](docs/TasksApi.md#bagsbagnametaskspost) | **Post** /bags/{bagName}/tasks | add task
+*TasksApi* | [**BagsBagNameTasksTaskNameGet**](docs/TasksApi.md#bagsbagnametaskstasknameget) | **Get** /bags/{bagName}/tasks/{taskName} | get task
 
 ## Documentation For Models
 
@@ -46,10 +49,9 @@ Class | Method | HTTP request | Description
  - [ApisListBagNodesResp](docs/ApisListBagNodesResp.md)
  - [ApisListBagsResp](docs/ApisListBagsResp.md)
  - [ApisNodeFreeReq](docs/ApisNodeFreeReq.md)
- - [ApisNodeFreeResp](docs/ApisNodeFreeResp.md)
  - [ApisNodeInfo](docs/ApisNodeInfo.md)
  - [ApisNodeJoinReq](docs/ApisNodeJoinReq.md)
- - [ApisNodeJoinResp](docs/ApisNodeJoinResp.md)
+ - [FilesUploadBody](docs/FilesUploadBody.md)
 
 ## Documentation For Authorization
  Endpoints do not require authorization.

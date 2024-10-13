@@ -45,3 +45,13 @@ type FreeNode struct {
 type JoinBag struct {
 	BagName string
 }
+
+type FileDescription struct {
+	Uri          string
+	LocationPath string
+}
+
+type UploadFiles struct {
+	OperationId string
+	Files       []FileDescription
+}

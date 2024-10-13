@@ -69,3 +69,14 @@ type NodeInfo struct {
 	BagName         string
 	MaxRunningTasks int
 }
+
+type UploadFilesReq struct {
+	Files []struct {
+		// File's URI
+		Uri string
+		// the location of file
+		LocationPath string
+	}
+	// nodes list which will receive these files.
+	Nodes []string
+}

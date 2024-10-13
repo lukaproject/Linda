@@ -9,6 +9,7 @@ import (
 
 var (
 	asyncWorksInstance *AsyncWorks
+	fileSaverInstnce   FileSaver
 )
 
 func InitAsyncWorksInstance() {
@@ -25,4 +26,12 @@ func InitAsyncWorksInstance() {
 
 func GetAsyncWorksInstance() *AsyncWorks {
 	return asyncWorksInstance
+}
+
+func InitFileSaver() {
+	fileSaverInstnce = NewLocalFileSaver()
+}
+
+func GetFileSaverInstance() FileSaver {
+	return fileSaverInstnce
 }

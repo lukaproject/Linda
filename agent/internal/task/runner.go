@@ -1,7 +1,7 @@
 package task
 
 import (
-	"Linda/agent/internal/utils"
+	"Linda/baselibs/abstractions/xos"
 	"io/fs"
 	"runtime"
 	"sync"
@@ -83,7 +83,7 @@ func (r *runner) taskRunningCallback(t Task) {
 }
 
 func (r *runner) createWorkingDir(t Task) (err error) {
-	utils.MkdirAll(t.GetWorkingDir(), fs.ModePerm)
+	xos.MkdirAll(t.GetWorkingDir(), fs.ModePerm)
 	return
 }
 

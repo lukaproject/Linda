@@ -30,7 +30,7 @@ func (s *nodeControlTestSuite) TestNormalScenario() {
 	currentStage := &stage.Stage{}
 	currentStage.SetUp(s.T(), cli)
 	testBagName := currentStage.CreateBag("test-current-bag")
-	joinBagResp, resp := xerr.Must2(cli.DefaultApi.AgentsJoinNodeIdPost(
+	joinBagResp, resp := xerr.Must2(cli.AgentsApi.AgentsJoinNodeIdPost(
 		context.Background(), swagger.ApisNodeJoinReq{
 			BagName: testBagName,
 		}, test_node_id))
@@ -39,7 +39,7 @@ func (s *nodeControlTestSuite) TestNormalScenario() {
 	<-currentStage.WaitForNodeJoinFinished(test_node_id, testBagName)
 	s.T().Log("join bag finished")
 
-	freeNodeResp, resp := xerr.Must2(cli.DefaultApi.AgentsFreeNodeIdPost(
+	freeNodeResp, resp := xerr.Must2(cli.AgentsApi.AgentsFreeNodeIdPost(
 		context.Background(), swagger.ApisNodeFreeReq{}, test_node_id))
 	s.Equal(http.StatusOK, resp.StatusCode)
 	s.T().Log(freeNodeResp)

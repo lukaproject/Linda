@@ -13,6 +13,7 @@ func EnableAgents(r *mux.Router) {
 	r.HandleFunc("/api/agents/free/{nodeId}", nodeFree).Methods(http.MethodPost)
 	r.HandleFunc("/api/agents/info/{nodeId}", nodeInfo).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/list", listNodes).Methods(http.MethodGet)
+	r.HandleFunc("/api/agents/uploadfiles", uploadFilesToNodes).Methods(http.MethodPost)
 }
 
 // node join godoc
@@ -85,4 +86,18 @@ func nodeInfo(w http.ResponseWriter, r *http.Request) {
 //	@Router		/agents/list [get]
 func listNodes(w http.ResponseWriter, r *http.Request) {
 	w.Write(models.Serialize(agents.GetMgrInstance().ListNodeIds()))
+}
+
+// upload files to nodes godoc
+//
+//	@Summary		upload files to nodes
+//	@Description	upload files to nodes
+//	@Tags			agents
+//	@Accept			json
+//	@Produce		json
+//	@Param			uploadFilesReq	body	apis.UploadFilesReq	true	"upload files request"
+//	@Router			/agents/uploadfiles [post]
+func uploadFilesToNodes(w http.ResponseWriter, r *http.Request) {
+	req := UploadFilesReq{}
+	models.ReadJSON(r.Body, &req)
 }

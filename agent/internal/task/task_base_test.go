@@ -2,6 +2,7 @@ package task
 
 import (
 	"Linda/agent/internal/utils"
+	"Linda/baselibs/abstractions/xos"
 	"os"
 	"path"
 
@@ -47,7 +48,7 @@ func (s *testBase) taskRequireDir(t Task) string {
 }
 
 func (s *testBase) createTaskRequireDir(t Task) {
-	utils.MkdirAll(s.taskRequireDir(t), os.ModePerm)
+	xos.MkdirAll(s.taskRequireDir(t), os.ModePerm)
 }
 
 func (s *testBase) createNewTestTask(name, bag, script string, resource int) Task {

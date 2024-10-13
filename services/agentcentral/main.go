@@ -15,6 +15,7 @@ import (
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
 	"Linda/services/agentcentral/apis"
+	"Linda/services/agentcentral/apis/files"
 	"Linda/services/agentcentral/apis/middlewares"
 	_ "Linda/services/agentcentral/docs"
 	"Linda/services/agentcentral/internal/config"
@@ -54,12 +55,12 @@ func main() {
 	apis.EnableTasks(r)
 	apis.EnableAgents(r)
 	apis.EnableInnerCall(r)
+	files.EnableFiles(r)
 	r.Use(middlewares.SetHeaderJSON)
 
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()
 	logic.InitAsyncWorks()
-
 	port := fmt.Sprintf(":%d", config.Instance().Port)
 	logrus.Infof("serve in %s", port)
 	logrus.Fatal(http.ListenAndServe(port, r))

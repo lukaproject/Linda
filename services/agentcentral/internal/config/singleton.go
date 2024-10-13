@@ -2,9 +2,11 @@ package config
 
 import (
 	"Linda/baselibs/abstractions/defaultor"
+	"Linda/baselibs/abstractions/xos"
 	"encoding/json"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/lukaproject/xerr"
 )
@@ -23,5 +25,11 @@ func Initial(configfile string) {
 			xerr.Must(os.Open(configfile)),
 		)), &fromfile)
 		c.Merge(&fromfile)
+	}
+
+	if strings.ToLower(c.Env) == "test" {
+		c.FileSaver = &FileSaverConfig{
+			RootDir: xos.CurrentPath(),
+		}
 	}
 }

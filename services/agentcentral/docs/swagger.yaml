@@ -130,6 +130,25 @@ definitions:
       bagName:
         type: string
     type: object
+  apis.UploadFilesReq:
+    properties:
+      files:
+        items:
+          properties:
+            locationPath:
+              description: the location of file
+              type: string
+            uri:
+              description: File's URI
+              type: string
+          type: object
+        type: array
+      nodes:
+        description: nodes list which will receive these files.
+        items:
+          type: string
+        type: array
+    type: object
 info:
   contact: {}
   description: This is agent central swagger API
@@ -231,6 +250,24 @@ paths:
       summary: list nodes, return all node ids
       tags:
       - agents
+  /agents/uploadfiles:
+    post:
+      consumes:
+      - application/json
+      description: upload files to nodes
+      parameters:
+      - description: upload files request
+        in: body
+        name: uploadFilesReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.UploadFilesReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: upload files to nodes
+      tags:
+      - agents
   /bagnodes/{bagName}:
     get:
       consumes:
@@ -243,14 +280,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apis.ListBagNodesResp'
-      summary: list bag nodes [no implementation]
+      summary: list bag nodes
       tags:
       - bags
   /bags:
     get:
       consumes:
       - application/json
-      description: list bag
+      description: list bags
       produces:
       - application/json
       responses:
@@ -258,7 +295,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/apis.ListBagsResp'
-      summary: list bag [no implementation]
+      summary: list bags [no implementation]
       tags:
       - bags
     post:
@@ -376,6 +413,59 @@ paths:
       summary: get task
       tags:
       - tasks
+  /files/download/{block}/{fileName}:
+    get:
+      consumes:
+      - application/json
+      description: download file
+      parameters:
+      - description: file name
+        in: path
+        name: fileName
+        required: true
+        type: string
+      - description: block name
+        in: path
+        name: block
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses: {}
+      summary: download file
+      tags:
+      - files
+  /files/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload file
+      parameters:
+      - description: file name
+        in: formData
+        name: fileName
+        required: true
+        type: string
+      - description: file block
+        in: formData
+        name: block
+        required: true
+        type: string
+      - description: this is a file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Upload file
+      tags:
+      - files
   /healthcheck:
     post:
       consumes:
