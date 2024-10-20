@@ -8,24 +8,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	LocalDBBucket = "bucket"
-
-	BagNameKey = "LINDA_BAGNAME"
-)
-
 var localdbInstance *LocalDB = nil
 
 func Initial() {
 	localdbInstance = New()
-	xerr.Must0(localdbInstance.db.Update(
-		func(tx *nutsdb.Tx) error {
-			if tx.ExistBucket(nutsdb.DataStructureBTree, LocalDBBucket) {
-				logrus.Info("localdb has created before!")
-				return nil
-			}
-			return tx.NewBucket(nutsdb.DataStructureBTree, LocalDBBucket)
-		}))
 }
 
 func Instance() *LocalDB {
@@ -45,18 +31,18 @@ func New() (ldb *LocalDB) {
 	return
 }
 
-func (ldb *LocalDB) Set(k, v string) error {
+func (ldb *LocalDB) Set2(bucket string, k, v []byte) error {
 	return ldb.db.Update(func(tx *nutsdb.Tx) error {
-		if err := tx.Put(LocalDBBucket, []byte(k), []byte(v), 0); err != nil {
+		if err := tx.Put(bucket, k, v, 0); err != nil {
 			return err
 		}
 		return nil
 	})
 }
 
-func (ldb *LocalDB) Delete(k string) error {
+func (ldb *LocalDB) Delete2(bucket string, k []byte) error {
 	return ldb.db.Update(func(tx *nutsdb.Tx) error {
-		if err := tx.Delete(LocalDBBucket, []byte(k)); err != nil {
+		if err := tx.Delete(bucket, k); err != nil {
 			if err == nutsdb.ErrKeyNotFound {
 				return nil
 			}
@@ -66,16 +52,37 @@ func (ldb *LocalDB) Delete(k string) error {
 	})
 }
 
-func (ldb *LocalDB) Get(k string) (v string, err error) {
+func (ldb *LocalDB) Get2(bucket string, k []byte) (v []byte, err error) {
 	err = ldb.db.View(
 		func(tx *nutsdb.Tx) error {
-			bytev, err := tx.Get(LocalDBBucket, []byte(k))
+			bytev, err := tx.Get(bucket, k)
 			if err != nil {
-				v = ""
 				return err
 			}
-			v = string(bytev)
+			v = bytev
 			return nil
 		})
+	return
+}
+
+func (ldb *LocalDB) NewBucket(bucket string) error {
+	return localdbInstance.db.Update(
+		func(tx *nutsdb.Tx) error {
+			if tx.ExistBucket(nutsdb.DataStructureBTree, bucket) {
+				logrus.Warnf("localdb bucket %s has created before!", bucket)
+				return nil
+			}
+			return tx.NewBucket(nutsdb.DataStructureBTree, bucket)
+		})
+}
+
+func (ldb *LocalDB) ExistBucket(bucket string) (exist bool) {
+	exist = false
+	_ = localdbInstance.db.View(func(tx *nutsdb.Tx) error {
+		if tx.ExistBucket(nutsdb.DataStructureBTree, bucket) {
+			exist = true
+		}
+		return nil
+	})
 	return
 }

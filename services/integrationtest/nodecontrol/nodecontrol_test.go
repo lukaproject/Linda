@@ -12,10 +12,6 @@ import (
 	"github.com/stretchr/testify/suite"
 )
 
-const (
-	test_node_id = "test-node-id-1"
-)
-
 // 这里用来测试node join bag / free node / get node info
 // 相关的API
 type nodeControlTestSuite struct {
@@ -29,6 +25,7 @@ func (s *nodeControlTestSuite) TestNormalScenario() {
 
 	currentStage := &stage.Stage{}
 	currentStage.SetUp(s.T(), cli)
+	test_node_id := currentStage.ListNodeIds()[0]
 	testBagName := currentStage.CreateBag("test-current-bag")
 	joinBagResp, resp := xerr.Must2(cli.AgentsApi.AgentsJoinNodeIdPost(
 		context.Background(), swagger.ApisNodeJoinReq{

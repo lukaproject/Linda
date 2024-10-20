@@ -86,6 +86,14 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 	return ch
 }
 
+func (s *Stage) ListNodeIds() []string {
+	nodeIds, resp := xerr.Must2(s.cli.AgentsApi.AgentsListGet(context.Background()))
+	if resp.StatusCode != http.StatusOK {
+		s.t.Logf("list nodes id info failed, %d", resp.StatusCode)
+	}
+	return nodeIds
+}
+
 // DownloadFromURL
 // 现在Swagger生成出来的client没法下载bytes，所以只能暂时用这种方法代替
 func (s *Stage) DownloadFromURL(url string) []byte {

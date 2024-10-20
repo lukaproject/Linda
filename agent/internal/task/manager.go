@@ -2,7 +2,7 @@ package task
 
 import (
 	"Linda/agent/internal/config"
-	"Linda/agent/internal/localdb"
+	"Linda/agent/internal/data"
 	"Linda/protocol/models"
 	"net/http"
 	"strings"
@@ -47,10 +47,10 @@ func (m *Mgr) PopFinishedTasks() (finishedTaskNames []string) {
 	return
 }
 
-func (m *Mgr) fetchTaskDataByTaskName(taskName string) (data TaskData, err error) {
+func (m *Mgr) fetchTaskDataByTaskName(taskName string) (taskData TaskData, err error) {
 	func() {
 		defer xerr.Recover(&err)
-		bagName := xerr.Must(localdb.Instance().Get(localdb.BagNameKey))
+		bagName := data.Instance().NodeData.BagName
 		taskUrl := m.getTaskUrl(bagName, taskName)
 		resp := xerr.Must(http.Get(taskUrl))
 		if resp.StatusCode != http.StatusOK {
@@ -61,7 +61,7 @@ func (m *Mgr) fetchTaskDataByTaskName(taskName string) (data TaskData, err error
 		}
 		t := &models.Task{}
 		models.ReadJSON(resp.Body, t)
-		data.FromTaskModel(t)
+		taskData.FromTaskModel(t)
 	}()
 	return
 }

@@ -8,9 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type FileDownloader struct{}
+type fileDownloader struct{}
 
-func (d *FileDownloader) Download(url, targetPath string) (err error) {
+func (d *fileDownloader) Download(url, targetPath string) (err error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		logrus.Error(err)

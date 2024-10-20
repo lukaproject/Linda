@@ -3,7 +3,7 @@ package handler
 import (
 	"Linda/agent/client"
 	"Linda/agent/internal/config"
-	"Linda/agent/internal/localdb"
+	"Linda/agent/internal/data"
 	"Linda/agent/internal/task"
 	"Linda/protocol/models"
 	"fmt"
@@ -66,10 +66,9 @@ func (h *Handler) packReq() (req *models.HeartBeatFromAgent) {
 	req = &models.HeartBeatFromAgent{
 		SeqId: h.seqId,
 	}
-	if bagName, err := localdb.Instance().Get(localdb.BagNameKey); err == nil {
-		req.Node = models.NodeInfo{
-			BagName: bagName,
-		}
+	nodeData := data.GetData(data.Instance().NodeData, true)
+	req.Node = models.NodeInfo{
+		BagName: nodeData.BagName,
 	}
 	if h.taskMgr != nil {
 		req.FinishedTaskNames = h.taskMgr.PopFinishedTasks()
@@ -81,15 +80,18 @@ func (h *Handler) joinBag(joinBag *models.JoinBag) {
 	if joinBag == nil {
 		return
 	}
-	nowBagName, err := localdb.Instance().Get(localdb.BagNameKey)
-	if err == nil {
-		if nowBagName != joinBag.BagName {
-			logrus.Warnf(
-				"join bag failed, current bag %s != comming bag %s",
-				nowBagName, joinBag.BagName)
-		}
+	nowBagName := data.GetData(data.Instance().NodeData, true).BagName
+	if nowBagName != joinBag.BagName {
+		logrus.Warnf(
+			"join bag failed, current bag %s != comming bag %s",
+			nowBagName, joinBag.BagName)
 	}
-	xerr.Must0(localdb.Instance().Set(localdb.BagNameKey, joinBag.BagName))
+
+	data.Instance().UpdateNodeData(
+		func(nd *data.NodeData) *data.NodeData {
+			nd.BagName = joinBag.BagName
+			return nd
+		})
 	logrus.Infof("join bag %s", joinBag.BagName)
 }
 
@@ -97,7 +99,11 @@ func (h *Handler) freeNode(freeNode *models.FreeNode) {
 	if freeNode == nil {
 		return
 	}
-	xerr.Must0(localdb.Instance().Delete(localdb.BagNameKey))
+	data.Instance().UpdateNodeData(
+		func(nd *data.NodeData) *data.NodeData {
+			nd.BagName = ""
+			return nd
+		})
 	logrus.Info("free node")
 }
 

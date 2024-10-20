@@ -3,6 +3,7 @@ package handler_test
 import (
 	"Linda/agent/client"
 	"Linda/agent/internal/config"
+	"Linda/agent/internal/data"
 	"Linda/agent/internal/handler"
 	"Linda/agent/internal/localdb"
 	"Linda/protocol/models"
@@ -26,6 +27,7 @@ func (s *testHandlerUnitSuite) TestJoinBag() {
 	}
 	config.SetInstance(conf)
 	localdb.Initial()
+	data.Initial()
 	mockCli := &client.MockClient{
 		HBFromServersList: []*models.HeartBeatFromServer{
 			{
