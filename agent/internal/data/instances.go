@@ -16,8 +16,7 @@ func Initial() {
 	iMgrInstance = &InstanceManager{
 		NodeData: &NodeData{},
 	}
-
-	iMgrInstance.NodeData.Load()
+	iMgrInstance.NodeData.SetUp()
 }
 
 func Instance() *InstanceManager {
@@ -28,4 +27,5 @@ func (im *InstanceManager) UpdateNodeData(updateFunc func(*NodeData) *NodeData) 
 	im.ndMut.Lock()
 	defer im.ndMut.Unlock()
 	im.NodeData = updateFunc(im.NodeData)
+	im.NodeData.Store()
 }

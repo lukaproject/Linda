@@ -1,6 +1,7 @@
 package data
 
 import (
+	"Linda/agent/internal/config"
 	"Linda/agent/internal/localdb"
 	"encoding/json"
 
@@ -19,7 +20,8 @@ var (
 // NodeData
 // NodeData会存储所有node相关的会被持久化的信息
 type NodeData struct {
-	BagName string
+	BagName  string
+	NodeName string
 }
 
 func (nd *NodeData) getPersistor() (p *localdb.Persistor[*KeyType, *NodeData]) {
@@ -49,4 +51,10 @@ func (nd *NodeData) Serialize() []byte {
 
 func (nd *NodeData) Deserialize(b []byte) (err error) {
 	return json.Unmarshal(b, nd)
+}
+
+func (nd *NodeData) SetUp() {
+	nd.Load()
+	nd.NodeName = config.Instance().NodeName
+	nd.Store()
 }

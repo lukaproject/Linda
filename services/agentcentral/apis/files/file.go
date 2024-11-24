@@ -22,7 +22,7 @@ func EnableFiles(r *mux.Router) {
 // Upload file
 //
 //	@Summary		Upload file
-//	@Description	Upload file
+//	@Description	Upload file, can only upload 1 file.
 //	@Tags			files
 //	@Accept			multipart/form-data
 //	@Produce		json

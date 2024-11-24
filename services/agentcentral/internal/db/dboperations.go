@@ -134,8 +134,36 @@ func (dbo *DBOperations) GetTaskByMultiFields(fieldsMap map[string]any) (tasksRe
 	return
 }
 
-func (dbo *DBOperations) AddNodeInfo(nodeInfo *models.NodeInfo) {
-	xerr.Must0(dbo.dbi.Create(nodeInfo).Error)
+func (dbo *DBOperations) AddNodeInfo(nodeInfo *models.NodeInfo) error {
+	return dbo.dbi.Create(nodeInfo).Error
+}
+
+func (dbo *DBOperations) DeleteNodeInfoByNodeId(nodeId string) {
+	xerr.Must0(dbo.dbi.Delete(&models.NodeInfo{
+		NodeId: nodeId,
+	}).Error)
+}
+
+func (dbo *DBOperations) DeleteNodeInfoByNodeName(nodeName string) {
+	xerr.Must0(dbo.dbi.Delete(&models.NodeInfo{
+		NodeName: nodeName,
+	}).Error)
+}
+
+func (dbo *DBOperations) GetNodeInfoByNodeId(nodeId string) (nodeInfo *models.NodeInfo) {
+	nodeInfo = &models.NodeInfo{
+		NodeId: nodeId,
+	}
+	xerr.Must0(dbo.dbi.First(nodeInfo).Error)
+	return
+}
+
+func (dbo *DBOperations) GetNodeInfoByNodeName(nodeName string) (nodeInfo *models.NodeInfo) {
+	nodeInfo = &models.NodeInfo{
+		NodeName: nodeName,
+	}
+	xerr.Must0(dbo.dbi.First(nodeInfo).Error)
+	return
 }
 
 func NewDBOperations() *DBOperations {

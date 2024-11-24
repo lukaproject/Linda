@@ -3,6 +3,7 @@ package agents
 import (
 	"Linda/baselibs/codes/errno"
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
 	"net/http"
 	"sync"
@@ -68,6 +69,7 @@ func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	defer mgr.agentsRWMut.Unlock()
 	if _, ok := mgr.agents[nodeId]; ok {
 		delete(mgr.agents, nodeId)
+		db.NewDBOperations().DeleteNodeInfoByNodeId(nodeId)
 		logrus.Debugf("node %s removed", nodeId)
 	} else {
 		logrus.Debugf("node %s has been removed yet", nodeId)

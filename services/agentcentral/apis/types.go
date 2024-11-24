@@ -74,9 +74,9 @@ type UploadFilesReq struct {
 	Files []struct {
 		// File's URI
 		Uri string
-		// the location of file
+		// the location of file in node
 		LocationPath string
 	}
-	// nodes list which will receive these files.
+	// nodes id list which will receive these files.
 	Nodes []string
 }

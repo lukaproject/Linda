@@ -57,7 +57,7 @@ func nodeFree(w http.ResponseWriter, r *http.Request) {
 // node info godoc
 //
 //	@Summary		get node info
-//	@Description	get node info
+//	@Description	get node info by node id
 //	@Tags			agents
 //	@Param			nodeId	path	string	true	"node id"
 //	@Accept			json

@@ -4,6 +4,7 @@ import (
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/config"
+	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
 	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 	"runtime/debug"
@@ -30,6 +31,7 @@ type Agent interface {
 type agentHolder struct {
 	conn       *websocket.Conn
 	nodeId     string
+	nodeName   string
 	nodeStates *nodeStates
 
 	lastHBTime      time.Time
@@ -44,6 +46,7 @@ func (ah *agentHolder) GetInfo() *models.NodeInfo {
 	return &models.NodeInfo{
 		BagName:         ah.nodeStates.GetBagName(),
 		MaxRunningTasks: ah.maxRunningTasks,
+		NodeName:        ah.nodeName,
 	}
 }
 
@@ -189,6 +192,21 @@ func (ah *agentHolder) processScheduledTask(bagName string, scheduledTaskNames [
 	return
 }
 
+func (ah *agentHolder) persistNodeInfo() (success bool) {
+	nodeInfo := &models.NodeInfo{
+		NodeId:          ah.nodeId,
+		NodeName:        ah.nodeName,
+		BagName:         ah.nodeStates.GetBagName(),
+		MaxRunningTasks: ah.maxRunningTasks,
+	}
+	err := db.NewDBOperations().AddNodeInfo(nodeInfo)
+	if err != nil {
+		logrus.Error(err)
+		return false
+	}
+	return true
+}
+
 func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	ah := &agentHolder{
 		conn:        conn,
@@ -205,14 +223,19 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	}
 	logrus.Infof("nodeId %s", nodeId)
 	ah.nodeStates = newNodeStates()
-	ah.lastHBTime = time.Now()
+	ah.nodeName = hbStart.Node.NodeName
 	ah.maxRunningTasks = max(hbStart.Node.MaxRunningTasks, 1)
-	err = hbconn.WriteMessage(ah.conn, &models.HeartBeatStartResponse{
-		Result: models.OK,
-	})
-	if err != nil {
+	success := ah.persistNodeInfo()
+	response := &models.HeartBeatStartResponse{}
+	if success {
+		response.Result = models.OK
+	} else {
+		response.Result = models.ADD_NODE_INFO_FAILED
+	}
+	if err = hbconn.WriteMessage(ah.conn, response); err != nil {
 		return nil, err
 	}
+	ah.lastHBTime = time.Now()
 	go ah.readHBLoop()
 	return ah, nil
 }

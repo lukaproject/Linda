@@ -34,6 +34,7 @@ func (h *Handler) startHeartBeat() {
 		h.cli.HeartBeatStart(&models.HeartBeatStart{
 			Node: models.NodeInfo{
 				MaxRunningTasks: 1,
+				NodeName:        data.Instance().NodeData.NodeName,
 			},
 		}))
 	if resp.Result != models.OK {
@@ -83,7 +84,7 @@ func (h *Handler) joinBag(joinBag *models.JoinBag) {
 	nowBagName := data.GetData(data.Instance().NodeData, true).BagName
 	if nowBagName != joinBag.BagName {
 		logrus.Warnf(
-			"join bag failed, current bag %s != comming bag %s",
+			"join bag failed, current bag %s not equal to comming bag %s",
 			nowBagName, joinBag.BagName)
 	}
 
