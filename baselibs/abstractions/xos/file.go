@@ -1,6 +1,7 @@
 package xos
 
 import (
+	"io"
 	"io/fs"
 	"os"
 
@@ -33,4 +34,8 @@ func MkdirAll(path string, mode fs.FileMode) {
 	if !PathExists(path) {
 		xerr.Must0(os.MkdirAll(path, mode))
 	}
+}
+
+func ReadStringFromFile(path string) string {
+	return string(xerr.Must(io.ReadAll(xerr.Must(os.Open(path)))))
 }
