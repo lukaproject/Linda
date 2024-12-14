@@ -4,6 +4,7 @@ import (
 	"Linda/agent/client"
 	"Linda/agent/internal/config"
 	"Linda/agent/internal/data"
+	"Linda/agent/internal/filemanager"
 	"Linda/agent/internal/task"
 	"Linda/protocol/models"
 	"fmt"
@@ -17,6 +18,7 @@ type Handler struct {
 	cli     client.IClient
 	seqId   int64
 	taskMgr task.IMgr
+	fileMgr filemanager.Mgr
 }
 
 func (h *Handler) Start() {
@@ -61,6 +63,9 @@ func (h *Handler) unPackResp(resp *models.HeartBeatFromServer) {
 			}
 		}()
 	}
+	if len(resp.DownloadFiles) != 0 {
+		go downloadFiles(h.fileMgr, resp.DownloadFiles)
+	}
 }
 
 func (h *Handler) packReq() (req *models.HeartBeatFromAgent) {
@@ -82,7 +87,7 @@ func (h *Handler) joinBag(joinBag *models.JoinBag) {
 		return
 	}
 	nowBagName := data.GetData(data.Instance().NodeData, true).BagName
-	if nowBagName != joinBag.BagName {
+	if nowBagName != joinBag.BagName && nowBagName != "" {
 		logrus.Warnf(
 			"join bag failed, current bag %s not equal to comming bag %s",
 			nowBagName, joinBag.BagName)
@@ -112,12 +117,12 @@ func NewHandler(c *config.Config) *Handler {
 	if c == nil {
 		c = config.Instance()
 	}
-	return NewHandlerWithCliAndTaskMgr(
+	return NewHandlerWithParameters(
 		xerr.Must(client.New(c.AgentHeartBeatUrl())),
 		task.NewMgr())
 }
 
-func NewHandlerWithCliAndTaskMgr(
+func NewHandlerWithParameters(
 	cli client.IClient,
 	taskMgr task.IMgr,
 ) *Handler {

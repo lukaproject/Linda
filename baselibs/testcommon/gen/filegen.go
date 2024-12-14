@@ -37,17 +37,23 @@ func FileGenerate(roles FileGenerateRoles) (err error) {
 	if err != nil {
 		return err
 	}
+	dirs = append(dirs, roles.RootDir)
 	rest := roles.MaxCount
 	for _, dir := range dirs {
 		cur := rand.Intn(rest) + 1
-		fileOnlyGenerate(fileOnlyGenerateRoles{
+		n, err := fileOnlyGenerate(fileOnlyGenerateRoles{
 			RootDir:        dir,
 			MaxFileNameLen: roles.MaxNameLen,
+			MinCount:       1,
 			MaxCount:       cur,
 		})
-		rest -= cur
+		if err != nil {
+			// fmt.Printf("dir=%s, not created\n", dir)
+			return err
+		}
+		rest -= n
 		if rest <= 0 {
-			return
+			return nil
 		}
 	}
 	return
@@ -100,6 +106,7 @@ func dirOnlyGenerate(roles dirOnlyGenerateRoles) (dirs []string, err error) {
 	dirs = make([]string, 0)
 	if roles.MaxDirDepth <= 0 {
 		// no more depth, create directory.
+		// fmt.Printf("dir=%s, created\n", roles.RootDir)
 		xos.MkdirAll(roles.RootDir, os.ModePerm)
 		dirs = append(dirs, roles.RootDir)
 		return
@@ -117,7 +124,6 @@ func dirOnlyGenerate(roles dirOnlyGenerateRoles) (dirs []string, err error) {
 			return nil, err
 		}
 		fullDirName := path.Join(roles.RootDir, dirname)
-		dirs = append(dirs, fullDirName)
 		var subDirs []string
 		subDirs, err = dirOnlyGenerate(dirOnlyGenerateRoles{
 			RootDir:       fullDirName,

@@ -39,3 +39,19 @@ func MkdirAll(path string, mode fs.FileMode) {
 func ReadStringFromFile(path string) string {
 	return string(xerr.Must(io.ReadAll(xerr.Must(os.Open(path)))))
 }
+
+// Touch
+// a unix-like operation `touch xxxx`,
+// to create an empty file in this path.
+func Touch(path string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		if os.IsExist(err) {
+			return nil
+		} else {
+			return err
+		}
+	}
+	f.Close()
+	return nil
+}

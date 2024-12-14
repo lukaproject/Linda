@@ -19,10 +19,10 @@ type testHandlerUnitSuite struct {
 }
 
 func (s *testHandlerUnitSuite) TestJoinBag() {
-	LocaldbDir := path.Join(s.T().TempDir(), "localdb")
+	localdbDir := path.Join(s.T().TempDir(), "TestJoinBag", "localdb")
 	conf := &config.Config{
 		NodeId:            "test-node-id-1",
-		LocalDBDir:        LocaldbDir,
+		LocalDBDir:        localdbDir,
 		HeartbeatPeriodMs: 50,
 	}
 	config.SetInstance(conf)
@@ -56,14 +56,69 @@ func (s *testHandlerUnitSuite) TestJoinBag() {
 			},
 		},
 	}
-	h := handler.NewHandlerWithCliAndTaskMgr(mockCli, nil)
+	h := handler.NewHandlerWithParameters(mockCli, nil)
 	h.Start()
 	<-time.After(2 * time.Second)
-	for id, v := range mockCli.HBFromAgentsList {
-		if id < 20 {
-			s.T().Log(v)
+	count := 0
+	for _, v := range mockCli.HBFromAgentsList {
+		if v.Node.BagName == "testBagName" {
+			count++
 		}
 	}
+	s.Greater(count, 5)
+}
+
+func (s *testHandlerUnitSuite) TestJoinBagAndFreeNode() {
+	localdbDir := path.Join(s.T().TempDir(), "TestJoinBagAndFreeNode", "localdb")
+	conf := &config.Config{
+		NodeId:            "test-node-id-1",
+		LocalDBDir:        localdbDir,
+		HeartbeatPeriodMs: 50,
+	}
+	config.SetInstance(conf)
+	localdb.Initial()
+	data.Initial()
+
+	joinSendOK := false
+	joinReportNum := 0
+	freeSendOK := false
+	freeReportNum := 0
+	testBagName := "testBagName"
+
+	mockCli := &client.MockClient{
+		HBHandleFunc: func(req *models.HeartBeatFromAgent) (resp *models.HeartBeatFromServer) {
+			resp = &models.HeartBeatFromServer{
+				SeqId: req.SeqId,
+			}
+			if req.Node.BagName == testBagName {
+				joinReportNum++
+			}
+			if req.Node.BagName == "" && freeSendOK {
+				freeReportNum++
+			}
+			if !joinSendOK {
+				resp.JoinBag = &models.JoinBag{
+					BagName: testBagName,
+				}
+				joinSendOK = true
+				return
+			} else if joinReportNum < 5 {
+				return
+			} else if !freeSendOK {
+				freeSendOK = true
+				resp.FreeNode = &models.FreeNode{}
+				return
+			}
+			return
+		},
+	}
+	h := handler.NewHandlerWithParameters(mockCli, nil)
+	h.Start()
+	<-time.After(3 * time.Second)
+	s.True(joinSendOK)
+	s.GreaterOrEqual(joinReportNum, 5)
+	s.GreaterOrEqual(freeReportNum, 5)
+	s.True(freeSendOK)
 }
 
 func TestHandlerUnit(t *testing.T) {

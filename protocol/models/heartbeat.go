@@ -23,6 +23,8 @@ type HeartBeatFromServer struct {
 	SeqId int64
 
 	ScheduledTaskNames []string
+	// 需要下载的文件
+	DownloadFiles []FileDescription
 
 	HeartBeatEnd *HeartBeatEnd
 	JoinBag      *JoinBag
