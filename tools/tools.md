@@ -4,14 +4,14 @@
 
 ## 下载新版本golang
 ```bash
-go install golang.org/dl/go1.21.12@latest
-go1.21.12 download
+go install golang.org/dl/go1.23.4@latest
+go1.23.4 download
 ```
 
 ## ENV
 ### build ENV
 
-- go version 1.21+, 目前是 go1.21.12
+- go version 1.22+, 目前是 go1.23.4
 - 使用installswag.sh 安装 swag
 - run
 ```bash

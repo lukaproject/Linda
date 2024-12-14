@@ -1,15 +1,16 @@
 module Linda/services/agentcentral
 
-go 1.21
+go 1.23
 
 require (
 	github.com/alicebob/miniredis/v2 v2.33.0
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.3
 	github.com/lukaproject/xerr v0.0.0-20240622080714-d12bd2b3a6fc
 	github.com/redis/go-redis/v9 v9.5.3
 	github.com/sirupsen/logrus v1.9.3
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.3
 	gorm.io/driver/postgres v1.5.9
@@ -40,7 +41,7 @@ require (
 	github.com/yuin/gopher-lua v1.1.1 // indirect
 	golang.org/x/crypto v0.24.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.17.0 // indirect
 	golang.org/x/tools v0.22.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
