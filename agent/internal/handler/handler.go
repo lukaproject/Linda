@@ -119,16 +119,19 @@ func NewHandler(c *config.Config) *Handler {
 	}
 	return NewHandlerWithParameters(
 		xerr.Must(client.New(c.AgentHeartBeatUrl())),
-		task.NewMgr())
+		task.NewMgr(),
+		filemanager.NewMgr())
 }
 
 func NewHandlerWithParameters(
 	cli client.IClient,
 	taskMgr task.IMgr,
+	fileMgr filemanager.Mgr,
 ) *Handler {
 	return &Handler{
 		seqId:   0,
 		taskMgr: taskMgr,
+		fileMgr: fileMgr,
 		cli:     cli,
 	}
 }

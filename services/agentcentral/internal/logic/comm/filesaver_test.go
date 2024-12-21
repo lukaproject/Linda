@@ -1,6 +1,7 @@
 package comm_test
 
 import (
+	"Linda/baselibs/testcommon/testenv"
 	"Linda/services/agentcentral/internal/logic/comm"
 	"io"
 	"os"
@@ -12,7 +13,7 @@ import (
 )
 
 type testFileSaverSuite struct {
-	suite.Suite
+	testenv.TestBase
 }
 
 func (s *testFileSaverSuite) tmpFileConent(size int) string {
@@ -24,7 +25,7 @@ func (s *testFileSaverSuite) tmpFileConent(size int) string {
 }
 
 func (s *testFileSaverSuite) TestLocalFileSaver() {
-	tmpdir := s.T().TempDir()
+	tmpdir := s.TempDir()
 	saver := comm.NewLocalFileSaver()
 
 	originPath := path.Join(tmpdir, "testlocalfilesaver.txt")

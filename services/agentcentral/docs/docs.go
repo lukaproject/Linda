@@ -63,7 +63,7 @@ const docTemplate = `{
         },
         "/agents/info/{nodeId}": {
             "get": {
-                "description": "get node info",
+                "description": "get node info by node id",
                 "consumes": [
                     "application/json"
                 ],
@@ -440,7 +440,7 @@ const docTemplate = `{
         },
         "/files/upload": {
             "post": {
-                "description": "Upload file",
+                "description": "Upload file, can only upload 1 file.",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -707,7 +707,7 @@ const docTemplate = `{
                         "type": "object",
                         "properties": {
                             "locationPath": {
-                                "description": "the location of file",
+                                "description": "the location of file in node",
                                 "type": "string"
                             },
                             "uri": {
@@ -718,7 +718,7 @@ const docTemplate = `{
                     }
                 },
                 "nodes": {
-                    "description": "nodes list which will receive these files.",
+                    "description": "nodes id list which will receive these files.",
                     "type": "array",
                     "items": {
                         "type": "string"

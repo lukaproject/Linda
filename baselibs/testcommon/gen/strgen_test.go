@@ -32,6 +32,5 @@ func (s *strGenTestSuite) TestStrGenFixedLen() {
 }
 
 func TestStrGenMain(t *testing.T) {
-	t.Parallel()
 	suite.Run(t, new(strGenTestSuite))
 }

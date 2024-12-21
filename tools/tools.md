@@ -11,7 +11,7 @@ go1.23.4 download
 ## ENV
 ### build ENV
 
-- go version 1.22+, 目前是 go1.23.4
+- go version 1.23+, 目前是 go1.23.4
 - 使用installswag.sh 安装 swag
 - run
 ```bash

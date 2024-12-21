@@ -27,8 +27,8 @@ echo 3
 		Bag:          "testbag",
 		Resource:     1,
 		PathToScript: s.tempShellPath(),
-		WorkingDir:   s.tempTestDir(),
-		TaskDir:      s.tempTestDir(),
+		WorkingDir:   s.TempDir(),
+		TaskDir:      s.TempDir(),
 	}
 	nowtask := NewTask(td)
 	xerr.Must0(nowtask.Start())
@@ -36,7 +36,7 @@ echo 3
 
 	expectOutput := "1\n2\n3\n"
 
-	s.T().Log(s.getStrFromFile(path.Join(s.tempTestDir(), "test.sh")))
+	s.T().Log(s.getStrFromFile(path.Join(s.TempDir(), "test.sh")))
 	s.Equal(
 		expectOutput,
 		s.getStrFromFile(path.Join(td.TaskDir, ConstStdOutFile)))
@@ -57,8 +57,8 @@ done
 		Bag:          "testbag",
 		Resource:     1,
 		PathToScript: s.tempShellPath(),
-		WorkingDir:   s.tempTestDir(),
-		TaskDir:      s.tempTestDir(),
+		WorkingDir:   s.TempDir(),
+		TaskDir:      s.TempDir(),
 	}
 	nowtask := NewTask(td)
 	xerr.Must0(nowtask.Start())

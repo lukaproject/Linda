@@ -58,8 +58,8 @@ func (ns *nodeStates) GetBagName() string {
 	return emptyBagName
 }
 
-// GetBagNameOnJoin is a method return bagname and state
-func (ns *nodeStates) GetBagNameWithState() (string, string) {
+// GetBagNameWithState is a method return bagname and state
+func (ns *nodeStates) GetBagNameWithState() (bagName string, state string) {
 	ns.mut.Lock()
 	defer ns.mut.Unlock()
 	return ns.BagName, ns.State

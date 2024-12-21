@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
 func EnableAgents(r *mux.Router) {
@@ -100,4 +101,19 @@ func listNodes(w http.ResponseWriter, r *http.Request) {
 func uploadFilesToNodes(w http.ResponseWriter, r *http.Request) {
 	req := UploadFilesReq{}
 	models.ReadJSON(r.Body, &req)
+	fileDescriptions := make([]models.FileDescription, 0)
+	for _, file := range req.Files {
+		fileDescriptions = append(fileDescriptions, models.FileDescription{
+			Uri:          file.Uri,
+			LocationPath: file.LocationPath,
+		})
+	}
+
+	for _, nodeId := range req.Nodes {
+		agents.GetMgrInstance().CallAgent(nodeId, func(ag agents.Agent) error {
+			ag.AddFilesUploadToNode(fileDescriptions)
+			logrus.Infof("upload files to node %s", nodeId)
+			return nil
+		})
+	}
 }

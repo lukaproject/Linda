@@ -20,6 +20,14 @@ def setup():
 
 
 def build_agent():
+    # cleanup
+    subprocess.run(
+        args=[
+            "docker",
+            "rmi",
+            "linda-agent:latest",
+        ],
+    )
     subprocess.run(
         args=[
             "buildx",
@@ -33,8 +41,31 @@ def build_agent():
     )
 
 
+def build_agentcentral():
+    # cleanup
+    subprocess.run(
+        args=[
+            "docker",
+            "rmi",
+            "linda-agentcentral:latest",
+        ],
+    )
+    subprocess.run(
+        args=[
+            "buildx",
+            "build",
+            "-f",
+            "tools/dockerimages/services/agentcentral/Dockerfile.agentcentral",
+            "-t",
+            "linda-agentcentral",
+            "."
+        ],
+    )
+
 if __name__ == "__main__":
     print("agent", args.agent)
     print("agent central", args.agentcentral)
     if args.agent:
         build_agent()
+    if args.agentcentral:
+        build_agentcentral()

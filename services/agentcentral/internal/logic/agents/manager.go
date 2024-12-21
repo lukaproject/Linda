@@ -5,6 +5,7 @@ import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
+	"errors"
 	"net/http"
 	"sync"
 
@@ -29,6 +30,8 @@ type Mgr interface {
 	GetNodeInfo(nodeId string) *models.NodeInfo
 
 	ListNodeIds() []string
+
+	CallAgent(nodeId string, callFunc func(agent Agent) error) error
 }
 
 type agentsmgr struct {
@@ -110,6 +113,16 @@ func (mgr *agentsmgr) ListNodeIds() (ret []string) {
 		ret = append(ret, k)
 	}
 	return
+}
+func (mgr *agentsmgr) CallAgent(nodeId string, callFunc func(agent Agent) error) error {
+	mgr.agentsRWMut.RLock()
+	defer mgr.agentsRWMut.RLock()
+
+	if agentHolder, ok := mgr.agents[nodeId]; ok {
+		return callFunc(agentHolder)
+	} else {
+		return errors.New("agent not found")
+	}
 }
 
 func NewMgr() Mgr {

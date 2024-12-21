@@ -136,7 +136,7 @@ definitions:
         items:
           properties:
             locationPath:
-              description: the location of file
+              description: the location of file in node
               type: string
             uri:
               description: File's URI
@@ -144,7 +144,7 @@ definitions:
           type: object
         type: array
       nodes:
-        description: nodes list which will receive these files.
+        description: nodes id list which will receive these files.
         items:
           type: string
         type: array
@@ -190,7 +190,7 @@ paths:
     get:
       consumes:
       - application/json
-      description: get node info
+      description: get node info by node id
       parameters:
       - description: node id
         in: path
@@ -439,7 +439,7 @@ paths:
     post:
       consumes:
       - multipart/form-data
-      description: Upload file
+      description: Upload file, can only upload 1 file.
       parameters:
       - description: file name
         in: formData

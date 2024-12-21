@@ -3,39 +3,25 @@ package task
 import (
 	"Linda/agent/internal/utils"
 	"Linda/baselibs/abstractions/xos"
+	"Linda/baselibs/testcommon/testenv"
 	"os"
 	"path"
 
 	"github.com/lukaproject/xerr"
-	"github.com/stretchr/testify/suite"
 )
 
 type testBase struct {
-	suite.Suite
+	testenv.TestBase
 	utils.TimerUtils
-	TempDir string
-}
-
-func (s *testBase) SetupSuite() {
-	s.TempDir = s.T().TempDir()
-	s.T().Logf("setup finished, temp dir is %s", s.TempDir)
 }
 
 func (s *testBase) SetupTest() {
-	s.createTempTaskDir()
-	s.T().Logf("setup test finished, temp dir is %s", s.tempTestDir())
+	s.TempDir()
+	s.T().Logf("setup test finished, temp dir is %s", s.TempDir())
 }
 
 func (s *testBase) tempShellPath() string {
-	return path.Join(s.TempDir, s.T().Name(), "test.sh")
-}
-
-func (s *testBase) tempTestDir() string {
-	return path.Join(s.TempDir, s.T().Name())
-}
-
-func (s *testBase) createTempTaskDir() {
-	xerr.Must0(os.MkdirAll(s.tempTestDir(), os.ModePerm))
+	return path.Join(s.TempDir(), "test.sh")
 }
 
 func (s *testBase) writeStrToTempShellFile(content string) {
@@ -44,7 +30,7 @@ func (s *testBase) writeStrToTempShellFile(content string) {
 }
 
 func (s *testBase) taskRequireDir(t Task) string {
-	return path.Join(s.tempTestDir(), t.GetBag(), t.GetName())
+	return path.Join(s.TempDir(), t.GetBag(), t.GetName())
 }
 
 func (s *testBase) createTaskRequireDir(t Task) {
@@ -52,7 +38,7 @@ func (s *testBase) createTaskRequireDir(t Task) {
 }
 
 func (s *testBase) createNewTestTask(name, bag, script string, resource int) Task {
-	workingDir := path.Join(s.tempTestDir(), bag, name)
+	workingDir := path.Join(s.TempDir(), bag, name)
 	pathToScript := path.Join(workingDir, "test.sh")
 	t := NewTask(TaskData{
 		Name:         name,

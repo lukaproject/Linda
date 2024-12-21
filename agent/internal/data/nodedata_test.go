@@ -4,6 +4,7 @@ import (
 	"Linda/agent/internal/config"
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/localdb"
+	"Linda/baselibs/testcommon/testenv"
 	"path"
 	"testing"
 
@@ -11,11 +12,11 @@ import (
 )
 
 type testNodeDataSuite struct {
-	suite.Suite
+	testenv.TestBase
 }
 
 func (s *testNodeDataSuite) TestLoadAndStore() {
-	LocaldbDir := path.Join(s.T().TempDir(), "localdb")
+	LocaldbDir := path.Join(s.TempDir(), "localdb")
 	conf := &config.Config{
 		NodeId:            "test-node-id-1",
 		LocalDBDir:        LocaldbDir,

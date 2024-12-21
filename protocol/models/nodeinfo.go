@@ -6,7 +6,7 @@ type NodeInfo struct {
 	BagName         string
 	MaxRunningTasks int
 	// 可以由用户传入的用于获取对应Node的NodeName
-	NodeName string `gorm:"uniqueIndex"`
+	NodeName string
 }
 
 type MemoryInfo struct {

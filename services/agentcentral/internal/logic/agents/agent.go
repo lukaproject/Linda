@@ -8,6 +8,7 @@ import (
 	"Linda/services/agentcentral/internal/logic/comm"
 	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -25,6 +26,9 @@ type Agent interface {
 	// 把当前Agent设置为空闲
 	Free()
 
+	// 上传文件到Node，但是不是及时的会有一定的延迟
+	AddFilesUploadToNode(files []models.FileDescription)
+
 	GetInfo() *models.NodeInfo
 }
 
@@ -40,6 +44,9 @@ type agentHolder struct {
 
 	hbAgent     chan *models.HeartBeatFromAgent
 	tasksClient taskqueueclient.Client
+
+	noUploadFiles    []models.FileDescription
+	noUploadFilesMut sync.Mutex
 }
 
 func (ah *agentHolder) GetInfo() *models.NodeInfo {
@@ -52,6 +59,12 @@ func (ah *agentHolder) GetInfo() *models.NodeInfo {
 
 func (ah *agentHolder) StartServe() {
 	go ah.serveLoop()
+}
+
+func (ah *agentHolder) AddFilesUploadToNode(files []models.FileDescription) {
+	ah.noUploadFilesMut.Lock()
+	defer ah.noUploadFilesMut.Unlock()
+	ah.noUploadFiles = append(ah.noUploadFiles, files...)
 }
 
 func (ah *agentHolder) Join(bagName string) {
@@ -137,6 +150,7 @@ func (ah *agentHolder) packHeartBeatResponse(
 		}
 	}
 	ah.scheduleTasks(hbFromAgent, hb)
+	ah.addUploadFilesToHB(hb)
 	return hb
 }
 
@@ -165,6 +179,18 @@ func (ah *agentHolder) scheduleTasks(
 		ah.processScheduledTask(bagName, hb.ScheduledTaskNames)
 	} else {
 		logrus.Infof("no task scheduled to %s", ah.nodeId)
+	}
+}
+
+func (ah *agentHolder) addUploadFilesToHB(
+	hb *models.HeartBeatFromServer,
+) {
+	ah.noUploadFilesMut.Lock()
+	defer ah.noUploadFilesMut.Unlock()
+	if len(ah.noUploadFiles) > 0 {
+		hb.DownloadFiles = ah.noUploadFiles
+		logrus.Infof("add upload files to hb, %v", hb.DownloadFiles)
+		ah.noUploadFiles = make([]models.FileDescription, 0)
 	}
 }
 
@@ -199,7 +225,7 @@ func (ah *agentHolder) persistNodeInfo() (success bool) {
 		BagName:         ah.nodeStates.GetBagName(),
 		MaxRunningTasks: ah.maxRunningTasks,
 	}
-	err := db.NewDBOperations().AddNodeInfo(nodeInfo)
+	err := db.NewDBOperations().CreateNodeInfo(nodeInfo)
 	if err != nil {
 		logrus.Error(err)
 		return false
@@ -209,11 +235,12 @@ func (ah *agentHolder) persistNodeInfo() (success bool) {
 
 func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	ah := &agentHolder{
-		conn:        conn,
-		nodeId:      nodeId,
-		hbAgent:     make(chan *models.HeartBeatFromAgent, 1),
-		lastSeqId:   -1,
-		tasksClient: taskqueueclient.NewRedisTaskQueueClient(config.Instance().Redis),
+		conn:          conn,
+		nodeId:        nodeId,
+		hbAgent:       make(chan *models.HeartBeatFromAgent, 1),
+		lastSeqId:     -1,
+		tasksClient:   taskqueueclient.NewRedisTaskQueueClient(config.Instance().Redis),
+		noUploadFiles: make([]models.FileDescription, 0),
 	}
 	hbStart := &models.HeartBeatStart{}
 	err := hbconn.ReadMessage(ah.conn, hbStart)

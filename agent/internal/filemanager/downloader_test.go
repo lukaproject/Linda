@@ -4,6 +4,7 @@ import (
 	"Linda/agent/internal/filemanager"
 	"Linda/baselibs/abstractions/xos"
 	"Linda/baselibs/testcommon/fake/fakefileserver"
+	"Linda/baselibs/testcommon/testenv"
 	"path/filepath"
 	"testing"
 
@@ -11,14 +12,14 @@ import (
 )
 
 type fileDownloaderTestSuite struct {
-	suite.Suite
+	testenv.TestBase
 
 	fakeFileServer fakefileserver.FileServer
 }
 
 func (ts *fileDownloaderTestSuite) TestDownloadFromPublic() {
 	path := filepath.Join("test1", "p1", "public.txt")
-	targetPath := filepath.Join(ts.T().TempDir(), "TestDownloadFromPublic", "public.txt")
+	targetPath := filepath.Join(ts.TempDir(), "public.txt")
 	ts.fakeFileServer.AddFileContent(
 		filepath.Join("test1", "p1", "public.txt"),
 		"test content")
