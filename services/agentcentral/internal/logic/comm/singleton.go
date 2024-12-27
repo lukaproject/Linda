@@ -1,6 +1,7 @@
 package comm
 
 import (
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
@@ -10,6 +11,7 @@ import (
 var (
 	asyncWorksInstance *AsyncWorks
 	fileSaverInstnce   FileSaver
+	logger             = xlog.NewForPackage()
 )
 
 func InitAsyncWorksInstance() {

@@ -2,14 +2,13 @@ package handler
 
 import (
 	"Linda/agent/internal/filemanager"
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/protocol/models"
 	"sync"
-
-	"github.com/sirupsen/logrus"
 )
 
-func downloadFiles(fileMgr filemanager.Mgr, files []models.FileDescription) {
-	logrus.Debugf("start to download files %v", files)
+func downloadFiles(logger xlog.Logger, fileMgr filemanager.Mgr, files []models.FileDescription) {
+	logger.Infof("start to download files %v", files)
 	wg := &sync.WaitGroup{}
 	n := len(files)
 	wg.Add(n)
@@ -28,7 +27,7 @@ func downloadFiles(fileMgr filemanager.Mgr, files []models.FileDescription) {
 
 	for i, err := range errs {
 		if err != nil {
-			logrus.Errorf("download %s failed, err=%v", files[i].Uri, err)
+			logger.Errorf("download %s failed, err=%v", files[i].Uri, err)
 		}
 	}
 	wg.Wait()

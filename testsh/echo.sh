@@ -1,2 +1,0 @@
-printenv
-echo "test-value"

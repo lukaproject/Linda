@@ -6,8 +6,6 @@ import (
 	"runtime"
 	"sync"
 	"sync/atomic"
-
-	"github.com/sirupsen/logrus"
 )
 
 type runner struct {
@@ -50,7 +48,7 @@ func (r *runner) AddTask(t Task) (err error) {
 	}
 	r.runningTasksMap[t.GetName()] = t
 	if err = t.Start(); err != nil {
-		logrus.Errorf("error=%v, taskName=%s", err, t.GetName())
+		logger.Errorf("error=%v, taskName=%s", err, t.GetName())
 		return err
 	}
 	r.ResourceCount.Add(int32(t.GetResource()))
@@ -71,7 +69,7 @@ func (r *runner) GetTask(taskName string) (t Task, err error) {
 
 func (r *runner) taskRunningCallback(t Task) {
 	if err := t.Wait(); err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 	}
 	func() {
 		r.runningTasksMapMut.Lock()

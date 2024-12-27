@@ -1,7 +1,7 @@
 package config
 
 import (
-	"Linda/baselibs/abstractions/defaultor"
+	"Linda/baselibs/abstractions/xconfig"
 	"Linda/baselibs/abstractions/xos"
 	"encoding/json"
 	"io"
@@ -11,7 +11,7 @@ import (
 	"github.com/lukaproject/xerr"
 )
 
-var c *Config = defaultor.New[Config]()
+var c = xconfig.NewFromOSEnv[Config]()
 
 func Instance() *Config {
 	return c
@@ -19,11 +19,12 @@ func Instance() *Config {
 
 func Initial(configfile string) {
 	// read file if file exist.
-	if _, err := os.Stat(configfile); !os.IsNotExist(err) {
+	if xos.PathExists(configfile) && !xos.IsDir(configfile) {
 		fromfile := Config{}
-		json.Unmarshal(xerr.Must(io.ReadAll(
-			xerr.Must(os.Open(configfile)),
-		)), &fromfile)
+		xerr.Must0(
+			json.Unmarshal(xerr.Must(io.ReadAll(
+				xerr.Must(os.Open(configfile)),
+			)), &fromfile))
 		c.Merge(&fromfile)
 	}
 

@@ -7,8 +7,6 @@ import (
 	"io/fs"
 	"os"
 	"path"
-
-	"github.com/sirupsen/logrus"
 )
 
 type FileSaver interface {
@@ -36,7 +34,7 @@ func (lfs *localFileSaver) WriteWithReader(filepath string, reader io.Reader) (e
 
 func (lfs *localFileSaver) ReadFrom(filepath string, writer io.Writer) (err error) {
 	if !xos.PathExists(filepath) {
-		logrus.Errorf("%s not exist", filepath)
+		logger.Errorf("%s not exist", filepath)
 		return os.ErrNotExist
 	}
 	f, err := os.Open(filepath)

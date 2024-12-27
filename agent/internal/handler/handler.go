@@ -6,12 +6,12 @@ import (
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/filemanager"
 	"Linda/agent/internal/task"
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/protocol/models"
 	"fmt"
 	"time"
 
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
@@ -19,6 +19,8 @@ type Handler struct {
 	seqId   int64
 	taskMgr task.IMgr
 	fileMgr filemanager.Mgr
+
+	logger xlog.Logger
 }
 
 func (h *Handler) Start() {
@@ -64,7 +66,7 @@ func (h *Handler) unPackResp(resp *models.HeartBeatFromServer) {
 		}()
 	}
 	if len(resp.DownloadFiles) != 0 {
-		go downloadFiles(h.fileMgr, resp.DownloadFiles)
+		go downloadFiles(h.logger, h.fileMgr, resp.DownloadFiles)
 	}
 }
 
@@ -88,7 +90,7 @@ func (h *Handler) joinBag(joinBag *models.JoinBag) {
 	}
 	nowBagName := data.GetData(data.Instance().NodeData, true).BagName
 	if nowBagName != joinBag.BagName && nowBagName != "" {
-		logrus.Warnf(
+		h.logger.Warnf(
 			"join bag failed, current bag %s not equal to comming bag %s",
 			nowBagName, joinBag.BagName)
 	}
@@ -98,7 +100,7 @@ func (h *Handler) joinBag(joinBag *models.JoinBag) {
 			nd.BagName = joinBag.BagName
 			return nd
 		})
-	logrus.Infof("join bag %s", joinBag.BagName)
+	h.logger.Infof("join bag %s", joinBag.BagName)
 }
 
 func (h *Handler) freeNode(freeNode *models.FreeNode) {
@@ -110,7 +112,7 @@ func (h *Handler) freeNode(freeNode *models.FreeNode) {
 			nd.BagName = ""
 			return nd
 		})
-	logrus.Info("free node")
+	h.logger.Info("free node")
 }
 
 func NewHandler(c *config.Config) *Handler {
@@ -133,5 +135,6 @@ func NewHandlerWithParameters(
 		taskMgr: taskMgr,
 		fileMgr: fileMgr,
 		cli:     cli,
+		logger:  xlog.NewForPackage(),
 	}
 }

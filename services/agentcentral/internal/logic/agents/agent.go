@@ -13,7 +13,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
 )
 
 type Agent interface {
@@ -85,7 +84,7 @@ func (ah *agentHolder) serveLoop() {
 			}
 		case <-time.After(15 * time.Second):
 			{
-				logrus.Errorf("hb timeout, nodeId %s", ah.nodeId)
+				logger.Errorf("hb timeout, nodeId %s", ah.nodeId)
 				mgrInstance.RemoveNode(ah.nodeId)
 				return
 			}
@@ -114,13 +113,13 @@ func (ah *agentHolder) heartBeatProcess(msg *models.HeartBeatFromAgent) {
 		xerr.Must0(hbconn.WriteMessage(ah.conn, hbFromServer))
 	}()
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 	}
 }
 
 func (ah *agentHolder) recoverWSPanic() {
 	if err := recover(); err != nil {
-		logrus.Error(string(debug.Stack()), err)
+		logger.Error(string(debug.Stack()), err)
 		mgrInstance.RemoveNode(ah.nodeId)
 	}
 }
@@ -146,7 +145,7 @@ func (ah *agentHolder) packHeartBeatResponse(
 				ah.nodeStates.FreeFinished()
 			}
 		} else {
-			logrus.Warn("should not in this switch")
+			logger.Warn("should not in this switch")
 		}
 	}
 	ah.scheduleTasks(hbFromAgent, hb)
@@ -166,7 +165,7 @@ func (ah *agentHolder) scheduleTasks(
 	for i := 0; i < numOfRestResource; i++ {
 		taskName, err := ah.tasksClient.Deque(bagName)
 		if err != nil {
-			logrus.Error(err)
+			logger.Error(err)
 			break
 		}
 		if hb.ScheduledTaskNames == nil {
@@ -175,10 +174,10 @@ func (ah *agentHolder) scheduleTasks(
 		hb.ScheduledTaskNames = append(hb.ScheduledTaskNames, taskName)
 	}
 	if hb.ScheduledTaskNames != nil {
-		logrus.Infof("taskNames scheduled to %s is %v", ah.nodeId, hb.ScheduledTaskNames)
+		logger.Infof("taskNames scheduled to %s is %v", ah.nodeId, hb.ScheduledTaskNames)
 		ah.processScheduledTask(bagName, hb.ScheduledTaskNames)
 	} else {
-		logrus.Infof("no task scheduled to %s", ah.nodeId)
+		logger.Infof("no task scheduled to %s", ah.nodeId)
 	}
 }
 
@@ -189,7 +188,7 @@ func (ah *agentHolder) addUploadFilesToHB(
 	defer ah.noUploadFilesMut.Unlock()
 	if len(ah.noUploadFiles) > 0 {
 		hb.DownloadFiles = ah.noUploadFiles
-		logrus.Infof("add upload files to hb, %v", hb.DownloadFiles)
+		logger.Infof("add upload files to hb, %v", hb.DownloadFiles)
 		ah.noUploadFiles = make([]models.FileDescription, 0)
 	}
 }
@@ -227,7 +226,7 @@ func (ah *agentHolder) persistNodeInfo() (success bool) {
 	}
 	err := db.NewDBOperations().CreateNodeInfo(nodeInfo)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return false
 	}
 	return true
@@ -245,10 +244,10 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 	hbStart := &models.HeartBeatStart{}
 	err := hbconn.ReadMessage(ah.conn, hbStart)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return nil, err
 	}
-	logrus.Infof("nodeId %s", nodeId)
+	logger.Infof("new node, nodeId is %s", nodeId)
 	ah.nodeStates = newNodeStates()
 	ah.nodeName = hbStart.Node.NodeName
 	ah.maxRunningTasks = max(hbStart.Node.MaxRunningTasks, 1)

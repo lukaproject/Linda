@@ -11,7 +11,6 @@ import (
 	"path/filepath"
 
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
 )
 
 type Downloader struct {
@@ -20,7 +19,7 @@ type Downloader struct {
 func (d *Downloader) DownloadFromPublicURL(url, targetPath string) (err error) {
 	resp, err := d.getClient().Do(d.newDefaultRequest(url))
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 	defer resp.Body.Close()
@@ -28,7 +27,7 @@ func (d *Downloader) DownloadFromPublicURL(url, targetPath string) (err error) {
 	xos.MkdirAll(filepath.Dir(targetPath), os.ModePerm)
 	f, err := os.Create(targetPath)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 	defer f.Close()
@@ -40,13 +39,13 @@ func (d *Downloader) DownloadFromInternal(block, fileName, targetPath string) (e
 	xos.MkdirAll(filepath.Dir(targetPath), fs.ModePerm)
 	f, err := os.Create(targetPath)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 	defer f.Close()
 	resp, err := d.getClient().Do(d.newDefaultRequest(url))
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 	defer resp.Body.Close()

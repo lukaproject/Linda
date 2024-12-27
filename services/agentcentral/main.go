@@ -11,9 +11,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/apis"
 	"Linda/services/agentcentral/apis/files"
 	"Linda/services/agentcentral/apis/middlewares"
@@ -38,11 +38,7 @@ var (
 func main() {
 	flag.Parse()
 	config.Initial(*configfile)
-
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
+	xlog.Initial()
 
 	db.InitialWithDSN(config.Instance().PGSQL_DSN)
 	r := mux.NewRouter()
@@ -56,12 +52,19 @@ func main() {
 	apis.EnableAgents(r)
 	apis.EnableInnerCall(r)
 	files.EnableFiles(r)
-	r.Use(middlewares.SetHeaderJSON)
+	r.Use(
+		middlewares.LogRequest,
+		middlewares.SetHeaderJSON)
 
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()
 	logic.InitAsyncWorks()
 	port := fmt.Sprintf(":%d", config.Instance().Port)
-	logrus.Infof("serve in %s", port)
-	logrus.Fatal(http.ListenAndServe(port, r))
+	xlog.Infof("serve in %s", port)
+	c := config.Instance()
+	if !c.SSL.Enabled {
+		xlog.Fatal(http.ListenAndServe(port, r))
+	} else {
+		xlog.Fatal(http.ListenAndServeTLS(port, c.SSL.CertFile, c.SSL.KeyFile, r))
+	}
 }

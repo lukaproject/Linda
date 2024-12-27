@@ -1,11 +1,15 @@
 package hbconn
 
 import (
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/protocol/models"
 	"errors"
 
 	"github.com/gorilla/websocket"
-	"github.com/sirupsen/logrus"
+)
+
+var (
+	logger = xlog.NewForPackage()
 )
 
 // 将内容写入读取 websocket conn
@@ -23,7 +27,7 @@ func ReadMessage[T any](conn IWSConn, v *T) error {
 	}
 	models.Deserialize(body, v)
 	if msgType != websocket.BinaryMessage {
-		logrus.Debugf("msgType is invalid, %d", msgType)
+		logger.Errorf("msgType is invalid, %d", msgType)
 		return errors.New("msgType is not binary")
 	}
 	return nil

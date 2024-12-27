@@ -1,12 +1,16 @@
 package apis
 
 import (
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/protocol/models"
 	"errors"
 	"net/http"
 
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+)
+
+var (
+	logger = xlog.NewForPackage()
 )
 
 // 用于放在各种 handlerFunc 中，对抛出的异常进行处理
@@ -19,7 +23,7 @@ func httpRecover(w http.ResponseWriter, _ *http.Request) {
 			}
 		default:
 			{
-				logrus.Fatalf("Panic no error value, value is %v", err)
+				logger.Fatalf("Panic no error value, value is %v", err)
 			}
 		}
 	}
@@ -27,11 +31,11 @@ func httpRecover(w http.ResponseWriter, _ *http.Request) {
 
 func processError(w http.ResponseWriter, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		logrus.Debugf("record not found, write 404 NotFound, err is %v", err)
+		logger.Debugf("record not found, write 404 NotFound, err is %v", err)
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	logrus.Error(err)
+	logger.Error(err)
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write(models.Serialize(map[string]any{
 		"errormsg": err.Error(),

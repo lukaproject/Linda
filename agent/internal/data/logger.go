@@ -1,4 +1,4 @@
-package task
+package data
 
 import "Linda/baselibs/abstractions/xlog"
 

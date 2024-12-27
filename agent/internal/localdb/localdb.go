@@ -5,7 +5,6 @@ import (
 
 	"github.com/lukaproject/xerr"
 	"github.com/nutsdb/nutsdb"
-	"github.com/sirupsen/logrus"
 )
 
 var localdbInstance *LocalDB = nil
@@ -69,7 +68,7 @@ func (ldb *LocalDB) NewBucket(bucket string) error {
 	return localdbInstance.db.Update(
 		func(tx *nutsdb.Tx) error {
 			if tx.ExistBucket(nutsdb.DataStructureBTree, bucket) {
-				logrus.Warnf("localdb bucket %s has created before!", bucket)
+				logger.Warnf("localdb bucket %s has created before!", bucket)
 				return nil
 			}
 			return tx.NewBucket(nutsdb.DataStructureBTree, bucket)

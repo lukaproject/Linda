@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
 )
 
 type AsyncWorks struct {
@@ -23,17 +22,17 @@ func (aw *AsyncWorks) TaskEnque(
 ) {
 	defer func() {
 		if err := recover(); err != nil {
-			logrus.Error(err)
+			logger.Error(err)
 		}
 	}()
 	NewRLocker(xerr.MustOk[*sync.Mutex](aw.bagsLocks.Load(bagName))).
 		Run(func() {
-			logrus.Infof("bag %s, task %s, enque start", bagName, taskName)
+			logger.Infof("bag %s, task %s, enque start", bagName, taskName)
 			dbo := db.NewDBOperations()
 			count := dbo.GetBagEnqueuedTaskNumber(bagName)
 			dbo.UpdateTaskOrderId(bagName, taskName, count+1)
 			xerr.Must0(aw.cli.Enque(taskName, bagName, priority, count+1))
-			logrus.Infof("bag %s, task %s, enque success", bagName, taskName)
+			logger.Infof("bag %s, task %s, enque success", bagName, taskName)
 		})
 }
 
@@ -50,10 +49,10 @@ func (aw *AsyncWorks) PersistScheduledTasks(bagName string, taskNames []string, 
 // bags locks CURD.
 func (aw *AsyncWorks) AddBag(bagName string) {
 	aw.bagsLocks.Store(bagName, &sync.Mutex{})
-	logrus.Debugf("add bag %s 's lock", bagName)
+	logger.Debugf("add bag %s 's lock", bagName)
 }
 
 func (aw *AsyncWorks) DeleteBag(bagName string) {
 	aw.bagsLocks.Delete(bagName)
-	logrus.Debugf("remove bag %s 's lock", bagName)
+	logger.Debugf("remove bag %s 's lock", bagName)
 }

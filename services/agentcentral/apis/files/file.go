@@ -1,6 +1,7 @@
 package files
 
 import (
+	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/logic/comm"
 	"net/http"
@@ -9,7 +10,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
+)
+
+var (
+	logger = xlog.NewForPackage()
 )
 
 const multipartFormMemoryLimit = (1 << 22)
@@ -35,7 +39,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	xerr.Must0(r.ParseMultipartForm(multipartFormMemoryLimit))
 	xerr.Must0(r.ParseForm())
 	filepath := path.Join(config.Instance().FileSaver.RootDir, r.Form.Get("block"), r.Form.Get("fileName"))
-	logrus.Debugf("upload file to %s", filepath)
+	logger.Debugf("upload file to %s", filepath)
 	fileHeader, ok := r.MultipartForm.File["file"]
 	if !ok {
 		w.WriteHeader(http.StatusBadRequest)
@@ -43,13 +47,12 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	}
 	file, err := fileHeader[0].Open()
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 	defer file.Close()
 	comm.GetFileSaverInstance().WriteWithReader(filepath, file)
-
 }
 
 // download file
@@ -71,7 +74,7 @@ func download(w http.ResponseWriter, r *http.Request) {
 		if err == os.ErrNotExist {
 			w.WriteHeader(http.StatusNotFound)
 		} else {
-			logrus.Error(err)
+			logger.Error(err)
 			w.WriteHeader(http.StatusInternalServerError)
 		}
 		return

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 func EnableHealthCheck(r *mux.Router) {
@@ -19,7 +18,7 @@ func EnableHealthCheck(r *mux.Router) {
 //	@Produce		plain
 //	@Router			/healthcheck [post]
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	logrus.Debug("health check success!")
+	logger.Debug("health check success!")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }

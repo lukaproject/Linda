@@ -11,7 +11,6 @@ import (
 
 	"github.com/gorilla/websocket"
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -41,7 +40,7 @@ type agentsmgr struct {
 
 func (mgr *agentsmgr) NewNode(nodeId string, w http.ResponseWriter, r *http.Request) {
 	if agent, err := mgr.addNewNodeToMem(nodeId, w, r); err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	} else {
 		agent.StartServe()
@@ -59,7 +58,7 @@ func (mgr *agentsmgr) addNewNodeToMem(
 		}
 		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
 		if err != nil {
-			logrus.Error(err)
+			logger.Error(err)
 			return
 		}
 		mgr.agents[nodeId] = agent
@@ -73,9 +72,9 @@ func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	if _, ok := mgr.agents[nodeId]; ok {
 		delete(mgr.agents, nodeId)
 		db.NewDBOperations().DeleteNodeInfoByNodeId(nodeId)
-		logrus.Debugf("node %s removed", nodeId)
+		logger.Debugf("node %s removed", nodeId)
 	} else {
-		logrus.Debugf("node %s has been removed yet", nodeId)
+		logger.Debugf("node %s has been removed yet", nodeId)
 	}
 	return nil
 }

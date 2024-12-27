@@ -1,6 +1,11 @@
 package agents
 
-var mgrInstance Mgr
+import "Linda/baselibs/abstractions/xlog"
+
+var (
+	mgrInstance Mgr
+	logger      = xlog.NewForPackage()
+)
 
 func GetMgrInstance() Mgr {
 	return mgrInstance

@@ -2,9 +2,13 @@ package localdb
 
 import (
 	"Linda/baselibs/abstractions"
+	"Linda/baselibs/abstractions/xlog"
 
 	"github.com/nutsdb/nutsdb"
-	"github.com/sirupsen/logrus"
+)
+
+var (
+	logger = xlog.NewForPackage()
 )
 
 // Persistor[K, V]
@@ -32,7 +36,7 @@ func GetPersistor[K, V abstractions.Serializable](bucket string) (p *Persistor[K
 	if !Instance().ExistBucket(bucket) {
 		err = Instance().NewBucket(bucket)
 		if err != nil && err != nutsdb.ErrBucketAlreadyExist {
-			logrus.Errorf("create bucket %s failed, err is %v", bucket, err)
+			logger.Errorf("create bucket %s failed, err is %v", bucket, err)
 			return
 		}
 	}

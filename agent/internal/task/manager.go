@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
 )
 
 type IMgr interface {
@@ -23,12 +22,12 @@ type Mgr struct {
 func (m *Mgr) AddTask(taskName string) {
 	taskData, err := m.fetchTaskDataByTaskName(taskName)
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 	err = m.taskRunner.AddTask(NewTask(taskData))
 	if err != nil {
-		logrus.Error(err)
+		logger.Error(err)
 		return
 	}
 }
@@ -54,7 +53,7 @@ func (m *Mgr) fetchTaskDataByTaskName(taskName string) (taskData TaskData, err e
 		taskUrl := m.getTaskUrl(bagName, taskName)
 		resp := xerr.Must(http.Get(taskUrl))
 		if resp.StatusCode != http.StatusOK {
-			logrus.Errorf(
+			logger.Errorf(
 				"can not to fetch task body, task name %s, bag name %s, status %s",
 				taskName, bagName, resp.Status)
 			return

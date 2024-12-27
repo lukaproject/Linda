@@ -1,13 +1,17 @@
 package config
 
 import (
+	"Linda/baselibs/abstractions/xlog"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
 	"github.com/lukaproject/xerr"
-	"github.com/sirupsen/logrus"
+)
+
+var (
+	logger = xlog.NewForPackage()
 )
 
 type Config struct {
@@ -52,12 +56,12 @@ func (c *Config) getNodeId() {
 	url := c.AgentAPIUrl("http") + "/agent/innercall/nodeidgen"
 	resp := xerr.Must(http.Get(url))
 	c.NodeId = string(xerr.Must(io.ReadAll(resp.Body)))
-	logrus.Infof("get node id from service, id = %s", c.NodeId)
+	logger.Infof("get node id from service, id = %s", c.NodeId)
 }
 
-func (c *Config) Setup() {
+func (c *Config) SetupNodeId() {
 	if c.NodeId == "" {
-		logrus.Warn("didn't set env variable LINDA_NODE_ID yet, ask for node id from service.")
+		logger.Warn("didn't set env variable LINDA_NODE_ID yet, ask for node id from service.")
 		c.getNodeId()
 	}
 }

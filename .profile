@@ -1,4 +1,4 @@
-root_dir=$(pwd)
+export root_dir=$(pwd)
 export env="test"
 export test_script_dir="$root_dir/tools/testscripts/"
 
