@@ -1,45 +1,26 @@
 package files
 
 import (
-	"Linda/baselibs/apiscall/swagger"
 	"Linda/baselibs/testcommon/testenv"
 	"Linda/services/integrationtest/stage"
-	"context"
 	"fmt"
-	"os"
-	"path"
 	"testing"
 
-	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
 )
 
 type filesTestSuite struct {
-	suite.Suite
+	testenv.TestBase
 }
 
 func (s *filesTestSuite) TestFileUpload() {
-	conf := swagger.NewConfiguration()
-	conf.BasePath = "http://localhost:5883/api"
-	cli := swagger.NewAPIClient(conf)
-
-	currentStage := &stage.Stage{}
-
-	tmpdir := s.T().TempDir()
-	f := xerr.Must(os.Create(path.Join(tmpdir, "test.txt")))
-	s.T().Log(tmpdir)
-	f.Write([]byte("test file"))
-	s.Nil(f.Close())
+	currentStage := stage.NewStageT(s.T())
 	blockName := "testBlock"
-	_, _, err := cli.FilesApi.FilesUploadPost(
-		context.Background(),
-		"test.txt.bak",
-		blockName,
-		xerr.Must(os.Open(path.Join(tmpdir, "test.txt"))))
-	s.Nil(err)
+	targetFileName := "test.txt.bak"
+	s.Nil(currentStage.FileOperations.UploadFileContent("test file", blockName, targetFileName))
 	content := string(
 		currentStage.DownloadFromURL(
-			fmt.Sprintf("http://localhost:5883/api/files/download/%s/%s", blockName, "test.txt.bak")))
+			fmt.Sprintf("http://localhost:5883/api/files/download/%s/%s", blockName, targetFileName)))
 	s.Equal("test file", content)
 }
 

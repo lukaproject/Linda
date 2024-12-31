@@ -549,10 +549,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "finishTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "nodeId": {
                     "type": "string"
@@ -561,7 +563,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "scheduledTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "scriptPath": {
                     "type": "string"
@@ -626,10 +629,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "finishTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "nodeId": {
                     "type": "string"
@@ -638,7 +643,8 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "scheduledTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "scriptPath": {
                     "type": "string"

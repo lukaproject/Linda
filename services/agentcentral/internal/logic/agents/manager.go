@@ -5,7 +5,6 @@ import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
-	"errors"
 	"net/http"
 	"sync"
 
@@ -52,7 +51,7 @@ func (mgr *agentsmgr) addNewNodeToMem(
 	w http.ResponseWriter,
 	r *http.Request,
 ) (agent Agent, err error) {
-	comm.NewRLocker(&mgr.agentsRWMut).Run(func() {
+	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if _, exist := mgr.agents[nodeId]; exist {
 			panic(errno.ErrNodeIdExists)
 		}
@@ -67,24 +66,24 @@ func (mgr *agentsmgr) addNewNodeToMem(
 }
 
 func (mgr *agentsmgr) RemoveNode(nodeId string) error {
-	mgr.agentsRWMut.Lock()
-	defer mgr.agentsRWMut.Unlock()
-	if _, ok := mgr.agents[nodeId]; ok {
-		delete(mgr.agents, nodeId)
-		db.NewDBOperations().DeleteNodeInfoByNodeId(nodeId)
-		logger.Debugf("node %s removed", nodeId)
-	} else {
-		logger.Debugf("node %s has been removed yet", nodeId)
-	}
+	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
+		if _, ok := mgr.agents[nodeId]; ok {
+			delete(mgr.agents, nodeId)
+			db.NewDBOperations().DeleteNodeInfoByNodeId(nodeId)
+			logger.Debugf("node %s removed", nodeId)
+		} else {
+			logger.Debugf("node %s has been removed yet", nodeId)
+		}
+	})
 	return nil
 }
 
 func (mgr *agentsmgr) AddNodeToBag(nodeId, bagName string) {
-	mgr.agentsRWMut.Lock()
-	defer mgr.agentsRWMut.Unlock()
-	if agent, exist := mgr.agents[nodeId]; exist {
-		agent.Join(bagName)
-	}
+	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
+		if agent, exist := mgr.agents[nodeId]; exist {
+			agent.Join(bagName)
+		}
+	})
 }
 
 func (mgr *agentsmgr) FreeNode(nodeId string) {
@@ -92,6 +91,8 @@ func (mgr *agentsmgr) FreeNode(nodeId string) {
 	defer mgr.agentsRWMut.Unlock()
 	if agent, exist := mgr.agents[nodeId]; exist {
 		agent.Free()
+	} else {
+		logger.Errorf("node %s not found", nodeId)
 	}
 }
 
@@ -113,14 +114,14 @@ func (mgr *agentsmgr) ListNodeIds() (ret []string) {
 	}
 	return
 }
+
 func (mgr *agentsmgr) CallAgent(nodeId string, callFunc func(agent Agent) error) error {
 	mgr.agentsRWMut.RLock()
-	defer mgr.agentsRWMut.RLock()
-
+	defer mgr.agentsRWMut.RUnlock()
 	if agentHolder, ok := mgr.agents[nodeId]; ok {
 		return callFunc(agentHolder)
 	} else {
-		return errors.New("agent not found")
+		return errno.ErrAgentNotFound
 	}
 }
 

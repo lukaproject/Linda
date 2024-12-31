@@ -7,9 +7,9 @@ type Task struct {
 	ScriptPath      string
 	Priority        int16
 	WorkingDir      string
-	CreateTimeMs    int64
-	FinishTimeMs    int64
-	ScheduledTimeMs int64
+	CreateTimeMs    int64 `swaggertype:"integer" format:"int64"`
+	FinishTimeMs    int64 `swaggertype:"integer" format:"int64"`
+	ScheduledTimeMs int64 `swaggertype:"integer" format:"int64"`
 	NodeId          string
 }
 

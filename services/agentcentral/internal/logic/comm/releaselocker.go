@@ -6,7 +6,7 @@ type ReleaseLocker struct {
 	Mut sync.Locker
 }
 
-func NewRLocker(mut sync.Locker) *ReleaseLocker {
+func NewLocker(mut sync.Locker) *ReleaseLocker {
 	return &ReleaseLocker{Mut: mut}
 }
 

@@ -14,7 +14,6 @@ func EnableHeartBeat(r *mux.Router) {
 }
 
 func heartbeat(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	nodeId := mux.Vars(r)["nodeId"]
 	logger.Infof("connection start from %s", nodeId)
 	logic.AgentsMgr().NewNode(nodeId, w, r)

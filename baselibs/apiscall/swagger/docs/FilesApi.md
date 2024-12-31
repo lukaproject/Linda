@@ -40,7 +40,7 @@ No authorization required
 > string FilesUploadPost(ctx, fileName, block, file)
 Upload file
 
-Upload file
+Upload file, can only upload 1 file.
 
 ### Required Parameters
 

@@ -71,6 +71,7 @@ func (ah *agentHolder) Join(bagName string) {
 }
 
 func (ah *agentHolder) Free() {
+	logger.Infof("free node %s", ah.nodeId)
 	ah.nodeStates.Free()
 }
 
@@ -132,6 +133,7 @@ func (ah *agentHolder) packHeartBeatResponse(
 	}
 	if ah.nodeStates.IsOnGoingStates() {
 		bagName, state := ah.nodeStates.GetBagNameWithState()
+		logger.Infof("ongoing, state=%s, bagName=%s", state, bagName)
 		if state == node_STATES_JOINING {
 			hb.JoinBag = &models.JoinBag{
 				BagName: bagName,
@@ -140,6 +142,7 @@ func (ah *agentHolder) packHeartBeatResponse(
 				ah.nodeStates.JoinFinished(hbFromAgent.Node.BagName)
 			}
 		} else if state == node_STATES_FREEING {
+			logger.Infof("nodeId %s is freeing from %s", ah.nodeId, bagName)
 			hb.FreeNode = &models.FreeNode{}
 			if hbFromAgent.Node.BagName == emptyBagName {
 				ah.nodeStates.FreeFinished()
@@ -165,7 +168,7 @@ func (ah *agentHolder) scheduleTasks(
 	for i := 0; i < numOfRestResource; i++ {
 		taskName, err := ah.tasksClient.Deque(bagName)
 		if err != nil {
-			logger.Error(err)
+			logger.Errorf("deque task from bag %s failed, err %v", bagName, err)
 			break
 		}
 		if hb.ScheduledTaskNames == nil {

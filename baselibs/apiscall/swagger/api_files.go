@@ -97,7 +97,7 @@ func (a *FilesApiService) FilesDownloadBlockFileNameGet(ctx context.Context, fil
 }
 /*
 FilesApiService Upload file
-Upload file
+Upload file, can only upload 1 file.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param fileName
  * @param block

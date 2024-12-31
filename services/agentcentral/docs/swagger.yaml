@@ -34,14 +34,17 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       finishTimeMs:
+        format: int64
         type: integer
       nodeId:
         type: string
       priority:
         type: integer
       scheduledTimeMs:
+        format: int64
         type: integer
       scriptPath:
         type: string
@@ -84,14 +87,17 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       finishTimeMs:
+        format: int64
         type: integer
       nodeId:
         type: string
       priority:
         type: integer
       scheduledTimeMs:
+        format: int64
         type: integer
       scriptPath:
         type: string

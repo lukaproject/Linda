@@ -4,11 +4,8 @@ import (
 	"Linda/baselibs/apiscall/swagger"
 	"Linda/baselibs/testcommon/testenv"
 	"Linda/services/integrationtest/stage"
-	"context"
-	"net/http"
 	"testing"
 
-	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -25,23 +22,13 @@ func (s *nodeControlTestSuite) TestNormalScenario() {
 
 	currentStage := &stage.Stage{}
 	currentStage.SetUp(s.T(), cli)
-	test_node_id := currentStage.ListNodeIds()[0]
+	testNodeId := currentStage.ListNodeIds()[0]
 	testBagName := currentStage.CreateBag("test-current-bag")
-	joinBagResp, resp := xerr.Must2(cli.AgentsApi.AgentsJoinNodeIdPost(
-		context.Background(), swagger.ApisNodeJoinReq{
-			BagName: testBagName,
-		}, test_node_id))
-	s.Equal(http.StatusOK, resp.StatusCode)
-	s.T().Log(joinBagResp)
-	<-currentStage.WaitForNodeJoinFinished(test_node_id, testBagName)
+	currentStage.NodeOperations.JoinBag(testBagName, testNodeId)
+	<-currentStage.WaitForNodeJoinFinished(testNodeId, testBagName)
 	s.T().Log("join bag finished")
-
-	freeNodeResp, resp := xerr.Must2(cli.AgentsApi.AgentsFreeNodeIdPost(
-		context.Background(), swagger.ApisNodeFreeReq{}, test_node_id))
-	s.Equal(http.StatusOK, resp.StatusCode)
-	s.T().Log(freeNodeResp)
-
-	<-currentStage.WaitForNodeFree(test_node_id)
+	currentStage.NodeOperations.FreeNode(testNodeId)
+	<-currentStage.WaitForNodeFree(testNodeId)
 	currentStage.DeleteBag(testBagName)
 }
 

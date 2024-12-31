@@ -8,6 +8,7 @@ Method | HTTP request | Description
 [**AgentsInfoNodeIdGet**](AgentsApi.md#AgentsInfoNodeIdGet) | **Get** /agents/info/{nodeId} | get node info
 [**AgentsJoinNodeIdPost**](AgentsApi.md#AgentsJoinNodeIdPost) | **Post** /agents/join/{nodeId} | join free node to a bag
 [**AgentsListGet**](AgentsApi.md#AgentsListGet) | **Get** /agents/list | list nodes, return all node ids
+[**AgentsUploadfilesPost**](AgentsApi.md#AgentsUploadfilesPost) | **Post** /agents/uploadfiles | upload files to nodes
 
 # **AgentsFreeNodeIdPost**
 > string AgentsFreeNodeIdPost(ctx, body, nodeId)
@@ -42,7 +43,7 @@ No authorization required
 > ApisNodeInfo AgentsInfoNodeIdGet(ctx, nodeId)
 get node info
 
-get node info
+get node info by node id
 
 ### Required Parameters
 
@@ -114,6 +115,34 @@ No authorization required
 
  - **Content-Type**: Not defined
  - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **AgentsUploadfilesPost**
+> AgentsUploadfilesPost(ctx, body)
+upload files to nodes
+
+upload files to nodes
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **body** | [**ApisUploadFilesReq**](ApisUploadFilesReq.md)| upload files request | 
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

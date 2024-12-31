@@ -94,6 +94,7 @@ func (dbo *DBOperations) AddTask(task *models.Task) {
 }
 
 func (dbo *DBOperations) UpdateTasksFinishTime(bagName string, taskNames []string, finishTimeMs int64) {
+	logger.Infof("tasks %v, bagName %s, finished in %d", taskNames, bagName, finishTimeMs)
 	xerr.Must0(dbo.dbi.
 		Model(&models.Task{}).
 		Where("task_name IN ?", taskNames).

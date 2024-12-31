@@ -25,7 +25,7 @@ func (aw *AsyncWorks) TaskEnque(
 			logger.Error(err)
 		}
 	}()
-	NewRLocker(xerr.MustOk[*sync.Mutex](aw.bagsLocks.Load(bagName))).
+	NewLocker(xerr.MustOk[*sync.Mutex](aw.bagsLocks.Load(bagName))).
 		Run(func() {
 			logger.Infof("bag %s, task %s, enque start", bagName, taskName)
 			dbo := db.NewDBOperations()

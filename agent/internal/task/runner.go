@@ -78,6 +78,7 @@ func (r *runner) taskRunningCallback(t Task) {
 	}()
 	r.ResourceCount.Add(int32(-t.GetResource()))
 	r.FinishedTasksCount.Add(1)
+	r.FinishedTaskChan <- t.GetName()
 }
 
 func (r *runner) createWorkingDir(t Task) (err error) {

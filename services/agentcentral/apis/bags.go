@@ -29,7 +29,6 @@ func EnableBags(r *mux.Router) {
 //	@Success		200	{object}	apis.AddBagResp
 //	@Router			/bags [post]
 func addBag(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	bag := AddBagReq{}
 	models.ReadJSON(r.Body, &bag)
 	bagModel := &models.Bag{BagDisplayName: bag.BagDisplayName}
@@ -51,7 +50,6 @@ func addBag(w http.ResponseWriter, r *http.Request) {
 //	@Success		200	{object}	apis.GetBagResp
 //	@Router			/bags/{bagName} [get]
 func getBag(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
 	bagModel := xerr.Must(tasks.GetBagsMgrInstance().GetBag(bagName))
 	resp := GetBagResp{}
@@ -70,7 +68,6 @@ func getBag(w http.ResponseWriter, r *http.Request) {
 //	@Router			/bags/{bagName} [delete]
 //	@Success		200	{object}	apis.DeleteBagResp
 func deleteBag(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
 	xerr.Must0(tasks.GetBagsMgrInstance().DeleteBag(bagName))
 }
@@ -85,7 +82,6 @@ func deleteBag(w http.ResponseWriter, r *http.Request) {
 //	@Router			/bags [get]
 //	@Success		200	{object}	apis.ListBagsResp
 func listBags(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	// TODO
 }
 
@@ -99,7 +95,6 @@ func listBags(w http.ResponseWriter, r *http.Request) {
 //	@Router			/bagnodes/{bagName} [get]
 //	@Success		200	{object}	apis.ListBagNodesResp
 func listBagNodes(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
 	bn := &agents.BagNodes{}
 	bn.ListByBagName(bagName)

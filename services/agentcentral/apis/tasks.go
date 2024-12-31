@@ -25,8 +25,6 @@ func EnableTasks(r *mux.Router) {
 //	@Success		200	{object}	apis.AddTaskResp
 //	@Router			/bags/{bagName}/tasks [post]
 func addTask(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
-
 	bagName := mux.Vars(r)["bagName"]
 	addTaskReq := AddTaskReq{}
 	models.ReadJSON(r.Body, &addTaskReq)
@@ -64,7 +62,6 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 //	@Success		200	{object}	apis.GetTaskResp
 //	@Router			/bags/{bagName}/tasks/{taskName} [get]
 func getTask(w http.ResponseWriter, r *http.Request) {
-	defer httpRecover(w, r)
 	bagName := mux.Vars(r)["bagName"]
 	taskName := mux.Vars(r)["taskName"]
 	taskModel := tasks.

@@ -25,6 +25,7 @@ Class | Method | HTTP request | Description
 *AgentsApi* | [**AgentsInfoNodeIdGet**](docs/AgentsApi.md#agentsinfonodeidget) | **Get** /agents/info/{nodeId} | get node info
 *AgentsApi* | [**AgentsJoinNodeIdPost**](docs/AgentsApi.md#agentsjoinnodeidpost) | **Post** /agents/join/{nodeId} | join free node to a bag
 *AgentsApi* | [**AgentsListGet**](docs/AgentsApi.md#agentslistget) | **Get** /agents/list | list nodes, return all node ids
+*AgentsApi* | [**AgentsUploadfilesPost**](docs/AgentsApi.md#agentsuploadfilespost) | **Post** /agents/uploadfiles | upload files to nodes
 *BagsApi* | [**BagnodesBagNameGet**](docs/BagsApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes
 *BagsApi* | [**BagsBagNameDelete**](docs/BagsApi.md#bagsbagnamedelete) | **Delete** /bags/{bagName} | delete bag
 *BagsApi* | [**BagsBagNameGet**](docs/BagsApi.md#bagsbagnameget) | **Get** /bags/{bagName} | get bag
@@ -51,6 +52,8 @@ Class | Method | HTTP request | Description
  - [ApisNodeFreeReq](docs/ApisNodeFreeReq.md)
  - [ApisNodeInfo](docs/ApisNodeInfo.md)
  - [ApisNodeJoinReq](docs/ApisNodeJoinReq.md)
+ - [ApisUploadFilesReq](docs/ApisUploadFilesReq.md)
+ - [ApisUploadFilesReqFiles](docs/ApisUploadFilesReqFiles.md)
  - [FilesUploadBody](docs/FilesUploadBody.md)
 
 ## Documentation For Authorization

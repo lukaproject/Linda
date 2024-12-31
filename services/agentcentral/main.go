@@ -54,7 +54,8 @@ func main() {
 	files.EnableFiles(r)
 	r.Use(
 		middlewares.LogRequest,
-		middlewares.SetHeaderJSON)
+		middlewares.SetHeaderJSON,
+		middlewares.HTTPRecover)
 
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()

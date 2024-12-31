@@ -47,7 +47,7 @@ paths:
       tags:
       - agents
       summary: get node info
-      description: get node info
+      description: get node info by node id
       parameters:
       - name: nodeId
         in: path
@@ -110,6 +110,20 @@ paths:
                 items:
                   type: string
                 x-content-type: application/json
+  /agents/uploadfiles:
+    post:
+      tags:
+      - agents
+      summary: upload files to nodes
+      description: upload files to nodes
+      requestBody:
+        description: upload files request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/apis.UploadFilesReq'
+        required: true
+      x-codegen-request-body-name: uploadFilesReq
   /bagnodes/{bagName}:
     get:
       tags:
@@ -287,7 +301,7 @@ paths:
       tags:
       - files
       summary: Upload file
-      description: Upload file
+      description: "Upload file, can only upload 1 file."
       requestBody:
         content:
           multipart/form-data:
@@ -349,14 +363,17 @@ components:
           type: string
         createTimeMs:
           type: integer
+          format: int64
         finishTimeMs:
           type: integer
+          format: int64
         nodeId:
           type: string
         priority:
           type: integer
         scheduledTimeMs:
           type: integer
+          format: int64
         scriptPath:
           type: string
         taskDisplayName:
@@ -422,14 +439,17 @@ components:
           type: string
         createTimeMs:
           type: integer
+          format: int64
         finishTimeMs:
           type: integer
+          format: int64
         nodeId:
           type: string
         priority:
           type: integer
         scheduledTimeMs:
           type: integer
+          format: int64
         scriptPath:
           type: string
         taskDisplayName:
@@ -494,6 +514,18 @@ components:
       properties:
         bagName:
           type: string
+    apis.UploadFilesReq:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: apis.UploadFilesReq_files
+        nodes:
+          type: array
+          description: nodes id list which will receive these files.
+          items:
+            type: string
     files_upload_body:
       required:
       - block
@@ -511,4 +543,13 @@ components:
           type: string
           description: this is a file
           format: binary
+    apis.UploadFilesReq_files:
+      type: object
+      properties:
+        locationPath:
+          type: string
+          description: the location of file in node
+        uri:
+          type: string
+          description: File's URI
 x-original-swagger-version: "2.0"

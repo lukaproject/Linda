@@ -13,17 +13,33 @@ import (
 
 type Stage struct {
 	t   *testing.T
-	cli *swagger.APIClient
+	Cli *swagger.APIClient
+
+	TasksOperations
+	FileOperations
+	NodeOperations
 }
 
 func (s *Stage) SetUp(t *testing.T, cli *swagger.APIClient) {
-	s.cli = cli
+	s.Cli = cli
 	s.t = t
+	s.TasksOperations = TasksOperations{
+		t:   t,
+		cli: cli,
+	}
+	s.FileOperations = FileOperations{
+		t:   t,
+		cli: cli,
+	}
+	s.NodeOperations = NodeOperations{
+		t:   t,
+		cli: cli,
+	}
 }
 
 func (s *Stage) CreateBag(bagDisplayName string) (bagName string) {
 	resp, httpResp := xerr.Must2(
-		s.cli.BagsApi.BagsPost(
+		s.Cli.BagsApi.BagsPost(
 			context.Background(),
 			swagger.ApisAddBagReq{
 				BagDisplayName: bagDisplayName,
@@ -38,7 +54,7 @@ func (s *Stage) CreateBag(bagDisplayName string) (bagName string) {
 
 func (s *Stage) DeleteBag(bagName string) {
 	resp, httpResp := xerr.Must2(
-		s.cli.BagsApi.BagsBagNameDelete(context.Background(), bagName))
+		s.Cli.BagsApi.BagsBagNameDelete(context.Background(), bagName))
 	if httpResp.StatusCode != http.StatusOK {
 		s.t.Logf(
 			"delete bag failed, bag display name %s, status code %d, error msg = %s",
@@ -50,7 +66,7 @@ func (s *Stage) WaitForNodeJoinFinished(nodeId, bagName string) (ch chan any) {
 	ch = make(chan any, 1)
 	go func() {
 		for {
-			nodeInfo, httpResp := xerr.Must2(s.cli.AgentsApi.AgentsInfoNodeIdGet(context.Background(), nodeId))
+			nodeInfo, httpResp := xerr.Must2(s.Cli.AgentsApi.AgentsInfoNodeIdGet(context.Background(), nodeId))
 			if httpResp.StatusCode != http.StatusOK {
 				s.t.Logf("get node info failed, %d", httpResp.StatusCode)
 			}
@@ -70,7 +86,7 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 	ch = make(chan any, 1)
 	go func() {
 		for {
-			nodeInfo, httpResp := xerr.Must2(s.cli.AgentsApi.AgentsInfoNodeIdGet(context.Background(), nodeId))
+			nodeInfo, httpResp := xerr.Must2(s.Cli.AgentsApi.AgentsInfoNodeIdGet(context.Background(), nodeId))
 			if httpResp.StatusCode != http.StatusOK {
 				s.t.Logf("get node info failed, %d", httpResp.StatusCode)
 			}
@@ -87,7 +103,7 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 }
 
 func (s *Stage) ListNodeIds() []string {
-	nodeIds, resp := xerr.Must2(s.cli.AgentsApi.AgentsListGet(context.Background()))
+	nodeIds, resp := xerr.Must2(s.Cli.AgentsApi.AgentsListGet(context.Background()))
 	if resp.StatusCode != http.StatusOK {
 		s.t.Logf("list nodes id info failed, %d", resp.StatusCode)
 	}
@@ -100,4 +116,14 @@ func (s *Stage) DownloadFromURL(url string) []byte {
 	resp := xerr.Must(http.Get(url))
 	defer resp.Body.Close()
 	return xerr.Must(io.ReadAll(resp.Body))
+}
+
+func NewStageT(t *testing.T) *Stage {
+	conf := swagger.NewConfiguration()
+	conf.BasePath = "http://localhost:5883/api"
+	cli := swagger.NewAPIClient(conf)
+
+	currentStage := &Stage{}
+	currentStage.SetUp(t, cli)
+	return currentStage
 }
