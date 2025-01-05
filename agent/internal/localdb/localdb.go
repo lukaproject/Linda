@@ -30,7 +30,7 @@ func New() (ldb *LocalDB) {
 	return
 }
 
-func (ldb *LocalDB) Set2(bucket string, k, v []byte) error {
+func (ldb *LocalDB) Set(bucket string, k, v []byte) error {
 	return ldb.db.Update(func(tx *nutsdb.Tx) error {
 		if err := tx.Put(bucket, k, v, 0); err != nil {
 			return err
@@ -39,7 +39,7 @@ func (ldb *LocalDB) Set2(bucket string, k, v []byte) error {
 	})
 }
 
-func (ldb *LocalDB) Delete2(bucket string, k []byte) error {
+func (ldb *LocalDB) Delete(bucket string, k []byte) error {
 	return ldb.db.Update(func(tx *nutsdb.Tx) error {
 		if err := tx.Delete(bucket, k); err != nil {
 			if err == nutsdb.ErrKeyNotFound {
@@ -51,7 +51,7 @@ func (ldb *LocalDB) Delete2(bucket string, k []byte) error {
 	})
 }
 
-func (ldb *LocalDB) Get2(bucket string, k []byte) (v []byte, err error) {
+func (ldb *LocalDB) Get(bucket string, k []byte) (v []byte, err error) {
 	err = ldb.db.View(
 		func(tx *nutsdb.Tx) error {
 			bytev, err := tx.Get(bucket, k)

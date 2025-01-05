@@ -26,7 +26,7 @@ type NodeData struct {
 func (nd *NodeData) getPersistor() (p *localdb.Persistor[*KeyType, *NodeData]) {
 	p, err := localdb.GetPersistor[*KeyType, *NodeData](BucketNodeData)
 	if err != nil {
-		logger.Errorf("get NodeData persistor failed, err %v", err)
+		logger.Errorf("get %s persistor failed, err %v", BucketNodeData, err)
 		panic(err)
 	}
 	return p

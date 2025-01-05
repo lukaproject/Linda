@@ -1,8 +1,8 @@
 package task
 
 import (
+	"Linda/agent/internal/data"
 	"Linda/agent/internal/utils"
-	"Linda/protocol/models"
 	"errors"
 	"os"
 	"os/exec"
@@ -16,26 +16,6 @@ const (
 	ConstStdErrFile = "stderr.txt"
 )
 
-type TaskData struct {
-	Name         string
-	Bag          string
-	Resource     int
-	PathToScript string
-
-	// script running dir
-	WorkingDir string
-	// task data located dir, such as stdout / stderr or others.
-	TaskDir string
-}
-
-func (t *TaskData) FromTaskModel(taskModel *models.Task) {
-	t.Bag = taskModel.BagName
-	t.Name = taskModel.TaskName
-	t.PathToScript = taskModel.ScriptPath
-	t.WorkingDir = taskModel.WorkingDir
-	t.Resource = 1
-}
-
 type TaskMetrics struct{}
 
 type Task interface {
@@ -43,7 +23,7 @@ type Task interface {
 	GetBag() string
 	GetResource() int
 	GetWorkingDir() string
-	GetData() TaskData
+	GetData() data.TaskData
 	Start() error
 	Stop() error
 	Wait() error
@@ -51,7 +31,7 @@ type Task interface {
 }
 
 type task struct {
-	TaskData
+	data.TaskData
 	TaskMetrics
 	isFinished bool
 	cmd        *exec.Cmd
@@ -76,17 +56,13 @@ func (t *task) GetWorkingDir() string {
 	return t.WorkingDir
 }
 
-func (t *task) GetData() TaskData {
+func (t *task) GetData() data.TaskData {
 	return t.TaskData
 }
 
 func (t *task) Start() (err error) {
 	func() {
-		defer func() {
-			if e := recover(); e != nil {
-				err = e.(error)
-			}
-		}()
+		defer xerr.Recover(&err)
 
 		t.stdoutFile = xerr.Must(os.Create(path.Join(t.TaskDir, ConstStdOutFile)))
 		t.cmd.Stdout = t.stdoutFile
@@ -108,12 +84,7 @@ func (t *task) Wait() error {
 
 func (t *task) Stop() (err error) {
 	func() {
-		defer func() {
-			if e := recover(); e != nil {
-				err = e.(error)
-			}
-		}()
-
+		defer xerr.Recover(&err)
 		xerr.Must0(t.cmd.Process.Kill())
 		t.isFinished = true
 		xerr.Must0(t.stdoutFile.Close())
@@ -127,7 +98,7 @@ func (t *task) IsFinished() bool {
 }
 
 func NewTask(
-	taskData TaskData,
+	taskData data.TaskData,
 ) Task {
 	t := &task{
 		TaskData: taskData,

@@ -3,8 +3,11 @@ package task
 import (
 	"Linda/agent/internal/config"
 	"Linda/agent/internal/data"
+	"Linda/baselibs/abstractions/xos"
 	"Linda/protocol/models"
 	"net/http"
+	"os"
+	"path"
 	"strings"
 
 	"github.com/lukaproject/xerr"
@@ -25,6 +28,8 @@ func (m *Mgr) AddTask(taskName string) {
 		logger.Error(err)
 		return
 	}
+	// need to pack task directory.
+	taskData.TaskDir = m.newTaskDir(&taskData)
 	err = m.taskRunner.AddTask(NewTask(taskData))
 	if err != nil {
 		logger.Error(err)
@@ -46,7 +51,7 @@ func (m *Mgr) PopFinishedTasks() (finishedTaskNames []string) {
 	return
 }
 
-func (m *Mgr) fetchTaskDataByTaskName(taskName string) (taskData TaskData, err error) {
+func (m *Mgr) fetchTaskDataByTaskName(taskName string) (taskData data.TaskData, err error) {
 	func() {
 		defer xerr.Recover(&err)
 		bagName := data.Instance().NodeData.BagName
@@ -74,6 +79,15 @@ func (m *Mgr) getTaskUrl(bagName, taskName string) string {
 			"tasks",
 			taskName,
 		}, "/")
+}
+
+func (m *Mgr) newTaskDir(taskData *data.TaskData) string {
+	tasksBaseDir := config.Instance().TasksDir
+	taskDir := path.Join(tasksBaseDir, taskData.Bag, taskData.Name)
+	if !xos.PathExists(taskDir) {
+		xos.MkdirAll(taskDir, os.ModePerm)
+	}
+	return taskDir
 }
 
 func NewMgr() IMgr {

@@ -1,11 +1,11 @@
-# use this compose to start a test agents cluster.
+
 services:
   agents-cluster:
     image: linda-agent:latest
     restart: always
     environment:
-      - 'LINDA_AGENT_CENTRAL_ENDPOINT={{ Agent central endpoint }}'
-      - 'LINDA_HB_PERIOD_MS=5000'
+      - 'LINDA_AGENT_CENTRAL_ENDPOINT=172.17.0.1:5883'
+      - 'LINDA_HB_PERIOD_MS=3000'
     deploy:
       resources:
         limits:

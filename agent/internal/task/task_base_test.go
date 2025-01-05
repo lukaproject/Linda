@@ -1,6 +1,7 @@
 package task
 
 import (
+	"Linda/agent/internal/data"
 	"Linda/agent/internal/utils"
 	"Linda/baselibs/abstractions/xos"
 	"Linda/baselibs/testcommon/testenv"
@@ -40,7 +41,7 @@ func (s *testBase) createTaskRequireDir(t Task) {
 func (s *testBase) createNewTestTask(name, bag, script string, resource int) Task {
 	workingDir := path.Join(s.TempDir(), bag, name)
 	pathToScript := path.Join(workingDir, "test.sh")
-	t := NewTask(TaskData{
+	t := NewTask(data.TaskData{
 		Name:         name,
 		Bag:          bag,
 		Resource:     resource,

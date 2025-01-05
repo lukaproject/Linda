@@ -19,15 +19,15 @@ type Persistor[K, V abstractions.Serializable] struct {
 }
 
 func (p *Persistor[K, V]) Set(k K, v V) (err error) {
-	return p.ldb.Set2(p.bucket, k.Serialize(), v.Serialize())
+	return p.ldb.Set(p.bucket, k.Serialize(), v.Serialize())
 }
 
 func (p *Persistor[K, V]) Delete(k K) (err error) {
-	return p.ldb.Delete2(p.bucket, k.Serialize())
+	return p.ldb.Delete(p.bucket, k.Serialize())
 }
 
 func (p *Persistor[K, V]) Get(k K, v V) (err error) {
-	result, err := p.ldb.Get2(p.bucket, k.Serialize())
+	result, err := p.ldb.Get(p.bucket, k.Serialize())
 	v.Deserialize(result)
 	return err
 }

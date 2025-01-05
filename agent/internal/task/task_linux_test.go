@@ -1,6 +1,7 @@
 package task
 
 import (
+	"Linda/agent/internal/data"
 	"os"
 	"path"
 	"runtime"
@@ -22,7 +23,7 @@ echo 1
 echo 2
 echo 3
 		`)
-	td := TaskData{
+	td := data.TaskData{
 		Name:         "testtask",
 		Bag:          "testbag",
 		Resource:     1,
@@ -52,7 +53,7 @@ do
 	sleep 1
 done
 		`)
-	td := TaskData{
+	td := data.TaskData{
 		Name:         "testtask2",
 		Bag:          "testbag",
 		Resource:     1,

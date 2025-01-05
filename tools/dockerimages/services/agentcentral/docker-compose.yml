@@ -1,9 +1,19 @@
 # use this compose to start a test agentcentral.
 services:
+  redis:
+    image: "bitnami/redis:latest"
+    restart: always
+    environment:
+      - REDIS_PASSWORD=123456
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 1024mb
+    ports:
+      - "16379:6379"
   agentcentral:
     image: linda-agentcentral:latest
     restart: always
     network_mode: host
+    depends_on:
+      - redis
     deploy:
       resources:
         limits:

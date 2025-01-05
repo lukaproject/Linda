@@ -20,6 +20,7 @@ type Config struct {
 	LocalDBDir           string `xdefault:"/tmp/linda-agent/db" xenv:"LINDA_LOCAL_DB_DIR"`
 	HeartbeatPeriodMs    int    `xdefault:"50" xenv:"LINDA_HB_PERIOD_MS"`
 	NodeName             string `xdefault:"test-node-name" xenv:"LINDA_NODE_NAME"`
+	TasksDir             string `xdefault:"/linda/tasks" xenv:"LINDA_TASKS_DIR"`
 }
 
 func (c *Config) AgentHeartBeatUrl() string {
@@ -48,6 +49,9 @@ func (c *Config) Merge(other *Config) {
 		c.HeartbeatPeriodMs = other.HeartbeatPeriodMs
 	}
 	if other.NodeName != "" {
+		c.NodeName = other.NodeName
+	}
+	if other.TasksDir != "" {
 		c.NodeName = other.NodeName
 	}
 }
