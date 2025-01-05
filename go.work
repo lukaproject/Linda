@@ -1,0 +1,12 @@
+go 1.23
+
+use (
+	./agent
+	./baselibs/abstractions
+	./baselibs/apiscall
+	./baselibs/codes
+	./baselibs/testcommon
+	./protocol
+	./services/agentcentral
+	./services/integrationtest
+)

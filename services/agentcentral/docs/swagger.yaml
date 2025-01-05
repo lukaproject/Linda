@@ -1,0 +1,484 @@
+basePath: /api
+definitions:
+  apis.AddBagReq:
+    properties:
+      bagDisplayName:
+        example: test-bagDisplayName
+        type: string
+    type: object
+  apis.AddBagResp:
+    properties:
+      bagDisplayName:
+        type: string
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      updateTimeMs:
+        type: integer
+    type: object
+  apis.AddTaskReq:
+    properties:
+      scriptPath:
+        example: /bin/test.sh
+        type: string
+      taskDisplayName:
+        example: test-taskDisplayName
+        type: string
+      workingDir:
+        example: /bin/testWorkingDir/working
+        type: string
+    type: object
+  apis.AddTaskResp:
+    properties:
+      bagName:
+        type: string
+      createTimeMs:
+        format: int64
+        type: integer
+      finishTimeMs:
+        format: int64
+        type: integer
+      nodeId:
+        type: string
+      priority:
+        type: integer
+      scheduledTimeMs:
+        format: int64
+        type: integer
+      scriptPath:
+        type: string
+      taskDisplayName:
+        type: string
+      taskName:
+        type: string
+      workingDir:
+        type: string
+    type: object
+  apis.Bag:
+    properties:
+      bagDisplayName:
+        type: string
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      updateTimeMs:
+        type: integer
+    type: object
+  apis.DeleteBagResp:
+    properties:
+      errorMsg:
+        type: string
+    type: object
+  apis.GetBagResp:
+    properties:
+      bagDisplayName:
+        type: string
+      bagName:
+        type: string
+      createTimeMs:
+        type: integer
+      updateTimeMs:
+        type: integer
+    type: object
+  apis.GetTaskResp:
+    properties:
+      bagName:
+        type: string
+      createTimeMs:
+        format: int64
+        type: integer
+      finishTimeMs:
+        format: int64
+        type: integer
+      nodeId:
+        type: string
+      priority:
+        type: integer
+      scheduledTimeMs:
+        format: int64
+        type: integer
+      scriptPath:
+        type: string
+      taskDisplayName:
+        type: string
+      taskName:
+        type: string
+      workingDir:
+        type: string
+    type: object
+  apis.ListBagNodesResp:
+    properties:
+      nodeIds:
+        items:
+          type: string
+        type: array
+    type: object
+  apis.ListBagsResp:
+    properties:
+      bags:
+        items:
+          $ref: '#/definitions/apis.Bag'
+        type: array
+    type: object
+  apis.NodeFreeReq:
+    type: object
+  apis.NodeInfo:
+    properties:
+      bagName:
+        type: string
+      maxRunningTasks:
+        type: integer
+    type: object
+  apis.NodeJoinReq:
+    properties:
+      bagName:
+        type: string
+    type: object
+  apis.UploadFilesReq:
+    properties:
+      files:
+        items:
+          properties:
+            locationPath:
+              description: the location of file in node
+              type: string
+            uri:
+              description: File's URI
+              type: string
+          type: object
+        type: array
+      nodes:
+        description: nodes id list which will receive these files.
+        items:
+          type: string
+        type: array
+    type: object
+info:
+  contact: {}
+  description: This is agent central swagger API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: AgentCentral API
+  version: 0.dev
+paths:
+  /agents/free/{nodeId}:
+    post:
+      consumes:
+      - application/json
+      description: free node
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: Node free request
+        in: body
+        name: nodeFreeReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.NodeFreeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: free node
+      tags:
+      - agents
+  /agents/info/{nodeId}:
+    get:
+      consumes:
+      - application/json
+      description: get node info by node id
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.NodeInfo'
+      summary: get node info
+      tags:
+      - agents
+  /agents/join/{nodeId}:
+    post:
+      consumes:
+      - application/json
+      description: join free node to a bag
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: Node join request
+        in: body
+        name: nodeJoinReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.NodeJoinReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: join free node to a bag
+      tags:
+      - agents
+  /agents/list:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: list nodes, return all node ids
+      tags:
+      - agents
+  /agents/uploadfiles:
+    post:
+      consumes:
+      - application/json
+      description: upload files to nodes
+      parameters:
+      - description: upload files request
+        in: body
+        name: uploadFilesReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.UploadFilesReq'
+      produces:
+      - application/json
+      responses: {}
+      summary: upload files to nodes
+      tags:
+      - agents
+  /bagnodes/{bagName}:
+    get:
+      consumes:
+      - application/json
+      description: list all node ids which belong to this node
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.ListBagNodesResp'
+      summary: list bag nodes
+      tags:
+      - bags
+  /bags:
+    get:
+      consumes:
+      - application/json
+      description: list bags
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.ListBagsResp'
+      summary: list bags [no implementation]
+      tags:
+      - bags
+    post:
+      consumes:
+      - application/json
+      description: create a new bag
+      parameters:
+      - description: bag's request
+        in: body
+        name: addBagReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.AddBagReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.AddBagResp'
+      summary: add bag
+      tags:
+      - bags
+  /bags/{bagName}:
+    delete:
+      consumes:
+      - application/json
+      description: delete bag
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.DeleteBagResp'
+      summary: delete bag
+      tags:
+      - bags
+    get:
+      consumes:
+      - application/json
+      description: get bag
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.GetBagResp'
+      summary: get bag
+      tags:
+      - bags
+  /bags/{bagName}/tasks:
+    post:
+      consumes:
+      - application/json
+      description: add task
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      - description: add tasks's request
+        in: body
+        name: addTaskReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.AddTaskReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.AddTaskResp'
+      summary: add task
+      tags:
+      - tasks
+  /bags/{bagName}/tasks/{taskName}:
+    get:
+      consumes:
+      - application/json
+      description: get task
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      - description: task's name
+        in: path
+        name: taskName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.GetTaskResp'
+      summary: get task
+      tags:
+      - tasks
+  /files/download/{block}/{fileName}:
+    get:
+      consumes:
+      - application/json
+      description: download file
+      parameters:
+      - description: file name
+        in: path
+        name: fileName
+        required: true
+        type: string
+      - description: block name
+        in: path
+        name: block
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses: {}
+      summary: download file
+      tags:
+      - files
+  /files/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload file, can only upload 1 file.
+      parameters:
+      - description: file name
+        in: formData
+        name: fileName
+        required: true
+        type: string
+      - description: file block
+        in: formData
+        name: block
+        required: true
+        type: string
+      - description: this is a file
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Upload file
+      tags:
+      - files
+  /healthcheck:
+    post:
+      consumes:
+      - application/json
+      description: health check
+      produces:
+      - text/plain
+      responses: {}
+      summary: health check
+swagger: "2.0"

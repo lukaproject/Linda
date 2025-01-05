@@ -1,0 +1,729 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is agent central swagger API",
+        "title": "AgentCentral API",
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {},
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "0.dev"
+    },
+    "basePath": "/api",
+    "paths": {
+        "/agents/free/{nodeId}": {
+            "post": {
+                "description": "free node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "free node",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Node free request",
+                        "name": "nodeFreeReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.NodeFreeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/info/{nodeId}": {
+            "get": {
+                "description": "get node info by node id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "get node info",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.NodeInfo"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/join/{nodeId}": {
+            "post": {
+                "description": "join free node to a bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "join free node to a bag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Node join request",
+                        "name": "nodeJoinReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.NodeJoinReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "list nodes, return all node ids",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/uploadfiles": {
+            "post": {
+                "description": "upload files to nodes",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "upload files to nodes",
+                "parameters": [
+                    {
+                        "description": "upload files request",
+                        "name": "uploadFilesReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.UploadFilesReq"
+                        }
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/bagnodes/{bagName}": {
+            "get": {
+                "description": "list all node ids which belong to this node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bags"
+                ],
+                "summary": "list bag nodes",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.ListBagNodesResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/bags": {
+            "get": {
+                "description": "list bags",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bags"
+                ],
+                "summary": "list bags [no implementation]",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.ListBagsResp"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create a new bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bags"
+                ],
+                "summary": "add bag",
+                "parameters": [
+                    {
+                        "description": "bag's request",
+                        "name": "addBagReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddBagReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddBagResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/bags/{bagName}": {
+            "get": {
+                "description": "get bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bags"
+                ],
+                "summary": "get bag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.GetBagResp"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "delete bag",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "bags"
+                ],
+                "summary": "delete bag",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.DeleteBagResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/bags/{bagName}/tasks": {
+            "post": {
+                "description": "add task",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "add task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "add tasks's request",
+                        "name": "addTaskReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddTaskReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.AddTaskResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/bags/{bagName}/tasks/{taskName}": {
+            "get": {
+                "description": "get task",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "get task",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "task's name",
+                        "name": "taskName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.GetTaskResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/files/download/{block}/{fileName}": {
+            "get": {
+                "description": "download file",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "download file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "fileName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "block name",
+                        "name": "block",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {}
+            }
+        },
+        "/files/upload": {
+            "post": {
+                "description": "Upload file, can only upload 1 file.",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "files"
+                ],
+                "summary": "Upload file",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "file name",
+                        "name": "fileName",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "file block",
+                        "name": "block",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "file",
+                        "description": "this is a file",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthcheck": {
+            "post": {
+                "description": "health check",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "text/plain"
+                ],
+                "summary": "health check",
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "apis.AddBagReq": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string",
+                    "example": "test-bagDisplayName"
+                }
+            }
+        },
+        "apis.AddBagResp": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string"
+                },
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "updateTimeMs": {
+                    "type": "integer"
+                }
+            }
+        },
+        "apis.AddTaskReq": {
+            "type": "object",
+            "properties": {
+                "scriptPath": {
+                    "type": "string",
+                    "example": "/bin/test.sh"
+                },
+                "taskDisplayName": {
+                    "type": "string",
+                    "example": "test-taskDisplayName"
+                },
+                "workingDir": {
+                    "type": "string",
+                    "example": "/bin/testWorkingDir/working"
+                }
+            }
+        },
+        "apis.AddTaskResp": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "finishTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "scheduledTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "scriptPath": {
+                    "type": "string"
+                },
+                "taskDisplayName": {
+                    "type": "string"
+                },
+                "taskName": {
+                    "type": "string"
+                },
+                "workingDir": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.Bag": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string"
+                },
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "updateTimeMs": {
+                    "type": "integer"
+                }
+            }
+        },
+        "apis.DeleteBagResp": {
+            "type": "object",
+            "properties": {
+                "errorMsg": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.GetBagResp": {
+            "type": "object",
+            "properties": {
+                "bagDisplayName": {
+                    "type": "string"
+                },
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer"
+                },
+                "updateTimeMs": {
+                    "type": "integer"
+                }
+            }
+        },
+        "apis.GetTaskResp": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "finishTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "scheduledTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "scriptPath": {
+                    "type": "string"
+                },
+                "taskDisplayName": {
+                    "type": "string"
+                },
+                "taskName": {
+                    "type": "string"
+                },
+                "workingDir": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.ListBagNodesResp": {
+            "type": "object",
+            "properties": {
+                "nodeIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "apis.ListBagsResp": {
+            "type": "object",
+            "properties": {
+                "bags": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/apis.Bag"
+                    }
+                }
+            }
+        },
+        "apis.NodeFreeReq": {
+            "type": "object"
+        },
+        "apis.NodeInfo": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                },
+                "maxRunningTasks": {
+                    "type": "integer"
+                }
+            }
+        },
+        "apis.NodeJoinReq": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.UploadFilesReq": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "locationPath": {
+                                "description": "the location of file in node",
+                                "type": "string"
+                            },
+                            "uri": {
+                                "description": "File's URI",
+                                "type": "string"
+                            }
+                        }
+                    }
+                },
+                "nodes": {
+                    "description": "nodes id list which will receive these files.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
