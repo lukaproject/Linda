@@ -9,6 +9,7 @@ parser = argparse.ArgumentParser(description="builder input args")
 parser.add_argument("--setup", action=argparse.BooleanOptionalAction, default=False, help="setup develop environment")
 parser.add_argument("--agent", action=argparse.BooleanOptionalAction, default=False, help="build agent")
 parser.add_argument("--agentcentral", action=argparse.BooleanOptionalAction, default=False, help="build agentcentral")
+parser.add_argument("--fileservicefe", action=argparse.BooleanOptionalAction, default=False, help="build fileservicefe")
 args = parser.parse_args()
 
 def _install_swag():
@@ -62,10 +63,34 @@ def build_agentcentral():
         ],
     )
 
+def build_fileservicefe():
+    # cleanup
+    subprocess.run(
+        args=[
+            "docker",
+            "rmi",
+            "linda-fileservicefe:latest",
+        ],
+    )
+    subprocess.run(
+        args=[
+            "buildx",
+            "build",
+            "-f",
+            "tools/dockerimages/services/fileservicefe/Dockerfile.fileservicefe",
+            "-t",
+            "linda-fileservicefe",
+            "."
+        ],
+    )
+
 if __name__ == "__main__":
     print("agent", args.agent)
     print("agent central", args.agentcentral)
+    print("fileservicefe", args.fileservicefe)
     if args.agent:
         build_agent()
     if args.agentcentral:
         build_agentcentral()
+    if args.fileservicefe:
+        build_fileservicefe()

@@ -273,49 +273,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/apis.GetTaskResp'
-  /files/download/{block}/{fileName}:
-    get:
-      tags:
-      - files
-      summary: download file
-      description: download file
-      parameters:
-      - name: fileName
-        in: path
-        description: file name
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-      - name: block
-        in: path
-        description: block name
-        required: true
-        style: simple
-        explode: false
-        schema:
-          type: string
-  /files/upload:
-    post:
-      tags:
-      - files
-      summary: Upload file
-      description: "Upload file, can only upload 1 file."
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/files_upload_body'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: string
-                x-content-type: application/json
   /healthcheck:
     post:
       summary: health check
@@ -526,23 +483,6 @@ components:
           description: nodes id list which will receive these files.
           items:
             type: string
-    files_upload_body:
-      required:
-      - block
-      - file
-      - fileName
-      type: object
-      properties:
-        fileName:
-          type: string
-          description: file name
-        block:
-          type: string
-          description: file block
-        file:
-          type: string
-          description: this is a file
-          format: binary
     apis.UploadFilesReq_files:
       type: object
       properties:

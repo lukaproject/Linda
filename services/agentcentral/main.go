@@ -15,7 +15,6 @@ import (
 
 	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/apis"
-	"Linda/services/agentcentral/apis/files"
 	"Linda/services/agentcentral/apis/middlewares"
 	_ "Linda/services/agentcentral/docs"
 	"Linda/services/agentcentral/internal/config"
@@ -51,7 +50,6 @@ func main() {
 	apis.EnableTasks(r)
 	apis.EnableAgents(r)
 	apis.EnableInnerCall(r)
-	files.EnableFiles(r)
 	r.Use(
 		middlewares.LogRequest,
 		middlewares.SetHeaderJSON,

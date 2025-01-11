@@ -3,6 +3,7 @@ package stage
 import (
 	"Linda/baselibs/apiscall/swagger"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"testing"
@@ -28,8 +29,9 @@ func (s *Stage) SetUp(t *testing.T, cli *swagger.APIClient) {
 		cli: cli,
 	}
 	s.FileOperations = FileOperations{
-		t:   t,
-		cli: cli,
+		t:                     t,
+		cli:                   cli,
+		fileServiceFEEndPoint: fmt.Sprintf("http://172.17.0.1:%d", FileServiceFEPort),
 	}
 	s.NodeOperations = NodeOperations{
 		t:   t,
@@ -120,7 +122,7 @@ func (s *Stage) DownloadFromURL(url string) []byte {
 
 func NewStageT(t *testing.T) *Stage {
 	conf := swagger.NewConfiguration()
-	conf.BasePath = "http://localhost:5883/api"
+	conf.BasePath = fmt.Sprintf("http://localhost:%d/api", AgentCentralPort)
 	cli := swagger.NewAPIClient(conf)
 
 	currentStage := &Stage{}

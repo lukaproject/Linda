@@ -1,16 +1,13 @@
 package fakefileserver
 
 import (
+	"Linda/baselibs/multifs"
 	"path/filepath"
 	"testing"
 )
 
-const (
-	PREFIX = "/files/"
-)
-
 func BuildDownloadURL(s FileServer, path string) string {
-	return s.Addr() + filepath.Join(PREFIX, path)
+	return s.Addr() + filepath.Join(multifs.FILE_DOWNLOAD_PREFIX, path)
 }
 
 func NewT(t *testing.T) FileServer {

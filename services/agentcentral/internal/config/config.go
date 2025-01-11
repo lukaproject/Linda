@@ -6,17 +6,12 @@ type Config struct {
 	Port      int    `xdefault:"5883"`
 	Redis     *RedisConfig
 	SSL       *SSLConfig
-	FileSaver *FileSaverConfig
 }
 
 type RedisConfig struct {
 	Addrs    []string `xdefault:"localhost:16379"`
 	Db       int      `xdefault:"1"`
 	Password string   `xdefault:"123456"`
-}
-
-type FileSaverConfig struct {
-	RootDir string `xdefault:"/tmp"`
 }
 
 type SSLConfig struct {
@@ -40,8 +35,5 @@ func (c *Config) Merge(other *Config) {
 	}
 	if other.SSL != nil {
 		c.SSL = other.SSL
-	}
-	if other.FileSaver != nil {
-		c.FileSaver = other.FileSaver
 	}
 }
