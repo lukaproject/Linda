@@ -2,6 +2,7 @@ package multifs
 
 import (
 	"Linda/baselibs/multifs/internal/local"
+	"Linda/protocol/xhttp"
 	"context"
 	"fmt"
 	"net"
@@ -81,11 +82,7 @@ func newLocalFileService(input NewFileServiceInput) *FileService {
 				BaseDir: fs.BaseDir,
 			}))
 
-	mux.HandleFunc("/api/healthcheck",
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte("OK"))
-		})
+	mux.HandleFunc("/api/healthcheck", xhttp.Healthcheck)
 
 	fs.server = &http.Server{
 		Addr:    serveAddr,

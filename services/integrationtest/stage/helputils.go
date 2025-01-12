@@ -8,6 +8,7 @@ import (
 
 // HealthCheck skip test if health check failed, and return false,
 // otherwise return false.
+// this function only work after dev-env setup.
 func HealthCheck(t *testing.T, port int) bool {
 	if !testenv.HealthCheck(
 		fmt.Sprintf(

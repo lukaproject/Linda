@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"Linda/protocol/xhttp"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -18,7 +19,5 @@ func EnableHealthCheck(r *mux.Router) {
 //	@Produce		plain
 //	@Router			/healthcheck [post]
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	logger.Debug("health check success!")
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("OK"))
+	xhttp.Healthcheck(w, r)
 }

@@ -17,6 +17,7 @@ type agentCentralClientTestSuite struct {
 	localAgentURLFormat string
 }
 
+// should run 30+ s
 func (s *agentCentralClientTestSuite) TestNormal() {
 	cli, err := client.New(fmt.Sprintf(s.localAgentURLFormat, "12121212"))
 	s.Nil(err)
