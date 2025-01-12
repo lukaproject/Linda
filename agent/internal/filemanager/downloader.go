@@ -1,11 +1,8 @@
 package filemanager
 
 import (
-	"Linda/agent/internal/config"
 	"Linda/baselibs/abstractions/xio"
 	"Linda/baselibs/abstractions/xos"
-	"fmt"
-	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -31,24 +28,6 @@ func (d *Downloader) DownloadFromPublicURL(url, targetPath string) (err error) {
 		return
 	}
 	defer f.Close()
-	return xio.Transport(resp.Body, f)
-}
-
-func (d *Downloader) DownloadFromInternal(block, fileName, targetPath string) (err error) {
-	url := fmt.Sprintf("%s/files/download/%s/%s", config.Instance().AgentAPIUrl("http"), block, fileName)
-	xos.MkdirAll(filepath.Dir(targetPath), fs.ModePerm)
-	f, err := os.Create(targetPath)
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-	defer f.Close()
-	resp, err := d.getClient().Do(d.newDefaultRequest(url))
-	if err != nil {
-		logger.Error(err)
-		return
-	}
-	defer resp.Body.Close()
 	return xio.Transport(resp.Body, f)
 }
 
