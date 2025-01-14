@@ -419,59 +419,6 @@ paths:
       summary: get task
       tags:
       - tasks
-  /files/download/{block}/{fileName}:
-    get:
-      consumes:
-      - application/json
-      description: download file
-      parameters:
-      - description: file name
-        in: path
-        name: fileName
-        required: true
-        type: string
-      - description: block name
-        in: path
-        name: block
-        required: true
-        type: string
-      produces:
-      - application/octet-stream
-      responses: {}
-      summary: download file
-      tags:
-      - files
-  /files/upload:
-    post:
-      consumes:
-      - multipart/form-data
-      description: Upload file, can only upload 1 file.
-      parameters:
-      - description: file name
-        in: formData
-        name: fileName
-        required: true
-        type: string
-      - description: file block
-        in: formData
-        name: block
-        required: true
-        type: string
-      - description: this is a file
-        in: formData
-        name: file
-        required: true
-        type: file
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            type: string
-      summary: Upload file
-      tags:
-      - files
   /healthcheck:
     post:
       consumes:

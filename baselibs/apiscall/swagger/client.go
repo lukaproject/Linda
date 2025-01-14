@@ -50,8 +50,6 @@ type APIClient struct {
 
 	DefaultApi *DefaultApiService
 
-	FilesApi *FilesApiService
-
 	TasksApi *TasksApiService
 }
 
@@ -74,7 +72,6 @@ func NewAPIClient(cfg *Configuration) *APIClient {
 	c.AgentsApi = (*AgentsApiService)(&c.common)
 	c.BagsApi = (*BagsApiService)(&c.common)
 	c.DefaultApi = (*DefaultApiService)(&c.common)
-	c.FilesApi = (*FilesApiService)(&c.common)
 	c.TasksApi = (*TasksApiService)(&c.common)
 
 	return c

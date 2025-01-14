@@ -24,26 +24,25 @@ func (s *runTaskTestSuite) TestRunTask() {
 	bagName := currentStage.CreateBag("testbag")
 	defer currentStage.DeleteBag(bagName)
 	s.T().Logf("bag name %s", bagName)
-	test_node_id := currentStage.ListNodeIds()[0]
+	testNodeId := currentStage.ListNodeIds()[0]
 	// join bag
-	currentStage.NodeOperations.JoinBag(bagName, test_node_id)
-	<-currentStage.WaitForNodeJoinFinished(test_node_id, bagName)
+	currentStage.NodeOperations.JoinBag(bagName, testNodeId)
+	<-currentStage.WaitForNodeJoinFinished(testNodeId, bagName)
 	defer func() {
 		// free node
-		s.T().Logf("free node %s", test_node_id)
-		currentStage.NodeOperations.FreeNode(test_node_id)
+		s.T().Logf("free node %s", testNodeId)
+		currentStage.NodeOperations.FreeNode(testNodeId)
 		s.T().Log("free node request sent")
-		<-currentStage.WaitForNodeFree(test_node_id)
+		<-currentStage.WaitForNodeFree(testNodeId)
 	}()
 	// upload file to node
-	blockName := "block1"
-	fileName := "test.sh"
-	s.Nil(currentStage.FileOperations.UploadFileContent("echo test > test.txt", "block1", "test.sh"))
+	filePath := "block1/test.sh"
+	s.Nil(currentStage.FileOperations.Upload("echo test > test.txt", filePath))
 	_ = xerr.Must(currentStage.Cli.AgentsApi.AgentsUploadfilesPost(context.Background(), swagger.ApisUploadFilesReq{
-		Nodes: []string{test_node_id},
+		Nodes: []string{testNodeId},
 		Files: []swagger.ApisUploadFilesReqFiles{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:5883/api/files/download/%s/%s", blockName, fileName),
+				Uri:          fmt.Sprintf("http://172.17.0.1:5555/files/%s", filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		},
@@ -65,9 +64,10 @@ func (s *runTaskTestSuite) TestRunTask() {
 }
 
 func TestRunTask(t *testing.T) {
-	if !testenv.HealthCheck("http://localhost:5883/api/healthcheck") {
-		// skip e2e tests
-		t.Skip("dev-env is not available, skip")
+	if !stage.HealthCheck(t, stage.AgentCentralPort) {
+		return
+	}
+	if !stage.HealthCheck(t, stage.FileServiceFEPort) {
 		return
 	}
 	suite.Run(t, new(runTaskTestSuite))

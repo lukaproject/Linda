@@ -32,8 +32,6 @@ Class | Method | HTTP request | Description
 *BagsApi* | [**BagsGet**](docs/BagsApi.md#bagsget) | **Get** /bags | list bags [no implementation]
 *BagsApi* | [**BagsPost**](docs/BagsApi.md#bagspost) | **Post** /bags | add bag
 *DefaultApi* | [**HealthcheckPost**](docs/DefaultApi.md#healthcheckpost) | **Post** /healthcheck | health check
-*FilesApi* | [**FilesDownloadBlockFileNameGet**](docs/FilesApi.md#filesdownloadblockfilenameget) | **Get** /files/download/{block}/{fileName} | download file
-*FilesApi* | [**FilesUploadPost**](docs/FilesApi.md#filesuploadpost) | **Post** /files/upload | Upload file
 *TasksApi* | [**BagsBagNameTasksPost**](docs/TasksApi.md#bagsbagnametaskspost) | **Post** /bags/{bagName}/tasks | add task
 *TasksApi* | [**BagsBagNameTasksTaskNameGet**](docs/TasksApi.md#bagsbagnametaskstasknameget) | **Get** /bags/{bagName}/tasks/{taskName} | get task
 
@@ -54,7 +52,6 @@ Class | Method | HTTP request | Description
  - [ApisNodeJoinReq](docs/ApisNodeJoinReq.md)
  - [ApisUploadFilesReq](docs/ApisUploadFilesReq.md)
  - [ApisUploadFilesReqFiles](docs/ApisUploadFilesReqFiles.md)
- - [FilesUploadBody](docs/FilesUploadBody.md)
 
 ## Documentation For Authorization
  Endpoints do not require authorization.

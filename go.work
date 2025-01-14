@@ -5,8 +5,10 @@ use (
 	./baselibs/abstractions
 	./baselibs/apiscall
 	./baselibs/codes
+	./baselibs/multifs
 	./baselibs/testcommon
 	./protocol
 	./services/agentcentral
+	./services/fileservicefe
 	./services/integrationtest
 )

@@ -43,7 +43,7 @@ func (fmgr *mgr) Download(input DownloadInput) (err error) {
 	if input.Type.IsPublic() {
 		return fmgr.DownloadFromPublicURL(input.SourceURL, input.TargetPath)
 	} else if input.Type.IsInternal() {
-		return fmgr.DownloadFromInternal(input.Block, input.FileName, input.TargetPath)
+		panic("not implementation")
 	} else {
 		return errors.New("no such download type")
 	}

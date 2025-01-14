@@ -2,7 +2,6 @@ package nodecontrol
 
 import (
 	"Linda/baselibs/apiscall/swagger"
-	"Linda/baselibs/testcommon/testenv"
 	"Linda/services/integrationtest/stage"
 	"testing"
 
@@ -33,12 +32,9 @@ func (s *nodeControlTestSuite) TestNormalScenario() {
 }
 
 func TestNodeControlTestSuiteMain(t *testing.T) {
-	if !testenv.HealthCheck("http://localhost:5883/api/healthcheck") {
-		// skip e2e tests
-		t.Skip("dev-env is not available, skip")
+	if !stage.HealthCheck(t, stage.AgentCentralPort) {
 		return
 	}
-
 	s := &nodeControlTestSuite{}
 	suite.Run(t, s)
 }
