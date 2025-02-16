@@ -157,7 +157,7 @@ func (s *realDBOperationsTestSuite) TestListBagNames() {
 }
 
 func (s *realDBOperationsTestSuite) SetupSuite() {
-	tables := []string{"tasks", "bags"}
+	tables := []string{"tasks", "bags", "node_infos"}
 	s.T().Logf("drop tables %v", tables)
 	for _, table := range tables {
 		xerr.Must0(db.Instance().Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", table)).Error)

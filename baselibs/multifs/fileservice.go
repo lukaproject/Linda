@@ -82,7 +82,7 @@ func newLocalFileService(input NewFileServiceInput) *FileService {
 				BaseDir: fs.BaseDir,
 			}))
 
-	mux.HandleFunc("/api/healthcheck", xhttp.Healthcheck)
+	mux.HandleFunc("/api/healthcheck", xhttp.HealthCheck)
 
 	fs.server = &http.Server{
 		Addr:    serveAddr,

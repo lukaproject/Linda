@@ -240,10 +240,25 @@ paths:
       summary: join free node to a bag
       tags:
       - agents
-  /agents/list:
+  /agents/listids:
     get:
       consumes:
       - application/json
+      description: list nodes, return node ids by query, query format support prefix=,
+        createAfter=.
+      parameters:
+      - description: find all ids with this prefix
+        in: query
+        name: perfix
+        type: string
+      - description: find all ids created after this time
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of node ids in result
+        in: query
+        name: limit
+        type: integer
       produces:
       - application/json
       responses:
@@ -253,7 +268,7 @@ paths:
             items:
               type: string
             type: array
-      summary: list nodes, return all node ids
+      summary: list nodes, return node ids by query
       tags:
       - agents
   /agents/uploadfiles:

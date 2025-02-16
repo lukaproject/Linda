@@ -1,10 +1,12 @@
 package agents
 
 import (
+	"Linda/baselibs/abstractions"
 	"Linda/baselibs/codes/errno"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
+	"errors"
 	"net/http"
 	"sync"
 
@@ -27,9 +29,9 @@ type Mgr interface {
 
 	GetNodeInfo(nodeId string) *models.NodeInfo
 
-	ListNodeIds() []string
-
 	CallAgent(nodeId string, callFunc func(agent Agent) error) error
+
+	List(query abstractions.ListQueryPacker) (chan *models.NodeInfo, error)
 }
 
 type agentsmgr struct {
@@ -69,7 +71,7 @@ func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if _, ok := mgr.agents[nodeId]; ok {
 			delete(mgr.agents, nodeId)
-			db.NewDBOperations().DeleteNodeInfoByNodeId(nodeId)
+			db.NewDBOperations().NodeInfos.Delete(nodeId)
 			logger.Debugf("node %s removed", nodeId)
 		} else {
 			logger.Debugf("node %s has been removed yet", nodeId)
@@ -105,16 +107,6 @@ func (mgr *agentsmgr) GetNodeInfo(nodeId string) *models.NodeInfo {
 	return nil
 }
 
-func (mgr *agentsmgr) ListNodeIds() (ret []string) {
-	ret = make([]string, 0, len(mgr.agents))
-	mgr.agentsRWMut.RLock()
-	defer mgr.agentsRWMut.RUnlock()
-	for k := range mgr.agents {
-		ret = append(ret, k)
-	}
-	return
-}
-
 func (mgr *agentsmgr) CallAgent(nodeId string, callFunc func(agent Agent) error) error {
 	mgr.agentsRWMut.RLock()
 	defer mgr.agentsRWMut.RUnlock()
@@ -123,6 +115,14 @@ func (mgr *agentsmgr) CallAgent(nodeId string, callFunc func(agent Agent) error)
 	} else {
 		return errno.ErrAgentNotFound
 	}
+}
+
+func (mgr *agentsmgr) List(queryPacker abstractions.ListQueryPacker) (chan *models.NodeInfo, error) {
+	if queryPacker == nil {
+		return nil, errors.New("query must be not nil")
+	}
+
+	return db.NewDBOperations().NodeInfos.List(queryPacker), nil
 }
 
 func NewMgr() Mgr {

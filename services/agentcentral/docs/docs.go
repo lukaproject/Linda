@@ -134,8 +134,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/agents/list": {
+        "/agents/listids": {
             "get": {
+                "description": "list nodes, return node ids by query, query format support prefix=, createAfter=.",
                 "consumes": [
                     "application/json"
                 ],
@@ -145,7 +146,27 @@ const docTemplate = `{
                 "tags": [
                     "agents"
                 ],
-                "summary": "list nodes, return all node ids",
+                "summary": "list nodes, return node ids by query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "find all ids with this prefix",
+                        "name": "perfix",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "find all ids created after this time",
+                        "name": "createAfter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max count of node ids in result",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

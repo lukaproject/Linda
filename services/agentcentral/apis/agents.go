@@ -1,6 +1,7 @@
 package apis
 
 import (
+	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/logic/agents"
 	"net/http"
@@ -12,7 +13,7 @@ func EnableAgents(r *mux.Router) {
 	r.HandleFunc("/api/agents/join/{nodeId}", nodeJoin).Methods(http.MethodPost)
 	r.HandleFunc("/api/agents/free/{nodeId}", nodeFree).Methods(http.MethodPost)
 	r.HandleFunc("/api/agents/info/{nodeId}", nodeInfo).Methods(http.MethodGet)
-	r.HandleFunc("/api/agents/list", listNodes).Methods(http.MethodGet)
+	r.HandleFunc("/api/agents/listids", listNodeIds).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/uploadfiles", uploadFilesToNodes).Methods(http.MethodPost)
 }
 
@@ -78,14 +79,37 @@ func nodeInfo(w http.ResponseWriter, r *http.Request) {
 
 // nodes list godoc
 //
-//	@Summary	list nodes, return all node ids
-//	@Tags		agents
-//	@Accept		json
-//	@Produce	json
-//	@Success	200	{object}	[]string
-//	@Router		/agents/list [get]
-func listNodes(w http.ResponseWriter, r *http.Request) {
-	w.Write(models.Serialize(agents.GetMgrInstance().ListNodeIds()))
+//	@Summary		list nodes, return node ids by query
+//	@Description	list nodes, return node ids by query, query format support prefix=, createAfter=, idAfter=, limit=.
+//	@Tags			agents
+//	@Accept			json
+//	@Produce		json
+//	@Param			perfix		query		string	false	"find all ids with this prefix"
+//	@Param			createAfter	query		int64	false	"find all ids created after this time (ms)"
+//	@Param			limit		query		int		false	"max count of node ids in result"
+//	@Param			idAfter		query		string	false	"find all node ids which id greater or equal to this id"
+//	@Success		200			{object}	[]string
+//	@Router			/agents/listids [get]
+func listNodeIds(w http.ResponseWriter, r *http.Request) {
+	query := r.URL.Query()
+	logger.Infof("query is %v", query)
+	lqp, err := abstractions.NewListQueryPacker(query)
+	if err != nil {
+		logger.Error(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	ch, err := agents.GetMgrInstance().List(lqp)
+	if err != nil {
+		logger.Error(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	result := make([]string, 0)
+	for nodeinfo := range ch {
+		result = append(result, nodeinfo.NodeId)
+	}
+	w.Write(models.Serialize(result))
 }
 
 // upload files to nodes godoc

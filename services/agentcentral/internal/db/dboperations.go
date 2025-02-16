@@ -2,6 +2,7 @@ package db
 
 import (
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/db/suboperations"
 
 	"github.com/lukaproject/xerr"
 	"gorm.io/gorm"
@@ -9,6 +10,8 @@ import (
 
 type DBOperations struct {
 	dbi *gorm.DB
+
+	NodeInfos *suboperations.NodeInfos
 }
 
 func (dbo *DBOperations) AddBag(bag *models.Bag) {
@@ -135,32 +138,12 @@ func (dbo *DBOperations) GetTaskByMultiFields(fieldsMap map[string]any) (tasksRe
 	return
 }
 
-func (dbo *DBOperations) CreateNodeInfo(nodeInfo *models.NodeInfo) error {
-	return dbo.dbi.Create(nodeInfo).Error
-}
-
-func (dbo *DBOperations) DeleteNodeInfoByNodeId(nodeId string) {
-	xerr.Must0(dbo.dbi.Delete(&models.NodeInfo{
-		NodeId: nodeId,
-	}).Error)
-}
-
-func (dbo *DBOperations) DeleteNodeInfoByNodeName(nodeName string) {
-	xerr.Must0(dbo.dbi.Delete(&models.NodeInfo{
-		NodeName: nodeName,
-	}).Error)
-}
-
-func (dbo *DBOperations) GetNodeInfoByNodeId(nodeId string) (nodeInfo *models.NodeInfo) {
-	nodeInfo = &models.NodeInfo{
-		NodeId: nodeId,
-	}
-	xerr.Must0(dbo.dbi.First(nodeInfo).Error)
-	return
-}
-
 func NewDBOperations() *DBOperations {
-	return &DBOperations{
-		dbi: Instance(),
+	dbi := Instance()
+	dbo := &DBOperations{
+		dbi: dbi,
 	}
+	dbo.NodeInfos = new(suboperations.NodeInfos)
+	dbo.NodeInfos.Initial(dbi)
+	return dbo
 }
