@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"sort"
 	"testing"
-	"time"
 
 	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
@@ -24,14 +23,14 @@ func (s *realDBOperationsTestSuite) TestBagCURD() {
 	dbo := db.NewDBOperations()
 	n := 10
 	bags := make([]*models.Bag, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		bags[i] = &models.Bag{
 			BagDisplayName: fmt.Sprintf("test-bag-%d", i),
 		}
 		dbo.AddBag(bags[i])
 	}
 
-	for i := 0; i < n; i++ {
+	for i := range n {
 		result := dbo.GetBagByBagName(bags[i].BagName)
 		s.Equal(bags[i].BagDisplayName, result.BagDisplayName)
 	}
@@ -46,100 +45,11 @@ func (s *realDBOperationsTestSuite) TestBagCURD() {
 	s.Equal(err, gorm.ErrRecordNotFound)
 }
 
-func (s *realDBOperationsTestSuite) TestAddTask() {
-	dbo := db.NewDBOperations()
-	n := 10
-	for i := 0; i < n; i++ {
-		t := &models.Task{
-			TaskDisplayName: fmt.Sprintf("testtask-%d", i),
-			BagName:         "test-addtask-bag",
-			ScriptPath:      "/bin/task.sh",
-			WorkingDir:      "bin/workingdir",
-		}
-		dbo.AddTask(t)
-		s.NotNil(t.TaskName)
-		s.True(t.CreateTimeMs != 0)
-	}
-}
-
-// 这个测试里面测了update和get task的操作
-func (s *realDBOperationsTestSuite) TestGetBagEnqueuedTaskNumber() {
-	dbo := db.NewDBOperations()
-	n := 10
-	taskNames := make([]string, n)
-	bagName := "test-getbag-enqueued-task-number-bag"
-	for i := 0; i < n; i++ {
-		task := &models.Task{
-			TaskDisplayName: fmt.Sprintf("testtask-%d", i),
-			BagName:         bagName,
-			ScriptPath:      "/bin/task.sh",
-			WorkingDir:      "bin/workingdir",
-		}
-		dbo.AddTask(task)
-		s.NotNil(task.TaskName)
-		s.True(task.CreateTimeMs != 0)
-		taskNames[i] = task.TaskName
-	}
-
-	for i := 0; i < n; i++ {
-		dbo.UpdateTaskOrderId(
-			bagName,
-			taskNames[i],
-			dbo.GetBagEnqueuedTaskNumber(bagName)+1,
-		)
-	}
-
-	for i := 0; i < n; i++ {
-		task := dbo.GetTaskByTaskNameAndBagName(taskNames[i], bagName)
-		s.Equal(uint32(i)+1, task.OrderId)
-	}
-}
-
-func (s *realDBOperationsTestSuite) TestTaskScheduledAndFinishScenario() {
-	dbo := db.NewDBOperations()
-	n := 10
-	taskNames := make([]string, n)
-	bagName := "test-task-scheduled-finished-scenario"
-	for i := 0; i < n; i++ {
-		task := &models.Task{
-			TaskDisplayName: fmt.Sprintf("testtask-%d", i),
-			BagName:         bagName,
-			ScriptPath:      "/bin/task.sh",
-			WorkingDir:      "bin/workingdir",
-		}
-		dbo.AddTask(task)
-		s.NotNil(task.TaskName)
-		s.True(task.CreateTimeMs != 0)
-		taskNames[i] = task.TaskName
-	}
-	for i := 0; i < n; i++ {
-		dbo.UpdateTaskOrderId(
-			bagName,
-			taskNames[i],
-			dbo.GetBagEnqueuedTaskNumber(bagName)+1,
-		)
-	}
-	nodeId := "test-bag-nodeid"
-	scheduledTime := time.Now().UnixMilli()
-	finishTime := time.Now().UnixMilli()
-	dbo.UpdateTasksScheduledTime(bagName, taskNames, nodeId, scheduledTime)
-	dbo.UpdateTasksFinishTime(bagName, taskNames, finishTime)
-	taskResults := dbo.GetTaskByMultiFields(map[string]any{
-		"bag_name": bagName,
-		"node_id":  nodeId,
-	})
-	s.Len(taskResults, n)
-	for _, task := range taskResults {
-		s.Equal(finishTime, task.FinishTimeMs)
-		s.Equal(scheduledTime, task.ScheduledTimeMs)
-	}
-}
-
 func (s *realDBOperationsTestSuite) TestListBagNames() {
 	dbo := db.NewDBOperations()
 	n := 55
 	bags := make([]*models.Bag, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		bags[i] = &models.Bag{
 			BagDisplayName: fmt.Sprintf("test-bag-%d", i),
 		}
@@ -151,12 +61,12 @@ func (s *realDBOperationsTestSuite) TestListBagNames() {
 	sort.Slice(bags, func(i, j int) bool {
 		return bags[i].BagName < bags[j].BagName
 	})
-	for i := 0; i < n; i++ {
+	for i := range n {
 		s.Equal(result[i], bags[i].BagName)
 	}
 }
 
-func (s *realDBOperationsTestSuite) SetupSuite() {
+func (s *realDBOperationsTestSuite) SetupTest() {
 	tables := []string{"tasks", "bags", "node_infos"}
 	s.T().Logf("drop tables %v", tables)
 	for _, table := range tables {

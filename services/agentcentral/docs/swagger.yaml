@@ -136,6 +136,32 @@ definitions:
       bagName:
         type: string
     type: object
+  apis.Task:
+    properties:
+      bagName:
+        type: string
+      createTimeMs:
+        format: int64
+        type: integer
+      finishTimeMs:
+        format: int64
+        type: integer
+      nodeId:
+        type: string
+      priority:
+        type: integer
+      scheduledTimeMs:
+        format: int64
+        type: integer
+      scriptPath:
+        type: string
+      taskDisplayName:
+        type: string
+      taskName:
+        type: string
+      workingDir:
+        type: string
+    type: object
   apis.UploadFilesReq:
     properties:
       files:
@@ -245,13 +271,13 @@ paths:
       consumes:
       - application/json
       description: list nodes, return node ids by query, query format support prefix=,
-        createAfter=.
+        createAfter=, idAfter=, limit=.
       parameters:
       - description: find all ids with this prefix
         in: query
         name: perfix
         type: string
-      - description: find all ids created after this time
+      - description: find all ids created after this time (ms)
         in: query
         name: createAfter
         type: integer
@@ -259,6 +285,10 @@ paths:
         in: query
         name: limit
         type: integer
+      - description: find all node ids which id greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
       produces:
       - application/json
       responses:
@@ -382,6 +412,44 @@ paths:
       tags:
       - bags
   /bags/{bagName}/tasks:
+    get:
+      consumes:
+      - application/json
+      description: list tasks
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      - description: find all tasks with this prefix
+        in: query
+        name: perfix
+        type: string
+      - description: find all tasks created after this time (ms)
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of tasks in result
+        in: query
+        name: limit
+        type: integer
+      - description: find all tasks which id greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/apis.Task'
+            type: array
+      summary: list tasks
+      tags:
+      - tasks
     post:
       consumes:
       - application/json

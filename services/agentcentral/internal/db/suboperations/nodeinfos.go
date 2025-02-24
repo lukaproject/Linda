@@ -45,23 +45,6 @@ func (ni *NodeInfos) Create(nodeInfo *models.NodeInfo) (err error) {
 func (ni *NodeInfos) List(lqp abstractions.ListQueryPacker) (responses chan *models.NodeInfo) {
 	chanSize := 10
 	responses = make(chan *models.NodeInfo, chanSize)
-	go func(
-		responseChan chan *models.NodeInfo,
-		listQueryPacker abstractions.ListQueryPacker,
-	) {
-		dbCurrent := listQueryPacker.PackListQuery("node_id", ni.dbi.Model(models.NodeInfo{}))
-		rows, err := dbCurrent.Rows()
-		if err != nil {
-			return
-		}
-		for rows.Next() {
-			var nodeInfo = &models.NodeInfo{}
-			if err = dbCurrent.ScanRows(rows, nodeInfo); err != nil {
-				break
-			}
-			responseChan <- nodeInfo
-		}
-		close(responseChan)
-	}(responses, lqp)
+	go listQueryAsync(responses, lqp, ni.dbi, "node_id")
 	return
 }

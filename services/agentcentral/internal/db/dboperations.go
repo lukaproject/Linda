@@ -12,6 +12,7 @@ type DBOperations struct {
 	dbi *gorm.DB
 
 	NodeInfos *suboperations.NodeInfos
+	Tasks     *suboperations.Tasks
 }
 
 func (dbo *DBOperations) AddBag(bag *models.Bag) {
@@ -85,59 +86,6 @@ func (dbo *DBOperations) ListBags() (ret []*models.Bag) {
 	return
 }
 
-func (dbo *DBOperations) UpdateTaskOrderId(bagName string, taskName string, orderId uint32) {
-	xerr.Must0(dbo.dbi.
-		Model(&models.Task{}).
-		Where("task_name = ?", taskName).
-		Update("order_id", orderId).Error)
-}
-
-func (dbo *DBOperations) AddTask(task *models.Task) {
-	xerr.Must0(dbo.dbi.Create(task).Error)
-}
-
-func (dbo *DBOperations) UpdateTasksFinishTime(bagName string, taskNames []string, finishTimeMs int64) {
-	logger.Infof("tasks %v, bagName %s, finished in %d", taskNames, bagName, finishTimeMs)
-	xerr.Must0(dbo.dbi.
-		Model(&models.Task{}).
-		Where("task_name IN ?", taskNames).
-		Where("order_id IS NOT NULL").
-		Where("order_id != 0").
-		Update("finish_time_ms", finishTimeMs).
-		Error)
-}
-
-func (dbo *DBOperations) UpdateTasksScheduledTime(bagName string, taskNames []string, nodeId string, scheduledTimeMs int64) {
-	xerr.Must0(dbo.dbi.
-		Model(&models.Task{}).
-		Where("task_name IN ?", taskNames).
-		Where("order_id IS NOT NULL").
-		Where("order_id != 0").
-		Where("finish_time_ms IS NOT NULL").
-		Updates(map[string]any{
-			"scheduled_time_ms": scheduledTimeMs,
-			"node_id":           nodeId,
-		}).
-		Error)
-}
-
-func (dbo *DBOperations) GetTaskByTaskNameAndBagName(taskName string, bagName string) (task *models.Task) {
-	task = &models.Task{}
-	xerr.Must0(dbo.dbi.
-		Where("task_name = ?", taskName).
-		Where("bag_name = ?", bagName).
-		First(task).Error)
-	return
-}
-
-func (dbo *DBOperations) GetTaskByMultiFields(fieldsMap map[string]any) (tasksResult []*models.Task) {
-	tasksResult = make([]*models.Task, 0)
-	xerr.Must0(dbo.dbi.
-		Where(fieldsMap).
-		Find(&tasksResult).Error)
-	return
-}
-
 func NewDBOperations() *DBOperations {
 	dbi := Instance()
 	dbo := &DBOperations{
@@ -145,5 +93,7 @@ func NewDBOperations() *DBOperations {
 	}
 	dbo.NodeInfos = new(suboperations.NodeInfos)
 	dbo.NodeInfos.Initial(dbi)
+	dbo.Tasks = new(suboperations.Tasks)
+	dbo.Tasks.Initial(dbi)
 	return dbo
 }

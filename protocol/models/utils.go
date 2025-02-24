@@ -18,3 +18,7 @@ func Deserialize[T any](b []byte, v T) {
 func ReadJSON[T any](reader io.Reader, v T) {
 	Deserialize(xerr.Must(io.ReadAll(reader)), v)
 }
+
+type DBModel interface {
+	GetPrimaryKeyColumn() string
+}

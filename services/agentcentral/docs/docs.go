@@ -136,7 +136,7 @@ const docTemplate = `{
         },
         "/agents/listids": {
             "get": {
-                "description": "list nodes, return node ids by query, query format support prefix=, createAfter=.",
+                "description": "list nodes, return node ids by query, query format support prefix=, createAfter=, idAfter=, limit=.",
                 "consumes": [
                     "application/json"
                 ],
@@ -156,7 +156,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "integer",
-                        "description": "find all ids created after this time",
+                        "description": "find all ids created after this time (ms)",
                         "name": "createAfter",
                         "in": "query"
                     },
@@ -164,6 +164,12 @@ const docTemplate = `{
                         "type": "integer",
                         "description": "max count of node ids in result",
                         "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "find all node ids which id greater or equal to this id",
+                        "name": "idAfter",
                         "in": "query"
                     }
                 ],
@@ -348,6 +354,63 @@ const docTemplate = `{
             }
         },
         "/bags/{bagName}/tasks": {
+            "get": {
+                "description": "list tasks",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "tasks"
+                ],
+                "summary": "list tasks",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "find all tasks with this prefix",
+                        "name": "perfix",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "find all tasks created after this time (ms)",
+                        "name": "createAfter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max count of tasks in result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "find all tasks which id greater or equal to this id",
+                        "name": "idAfter",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/apis.Task"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "add task",
                 "consumes": [
@@ -643,6 +706,44 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "bagName": {
+                    "type": "string"
+                }
+            }
+        },
+        "apis.Task": {
+            "type": "object",
+            "properties": {
+                "bagName": {
+                    "type": "string"
+                },
+                "createTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "finishTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "nodeId": {
+                    "type": "string"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "scheduledTimeMs": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "scriptPath": {
+                    "type": "string"
+                },
+                "taskDisplayName": {
+                    "type": "string"
+                },
+                "taskName": {
+                    "type": "string"
+                },
+                "workingDir": {
                     "type": "string"
                 }
             }

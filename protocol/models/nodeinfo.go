@@ -30,6 +30,10 @@ func (nodeInfo *NodeInfo) BeforeSave(tx *gorm.DB) (err error) {
 	return
 }
 
+func (nodeInfo *NodeInfo) GetPrimaryKeyColumn() string {
+	return "node_id"
+}
+
 type MemoryInfo struct {
 	FreeMB  int64
 	InUseMB int64

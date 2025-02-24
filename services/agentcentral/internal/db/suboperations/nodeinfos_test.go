@@ -3,7 +3,6 @@ package suboperations_test
 import (
 	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
-	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/agents"
 	"fmt"
@@ -17,14 +16,12 @@ import (
 )
 
 type nodeInfosTestSuite struct {
-	suite.Suite
-
-	dsn string
+	CommonTestSuite
 }
 
 func (s *nodeInfosTestSuite) TestCreateNodeInfo_Success() {
 	dbo := db.NewDBOperations()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		s.Nil(dbo.NodeInfos.Create(&models.NodeInfo{
 			NodeId:   agents.GenNodeId(),
 			NodeName: strconv.Itoa(i),
@@ -48,13 +45,13 @@ func (s *nodeInfosTestSuite) TestCreateNodeInfo_PrimaryKeyConflict() {
 
 func (s *nodeInfosTestSuite) TestListNodeInfo_Prefix_Limit() {
 	dbo := db.NewDBOperations()
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		s.Nil(dbo.NodeInfos.Create(&models.NodeInfo{
 			NodeId:   "prefix1_" + fmt.Sprintf("%05d", i),
 			NodeName: strconv.Itoa(i),
 		}))
 	}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		s.Nil(dbo.NodeInfos.Create(&models.NodeInfo{
 			NodeId:   "prefix2_" + fmt.Sprintf("%05d", i),
 			NodeName: strconv.Itoa(i),
@@ -80,6 +77,7 @@ func (s *nodeInfosTestSuite) TestListNodeInfo_Prefix_Limit() {
 }
 
 func (s *nodeInfosTestSuite) SetupSuite() {
+	s.HealthCheckAndSetup()
 	tables := []string{"tasks", "bags", "node_infos"}
 	s.T().Logf("drop tables %v", tables)
 	for _, table := range tables {
@@ -89,17 +87,6 @@ func (s *nodeInfosTestSuite) SetupSuite() {
 }
 
 func TestNodeInfosTestSuite(t *testing.T) {
-	var err error
 	s := &nodeInfosTestSuite{}
-	func() {
-		s.dsn = config.TestConfig().PGSQL_DSN
-		defer xerr.Recover(&err)
-		db.InitialWithDSN(s.dsn)
-	}()
-	if err != nil {
-		t.Logf("failed to connect db, err is %v", err)
-		return
-	}
-	t.Log("success init! begin to test real db-operations test suite.")
 	suite.Run(t, s)
 }

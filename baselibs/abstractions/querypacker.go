@@ -18,6 +18,8 @@ type listQueryPacker struct {
 	createAfter *int64
 	limit       *int
 	idAfter     *string
+	// an external prarameter for multifields.
+	_ *map[string]string
 }
 
 func (lqp *listQueryPacker) PackListQuery(primaryKey string, db *gorm.DB) *gorm.DB {
