@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"strings"
 	"fmt"
+	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -286,11 +287,25 @@ func (a *AgentsApiService) AgentsJoinNodeIdPost(ctx context.Context, body ApisNo
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 /*
-AgentsApiService list nodes, return all node ids
+AgentsApiService list nodes, return node ids by query
+list nodes, return node ids by query, query format support prefix&#x3D;, createAfter&#x3D;, idAfter&#x3D;, limit&#x3D;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param optional nil or *AgentsApiAgentsListidsGetOpts - Optional Parameters:
+     * @param "Perfix" (optional.String) -  find all ids with this prefix
+     * @param "CreateAfter" (optional.Int32) -  find all ids created after this time (ms)
+     * @param "Limit" (optional.Int32) -  max count of node ids in result
+     * @param "IdAfter" (optional.String) -  find all node ids which id greater or equal to this id
 @return []string
 */
-func (a *AgentsApiService) AgentsListGet(ctx context.Context) ([]string, *http.Response, error) {
+
+type AgentsApiAgentsListidsGetOpts struct {
+    Perfix optional.String
+    CreateAfter optional.Int32
+    Limit optional.Int32
+    IdAfter optional.String
+}
+
+func (a *AgentsApiService) AgentsListidsGet(ctx context.Context, localVarOptionals *AgentsApiAgentsListidsGetOpts) ([]string, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -300,12 +315,24 @@ func (a *AgentsApiService) AgentsListGet(ctx context.Context) ([]string, *http.R
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/agents/list"
+	localVarPath := a.client.cfg.BasePath + "/agents/listids"
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.Perfix.IsSet() {
+		localVarQueryParams.Add("perfix", parameterToString(localVarOptionals.Perfix.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.CreateAfter.IsSet() {
+		localVarQueryParams.Add("createAfter", parameterToString(localVarOptionals.CreateAfter.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdAfter.IsSet() {
+		localVarQueryParams.Add("idAfter", parameterToString(localVarOptionals.IdAfter.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{}
 

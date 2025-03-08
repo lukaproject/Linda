@@ -7,7 +7,7 @@ Method | HTTP request | Description
 [**AgentsFreeNodeIdPost**](AgentsApi.md#AgentsFreeNodeIdPost) | **Post** /agents/free/{nodeId} | free node
 [**AgentsInfoNodeIdGet**](AgentsApi.md#AgentsInfoNodeIdGet) | **Get** /agents/info/{nodeId} | get node info
 [**AgentsJoinNodeIdPost**](AgentsApi.md#AgentsJoinNodeIdPost) | **Post** /agents/join/{nodeId} | join free node to a bag
-[**AgentsListGet**](AgentsApi.md#AgentsListGet) | **Get** /agents/list | list nodes, return all node ids
+[**AgentsListidsGet**](AgentsApi.md#AgentsListidsGet) | **Get** /agents/listids | list nodes, return node ids by query
 [**AgentsUploadfilesPost**](AgentsApi.md#AgentsUploadfilesPost) | **Post** /agents/uploadfiles | upload files to nodes
 
 # **AgentsFreeNodeIdPost**
@@ -96,12 +96,27 @@ No authorization required
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **AgentsListGet**
-> []string AgentsListGet(ctx, )
-list nodes, return all node ids
+# **AgentsListidsGet**
+> []string AgentsListidsGet(ctx, optional)
+list nodes, return node ids by query
+
+list nodes, return node ids by query, query format support prefix=, createAfter=, idAfter=, limit=.
 
 ### Required Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***AgentsApiAgentsListidsGetOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+Optional parameters are passed through a pointer to a AgentsApiAgentsListidsGetOpts struct
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **perfix** | **optional.String**| find all ids with this prefix | 
+ **createAfter** | **optional.Int32**| find all ids created after this time (ms) | 
+ **limit** | **optional.Int32**| max count of node ids in result | 
+ **idAfter** | **optional.String**| find all node ids which id greater or equal to this id | 
 
 ### Return type
 

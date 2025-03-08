@@ -3,6 +3,7 @@ module Linda/services/integrationtest
 go 1.23
 
 require (
+	github.com/antihax/optional v1.0.0
 	github.com/lukaproject/xerr v0.0.0-20240622080714-d12bd2b3a6fc
 	github.com/stretchr/testify v1.10.0
 )

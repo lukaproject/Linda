@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"strings"
 	"fmt"
+	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -24,6 +25,116 @@ var (
 )
 
 type TasksApiService service
+/*
+TasksApiService list tasks
+list tasks
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param bagName bag&#x27;s name
+ * @param optional nil or *TasksApiBagsBagNameTasksGetOpts - Optional Parameters:
+     * @param "Perfix" (optional.String) -  find all tasks with this prefix
+     * @param "CreateAfter" (optional.Int32) -  find all tasks created after this time (ms)
+     * @param "Limit" (optional.Int32) -  max count of tasks in result
+     * @param "IdAfter" (optional.String) -  find all tasks which id greater or equal to this id
+@return []ApisTask
+*/
+
+type TasksApiBagsBagNameTasksGetOpts struct {
+    Perfix optional.String
+    CreateAfter optional.Int32
+    Limit optional.Int32
+    IdAfter optional.String
+}
+
+func (a *TasksApiService) BagsBagNameTasksGet(ctx context.Context, bagName string, localVarOptionals *TasksApiBagsBagNameTasksGetOpts) ([]ApisTask, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue []ApisTask
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/bags/{bagName}/tasks"
+	localVarPath = strings.Replace(localVarPath, "{"+"bagName"+"}", fmt.Sprintf("%v", bagName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Perfix.IsSet() {
+		localVarQueryParams.Add("perfix", parameterToString(localVarOptionals.Perfix.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.CreateAfter.IsSet() {
+		localVarQueryParams.Add("createAfter", parameterToString(localVarOptionals.CreateAfter.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdAfter.IsSet() {
+		localVarQueryParams.Add("idAfter", parameterToString(localVarOptionals.IdAfter.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		if localVarHttpResponse.StatusCode == 200 {
+			var v []ApisTask
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
 /*
 TasksApiService add task
 add task
