@@ -91,6 +91,6 @@ func (t *Tasks) ListByMultiFields(fieldsMap map[string]any) (tasksResult []*mode
 func (t *Tasks) List(bagName string, lqp abstractions.ListQueryPacker) (responses chan *models.Task) {
 	chanSize := 10
 	responses = make(chan *models.Task, chanSize)
-	go listQueryAsync(responses, lqp, t.dbi, "task_name")
+	go listQueryAsync(responses, lqp, t.dbi.Where("bag_name = ?", bagName), "task_name")
 	return
 }

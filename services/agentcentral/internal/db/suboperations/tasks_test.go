@@ -111,16 +111,25 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 func (s *tasksTestSuite) TestListTasks_Prefix_Limit() {
 	dbo := db.NewDBOperations()
 	testBagName := "test-bag-name"
+	anotherTestBagName := "another-test-bag-name"
 	for i := range 10 {
 		s.Nil(dbo.Tasks.Create(&models.Task{
 			TaskName: "prefix1_" + fmt.Sprintf("%05d", i),
 			BagName:  testBagName,
+		}))
+		s.Nil(dbo.Tasks.Create(&models.Task{
+			TaskName: "prefix1_" + fmt.Sprintf("%05d", i+100),
+			BagName:  anotherTestBagName,
 		}))
 	}
 	for i := range 10 {
 		s.Nil(dbo.Tasks.Create(&models.Task{
 			TaskName: "prefix2_" + fmt.Sprintf("%05d", i),
 			BagName:  testBagName,
+		}))
+		s.Nil(dbo.Tasks.Create(&models.Task{
+			TaskName: "prefix2_" + fmt.Sprintf("%05d", i+100),
+			BagName:  anotherTestBagName,
 		}))
 	}
 	check := func(prefix string, expectCount, limit int) {
@@ -132,7 +141,6 @@ func (s *tasksTestSuite) TestListTasks_Prefix_Limit() {
 		for task := range ch {
 			cnt++
 			s.True(strings.HasPrefix(task.TaskName, prefix))
-			s.T().Log(task.TaskName)
 		}
 		s.Equal(min(expectCount, limit), cnt)
 	}

@@ -3,6 +3,7 @@ package apis
 import (
 	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/tasks"
 	"net/http"
 
@@ -11,8 +12,8 @@ import (
 
 func EnableTasks(r *mux.Router) {
 	r.HandleFunc("/api/bags/{bagName}/tasks", addTask).Methods(http.MethodPost)
-	r.HandleFunc("/api/bags/{bagName}/tasks", getTask).Methods(http.MethodGet)
-	r.HandleFunc("/api/bags/{bagName}/tasks/{taskName}", listTasks).Methods(http.MethodGet)
+	r.HandleFunc("/api/bags/{bagName}/tasks", listTasks).Methods(http.MethodGet)
+	r.HandleFunc("/api/bags/{bagName}/tasks/{taskName}", getTask).Methods(http.MethodGet)
 }
 
 // addTask godoc
@@ -90,12 +91,20 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 //	@Router			/bags/{bagName}/tasks [get]
 func listTasks(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
+	bagName := mux.Vars(r)["bagName"]
 	logger.Infof("query is %v", query)
-	_, err := abstractions.NewListQueryPacker(query)
+	lqp, err := abstractions.NewListQueryPacker(query)
 	if err != nil {
 		logger.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	panic("Not implementation")
+	ch := db.NewDBOperations().Tasks.List(bagName, lqp)
+	result := make([]Task, 0)
+	for taskModel := range ch {
+		var task = Task{}
+		FromTaskModelToTask(taskModel, &task)
+		result = append(result, task)
+	}
+	w.Write(models.Serialize(result))
 }
