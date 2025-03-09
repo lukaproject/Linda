@@ -113,7 +113,7 @@ Name | Type | Description  | Notes
 Optional parameters are passed through a pointer to a AgentsApiAgentsListidsGetOpts struct
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **perfix** | **optional.String**| find all ids with this prefix | 
+ **prefix** | **optional.String**| find all ids with this prefix | 
  **createAfter** | **optional.Int32**| find all ids created after this time (ms) | 
  **limit** | **optional.Int32**| max count of node ids in result | 
  **idAfter** | **optional.String**| find all node ids which id greater or equal to this id | 

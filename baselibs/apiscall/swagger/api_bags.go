@@ -16,6 +16,7 @@ import (
 	"net/url"
 	"strings"
 	"fmt"
+	"github.com/antihax/optional"
 )
 
 // Linger please
@@ -28,9 +29,10 @@ type BagsApiService service
 BagsApiService list bag nodes
 list all node ids which belong to this node
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param bagName bag&#x27;s name
 @return ApisListBagNodesResp
 */
-func (a *BagsApiService) BagnodesBagNameGet(ctx context.Context) (ApisListBagNodesResp, *http.Response, error) {
+func (a *BagsApiService) BagnodesBagNameGet(ctx context.Context, bagName string) (ApisListBagNodesResp, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -41,6 +43,7 @@ func (a *BagsApiService) BagnodesBagNameGet(ctx context.Context) (ApisListBagNod
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/bagnodes/{bagName}"
+	localVarPath = strings.Replace(localVarPath, "{"+"bagName"+"}", fmt.Sprintf("%v", bagName), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -278,18 +281,31 @@ func (a *BagsApiService) BagsBagNameGet(ctx context.Context, bagName string) (Ap
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 /*
-BagsApiService list bags [no implementation]
+BagsApiService list bags
 list bags
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
-@return ApisListBagsResp
+ * @param optional nil or *BagsApiBagsGetOpts - Optional Parameters:
+     * @param "Prefix" (optional.String) -  find all bags which bagName with this prefix
+     * @param "CreateAfter" (optional.Int32) -  find all bags created after this time (ms)
+     * @param "Limit" (optional.Int32) -  max count of bags in result
+     * @param "IdAfter" (optional.String) -  find all bags which bagName greater or equal to this id
+@return []ApisBag
 */
-func (a *BagsApiService) BagsGet(ctx context.Context) (ApisListBagsResp, *http.Response, error) {
+
+type BagsApiBagsGetOpts struct {
+    Prefix optional.String
+    CreateAfter optional.Int32
+    Limit optional.Int32
+    IdAfter optional.String
+}
+
+func (a *BagsApiService) BagsGet(ctx context.Context, localVarOptionals *BagsApiBagsGetOpts) ([]ApisBag, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
 		localVarFileName   string
 		localVarFileBytes  []byte
-		localVarReturnValue ApisListBagsResp
+		localVarReturnValue []ApisBag
 	)
 
 	// create path and map variables
@@ -299,6 +315,18 @@ func (a *BagsApiService) BagsGet(ctx context.Context) (ApisListBagsResp, *http.R
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.Prefix.IsSet() {
+		localVarQueryParams.Add("prefix", parameterToString(localVarOptionals.Prefix.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.CreateAfter.IsSet() {
+		localVarQueryParams.Add("createAfter", parameterToString(localVarOptionals.CreateAfter.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdAfter.IsSet() {
+		localVarQueryParams.Add("idAfter", parameterToString(localVarOptionals.IdAfter.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{}
 
@@ -346,7 +374,7 @@ func (a *BagsApiService) BagsGet(ctx context.Context) (ApisListBagsResp, *http.R
 			error: localVarHttpResponse.Status,
 		}
 		if localVarHttpResponse.StatusCode == 200 {
-			var v ApisListBagsResp
+			var v []ApisBag
 			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
 				if err != nil {
 					newErr.error = err.Error()

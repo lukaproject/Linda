@@ -27,10 +27,10 @@ Optional parameters are passed through a pointer to a TasksApiBagsBagNameTasksGe
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
 
- **perfix** | **optional.String**| find all tasks with this prefix | 
+ **prefix** | **optional.String**| find all tasks which taskName with this prefix | 
  **createAfter** | **optional.Int32**| find all tasks created after this time (ms) | 
  **limit** | **optional.Int32**| max count of tasks in result | 
- **idAfter** | **optional.String**| find all tasks which id greater or equal to this id | 
+ **idAfter** | **optional.String**| find all tasks which taskName greater or equal to this id | 
 
 ### Return type
 

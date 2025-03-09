@@ -31,15 +31,15 @@ list tasks
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param bagName bag&#x27;s name
  * @param optional nil or *TasksApiBagsBagNameTasksGetOpts - Optional Parameters:
-     * @param "Perfix" (optional.String) -  find all tasks with this prefix
+     * @param "Prefix" (optional.String) -  find all tasks which taskName with this prefix
      * @param "CreateAfter" (optional.Int32) -  find all tasks created after this time (ms)
      * @param "Limit" (optional.Int32) -  max count of tasks in result
-     * @param "IdAfter" (optional.String) -  find all tasks which id greater or equal to this id
+     * @param "IdAfter" (optional.String) -  find all tasks which taskName greater or equal to this id
 @return []ApisTask
 */
 
 type TasksApiBagsBagNameTasksGetOpts struct {
-    Perfix optional.String
+    Prefix optional.String
     CreateAfter optional.Int32
     Limit optional.Int32
     IdAfter optional.String
@@ -62,8 +62,8 @@ func (a *TasksApiService) BagsBagNameTasksGet(ctx context.Context, bagName strin
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
-	if localVarOptionals != nil && localVarOptionals.Perfix.IsSet() {
-		localVarQueryParams.Add("perfix", parameterToString(localVarOptionals.Perfix.Value(), ""))
+	if localVarOptionals != nil && localVarOptionals.Prefix.IsSet() {
+		localVarQueryParams.Add("prefix", parameterToString(localVarOptionals.Prefix.Value(), ""))
 	}
 	if localVarOptionals != nil && localVarOptionals.CreateAfter.IsSet() {
 		localVarQueryParams.Add("createAfter", parameterToString(localVarOptionals.CreateAfter.Value(), ""))

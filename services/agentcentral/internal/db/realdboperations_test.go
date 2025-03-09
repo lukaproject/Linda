@@ -10,39 +10,12 @@ import (
 
 	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
-	"gorm.io/gorm"
 )
 
 type realDBOperationsTestSuite struct {
 	suite.Suite
 
 	dsn string
-}
-
-func (s *realDBOperationsTestSuite) TestBagCURD() {
-	dbo := db.NewDBOperations()
-	n := 10
-	bags := make([]*models.Bag, n)
-	for i := range n {
-		bags[i] = &models.Bag{
-			BagDisplayName: fmt.Sprintf("test-bag-%d", i),
-		}
-		dbo.AddBag(bags[i])
-	}
-
-	for i := range n {
-		result := dbo.GetBagByBagName(bags[i].BagName)
-		s.Equal(bags[i].BagDisplayName, result.BagDisplayName)
-	}
-
-	dbo.DeleteBagByBagName(bags[3].BagName)
-
-	var err error = nil
-	func() {
-		defer xerr.Recover(&err)
-		dbo.GetBagByBagName(bags[3].BagName)
-	}()
-	s.Equal(err, gorm.ErrRecordNotFound)
 }
 
 func (s *realDBOperationsTestSuite) TestListBagNames() {
@@ -53,7 +26,7 @@ func (s *realDBOperationsTestSuite) TestListBagNames() {
 		bags[i] = &models.Bag{
 			BagDisplayName: fmt.Sprintf("test-bag-%d", i),
 		}
-		dbo.AddBag(bags[i])
+		dbo.Bags.Create(bags[i])
 	}
 
 	result := dbo.ListBagNames()

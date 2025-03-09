@@ -13,24 +13,7 @@ type DBOperations struct {
 
 	NodeInfos *suboperations.NodeInfos
 	Tasks     *suboperations.Tasks
-}
-
-func (dbo *DBOperations) AddBag(bag *models.Bag) {
-	xerr.Must0(dbo.dbi.Create(bag).Error)
-}
-
-func (dbo *DBOperations) GetBagByBagName(bagName string) (bag *models.Bag) {
-	bag = &models.Bag{
-		BagName: bagName,
-	}
-	xerr.Must0(dbo.dbi.First(bag).Error)
-	return
-}
-
-func (dbo *DBOperations) DeleteBagByBagName(bagName string) {
-	xerr.Must0(dbo.dbi.Delete(&models.Bag{
-		BagName: bagName,
-	}).Error)
+	Bags      *suboperations.Bags
 }
 
 func (dbo *DBOperations) GetBagEnqueuedTaskNumber(bagName string) uint32 {
@@ -95,5 +78,7 @@ func NewDBOperations() *DBOperations {
 	dbo.NodeInfos.Initial(dbi)
 	dbo.Tasks = new(suboperations.Tasks)
 	dbo.Tasks.Initial(dbi)
+	dbo.Bags = new(suboperations.Bags)
+	dbo.Bags.Initial(dbi)
 	return dbo
 }

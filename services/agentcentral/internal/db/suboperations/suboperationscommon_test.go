@@ -3,6 +3,7 @@ package suboperations_test
 import (
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
+	"fmt"
 
 	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
@@ -27,4 +28,12 @@ func (cts *CommonTestSuite) HealthCheckAndSetup() {
 		return
 	}
 	cts.T().Log("success init! begin to test real db-operations test suite.")
+}
+
+func (cts *CommonTestSuite) DropTables() {
+	tables := []string{"tasks", "bags", "node_infos"}
+	cts.T().Logf("drop tables %v", tables)
+	for _, table := range tables {
+		xerr.Must0(db.Instance().Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", table)).Error)
+	}
 }

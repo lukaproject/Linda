@@ -13,8 +13,10 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       updateTimeMs:
+        format: int64
         type: integer
     type: object
   apis.AddTaskReq:
@@ -62,8 +64,10 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       updateTimeMs:
+        format: int64
         type: integer
     type: object
   apis.DeleteBagResp:
@@ -78,8 +82,10 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       updateTimeMs:
+        format: int64
         type: integer
     type: object
   apis.GetTaskResp:
@@ -113,13 +119,6 @@ definitions:
       nodeIds:
         items:
           type: string
-        type: array
-    type: object
-  apis.ListBagsResp:
-    properties:
-      bags:
-        items:
-          $ref: '#/definitions/apis.Bag'
         type: array
     type: object
   apis.NodeFreeReq:
@@ -275,7 +274,7 @@ paths:
       parameters:
       - description: find all ids with this prefix
         in: query
-        name: perfix
+        name: prefix
         type: string
       - description: find all ids created after this time (ms)
         in: query
@@ -324,6 +323,12 @@ paths:
       consumes:
       - application/json
       description: list all node ids which belong to this node
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -339,14 +344,33 @@ paths:
       consumes:
       - application/json
       description: list bags
+      parameters:
+      - description: find all bags which bagName with this prefix
+        in: query
+        name: prefix
+        type: string
+      - description: find all bags created after this time (ms)
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of bags in result
+        in: query
+        name: limit
+        type: integer
+      - description: find all bags which bagName greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/apis.ListBagsResp'
-      summary: list bags [no implementation]
+            items:
+              $ref: '#/definitions/apis.Bag'
+            type: array
+      summary: list bags
       tags:
       - bags
     post:
@@ -422,9 +446,9 @@ paths:
         name: bagName
         required: true
         type: string
-      - description: find all tasks with this prefix
+      - description: find all tasks which taskName with this prefix
         in: query
-        name: perfix
+        name: prefix
         type: string
       - description: find all tasks created after this time (ms)
         in: query
@@ -434,7 +458,7 @@ paths:
         in: query
         name: limit
         type: integer
-      - description: find all tasks which id greater or equal to this id
+      - description: find all tasks which taskName greater or equal to this id
         in: query
         name: idAfter
         type: string

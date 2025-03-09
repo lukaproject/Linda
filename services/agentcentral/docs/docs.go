@@ -151,7 +151,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "find all ids with this prefix",
-                        "name": "perfix",
+                        "name": "prefix",
                         "in": "query"
                     },
                     {
@@ -226,6 +226,15 @@ const docTemplate = `{
                     "bags"
                 ],
                 "summary": "list bag nodes",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "bag's name",
+                        "name": "bagName",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -248,12 +257,41 @@ const docTemplate = `{
                 "tags": [
                     "bags"
                 ],
-                "summary": "list bags [no implementation]",
+                "summary": "list bags",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "find all bags which bagName with this prefix",
+                        "name": "prefix",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "find all bags created after this time (ms)",
+                        "name": "createAfter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max count of bags in result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "find all bags which bagName greater or equal to this id",
+                        "name": "idAfter",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/apis.ListBagsResp"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/apis.Bag"
+                            }
                         }
                     }
                 }
@@ -376,8 +414,8 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "find all tasks with this prefix",
-                        "name": "perfix",
+                        "description": "find all tasks which taskName with this prefix",
+                        "name": "prefix",
                         "in": "query"
                     },
                     {
@@ -394,7 +432,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "find all tasks which id greater or equal to this id",
+                        "description": "find all tasks which taskName greater or equal to this id",
                         "name": "idAfter",
                         "in": "query"
                     }
@@ -524,10 +562,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "updateTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -596,10 +636,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "updateTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -621,10 +663,12 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "createTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 },
                 "updateTimeMs": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int64"
                 }
             }
         },
@@ -673,17 +717,6 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
-                }
-            }
-        },
-        "apis.ListBagsResp": {
-            "type": "object",
-            "properties": {
-                "bags": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/apis.Bag"
                     }
                 }
             }

@@ -152,11 +152,7 @@ func (s *tasksTestSuite) TestListTasks_Prefix_Limit() {
 
 func (s *tasksTestSuite) SetupSuite() {
 	s.HealthCheckAndSetup()
-	tables := []string{"tasks", "bags", "node_infos"}
-	s.T().Logf("drop tables %v", tables)
-	for _, table := range tables {
-		xerr.Must0(db.Instance().Exec(fmt.Sprintf("DROP TABLE IF EXISTS %s", table)).Error)
-	}
+	s.DropTables()
 	db.ReInitialWithDSN(s.dsn)
 }
 

@@ -84,7 +84,7 @@ func nodeInfo(w http.ResponseWriter, r *http.Request) {
 //	@Tags			agents
 //	@Accept			json
 //	@Produce		json
-//	@Param			perfix		query		string	false	"find all ids with this prefix"
+//	@Param			prefix		query		string	false	"find all ids with this prefix"
 //	@Param			createAfter	query		int64	false	"find all ids created after this time (ms)"
 //	@Param			limit		query		int		false	"max count of node ids in result"
 //	@Param			idAfter		query		string	false	"find all node ids which id greater or equal to this id"

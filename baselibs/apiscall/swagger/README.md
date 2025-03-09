@@ -29,7 +29,7 @@ Class | Method | HTTP request | Description
 *BagsApi* | [**BagnodesBagNameGet**](docs/BagsApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes
 *BagsApi* | [**BagsBagNameDelete**](docs/BagsApi.md#bagsbagnamedelete) | **Delete** /bags/{bagName} | delete bag
 *BagsApi* | [**BagsBagNameGet**](docs/BagsApi.md#bagsbagnameget) | **Get** /bags/{bagName} | get bag
-*BagsApi* | [**BagsGet**](docs/BagsApi.md#bagsget) | **Get** /bags | list bags [no implementation]
+*BagsApi* | [**BagsGet**](docs/BagsApi.md#bagsget) | **Get** /bags | list bags
 *BagsApi* | [**BagsPost**](docs/BagsApi.md#bagspost) | **Post** /bags | add bag
 *DefaultApi* | [**HealthcheckPost**](docs/DefaultApi.md#healthcheckpost) | **Post** /healthcheck | health check
 *TasksApi* | [**BagsBagNameTasksGet**](docs/TasksApi.md#bagsbagnametasksget) | **Get** /bags/{bagName}/tasks | list tasks
@@ -47,7 +47,6 @@ Class | Method | HTTP request | Description
  - [ApisGetBagResp](docs/ApisGetBagResp.md)
  - [ApisGetTaskResp](docs/ApisGetTaskResp.md)
  - [ApisListBagNodesResp](docs/ApisListBagNodesResp.md)
- - [ApisListBagsResp](docs/ApisListBagsResp.md)
  - [ApisNodeFreeReq](docs/ApisNodeFreeReq.md)
  - [ApisNodeInfo](docs/ApisNodeInfo.md)
  - [ApisNodeJoinReq](docs/ApisNodeJoinReq.md)
