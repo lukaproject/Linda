@@ -1,7 +1,9 @@
 package apis
 
 import (
+	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/agents"
 	"Linda/services/agentcentral/internal/logic/tasks"
 	"net/http"
@@ -74,21 +76,41 @@ func deleteBag(w http.ResponseWriter, r *http.Request) {
 
 // list Bag godoc
 //
-//	@Summary		list bags [no implementation]
+//	@Summary		list bags
 //	@Description	list bags
+//	@Param			prefix		query		string	false	"find all bags which bagName with this prefix"
+//	@Param			createAfter	query		int64	false	"find all bags created after this time (ms)"
+//	@Param			limit		query		int		false	"max count of bags in result"
+//	@Param			idAfter		query		string	false	"find all bags which bagName greater or equal to this id"
 //	@Tags			bags
 //	@Accept			json
 //	@Produce		json
 //	@Router			/bags [get]
-//	@Success		200	{object}	apis.ListBagsResp
+//	@Success		200	{object}	[]apis.Bag
 func listBags(w http.ResponseWriter, r *http.Request) {
-	// TODO
+	query := r.URL.Query()
+	logger.Infof("query is %v", query)
+	lqp, err := abstractions.NewListQueryPacker(query)
+	if err != nil {
+		logger.Error(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	result := make([]Bag, 0)
+	ch := db.NewDBOperations().Bags.List(lqp)
+	for bagModel := range ch {
+		var bag = Bag{}
+		FromBagModelToBag(bagModel, &bag)
+		result = append(result, bag)
+	}
+	w.Write(models.Serialize(result))
 }
 
 // list bag nodes godoc
 //
 //	@Summary		list bag nodes
 //	@Description	list all node ids which belong to this node
+//	@Param			bagName	path	string	true	"bag's name"
 //	@Tags			bags
 //	@Accept			json
 //	@Produce		json

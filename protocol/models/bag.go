@@ -15,7 +15,9 @@ type Bag struct {
 }
 
 func (b *Bag) BeforeCreate(tx *gorm.DB) (err error) {
-	b.BagName = uuid.NewString()
+	if b.BagName == "" {
+		b.BagName = uuid.NewString()
+	}
 	createTimeMs := time.Now().UnixMilli()
 	b.CreateTimeMs = createTimeMs
 	b.UpdateTimeMs = createTimeMs

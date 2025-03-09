@@ -30,18 +30,18 @@ func (aw *AsyncWorks) TaskEnque(
 			logger.Infof("bag %s, task %s, enque start", bagName, taskName)
 			dbo := db.NewDBOperations()
 			count := dbo.GetBagEnqueuedTaskNumber(bagName)
-			dbo.UpdateTaskOrderId(bagName, taskName, count+1)
+			dbo.Tasks.UpdateOrderId(bagName, taskName, count+1)
 			xerr.Must0(aw.cli.Enque(taskName, bagName, priority, count+1))
 			logger.Infof("bag %s, task %s, enque success", bagName, taskName)
 		})
 }
 
 func (aw *AsyncWorks) PersistFinishedTasks(bagName string, taskNames []string) {
-	db.NewDBOperations().UpdateTasksFinishTime(bagName, taskNames, time.Now().UnixMilli())
+	db.NewDBOperations().Tasks.UpdateFinishedTime(bagName, taskNames, time.Now().UnixMilli())
 }
 
 func (aw *AsyncWorks) PersistScheduledTasks(bagName string, taskNames []string, nodeId string) {
-	db.NewDBOperations().UpdateTasksScheduledTime(bagName, taskNames, nodeId, time.Now().UnixMilli())
+	db.NewDBOperations().Tasks.UpdateScheduledTime(bagName, taskNames, nodeId, time.Now().UnixMilli())
 }
 
 // operations for locks, so it is not a async method.

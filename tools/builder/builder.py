@@ -1,6 +1,5 @@
-# 不出以外的话
-# 应该支持的python版本如下：
-# 3.10, 3.11. 3.12
+#!/bin/python3
+# python 3.10+
 
 import subprocess
 import argparse

@@ -19,5 +19,5 @@ func EnableHealthCheck(r *mux.Router) {
 //	@Produce		plain
 //	@Router			/healthcheck [post]
 func healthCheck(w http.ResponseWriter, r *http.Request) {
-	xhttp.Healthcheck(w, r)
+	xhttp.HealthCheck(w, r)
 }

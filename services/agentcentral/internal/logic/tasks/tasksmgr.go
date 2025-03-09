@@ -21,11 +21,11 @@ type tasksManager struct {
 }
 
 func (m *tasksManager) AddTask(task *models.Task) {
-	db.NewDBOperations().AddTask(task)
+	db.NewDBOperations().Tasks.Create(task)
 	go comm.GetAsyncWorksInstance().TaskEnque(task.TaskName, task.BagName, uint16(task.Priority))
 }
 
 func (m *tasksManager) GetTask(taskName string) (task *models.Task) {
-	task = db.NewDBOperations().GetTaskByTaskNameAndBagName(taskName, m.BagName)
+	task = db.NewDBOperations().Tasks.Get(m.BagName, taskName)
 	return
 }

@@ -7,17 +7,21 @@ Method | HTTP request | Description
 [**BagnodesBagNameGet**](BagsApi.md#BagnodesBagNameGet) | **Get** /bagnodes/{bagName} | list bag nodes
 [**BagsBagNameDelete**](BagsApi.md#BagsBagNameDelete) | **Delete** /bags/{bagName} | delete bag
 [**BagsBagNameGet**](BagsApi.md#BagsBagNameGet) | **Get** /bags/{bagName} | get bag
-[**BagsGet**](BagsApi.md#BagsGet) | **Get** /bags | list bags [no implementation]
+[**BagsGet**](BagsApi.md#BagsGet) | **Get** /bags | list bags
 [**BagsPost**](BagsApi.md#BagsPost) | **Post** /bags | add bag
 
 # **BagnodesBagNameGet**
-> ApisListBagNodesResp BagnodesBagNameGet(ctx, )
+> ApisListBagNodesResp BagnodesBagNameGet(ctx, bagName)
 list bag nodes
 
 list all node ids which belong to this node
 
 ### Required Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **bagName** | **string**| bag&#x27;s name | 
 
 ### Return type
 
@@ -91,17 +95,30 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 # **BagsGet**
-> ApisListBagsResp BagsGet(ctx, )
-list bags [no implementation]
+> []ApisBag BagsGet(ctx, optional)
+list bags
 
 list bags
 
 ### Required Parameters
-This endpoint does not need any parameter.
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+ **optional** | ***BagsApiBagsGetOpts** | optional parameters | nil if no parameters
+
+### Optional Parameters
+Optional parameters are passed through a pointer to a BagsApiBagsGetOpts struct
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **prefix** | **optional.String**| find all bags which bagName with this prefix | 
+ **createAfter** | **optional.Int32**| find all bags created after this time (ms) | 
+ **limit** | **optional.Int32**| max count of bags in result | 
+ **idAfter** | **optional.String**| find all bags which bagName greater or equal to this id | 
 
 ### Return type
 
-[**ApisListBagsResp**](apis.ListBagsResp.md)
+[**[]ApisBag**](apis.Bag.md)
 
 ### Authorization
 

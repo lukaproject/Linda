@@ -29,6 +29,12 @@ type TaskBusiness struct {
 
 func (t *Task) BeforeCreate(tx *gorm.DB) (err error) {
 	t.CreateTimeMs = time.Now().UnixMilli()
-	t.TaskName = uuid.NewString()
+	if t.TaskName == "" {
+		t.TaskName = uuid.NewString()
+	}
 	return
+}
+
+func (t *Task) GetPrimaryKeyColumn() string {
+	return "task_name"
 }

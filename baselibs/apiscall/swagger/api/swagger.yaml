@@ -95,11 +95,46 @@ paths:
                 type: string
                 x-content-type: application/json
       x-codegen-request-body-name: nodeJoinReq
-  /agents/list:
+  /agents/listids:
     get:
       tags:
       - agents
-      summary: "list nodes, return all node ids"
+      summary: "list nodes, return node ids by query"
+      description: "list nodes, return node ids by query, query format support prefix=,\
+        \ createAfter=, idAfter=, limit=."
+      parameters:
+      - name: prefix
+        in: query
+        description: find all ids with this prefix
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createAfter
+        in: query
+        description: find all ids created after this time (ms)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: max count of node ids in result
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: idAfter
+        in: query
+        description: find all node ids which id greater or equal to this id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -130,6 +165,15 @@ paths:
       - bags
       summary: list bag nodes
       description: list all node ids which belong to this node
+      parameters:
+      - name: bagName
+        in: path
+        description: bag's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
       responses:
         "200":
           description: OK
@@ -141,15 +185,51 @@ paths:
     get:
       tags:
       - bags
-      summary: "list bags [no implementation]"
+      summary: list bags
       description: list bags
+      parameters:
+      - name: prefix
+        in: query
+        description: find all bags which bagName with this prefix
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createAfter
+        in: query
+        description: find all bags created after this time (ms)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: max count of bags in result
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: idAfter
+        in: query
+        description: find all bags which bagName greater or equal to this id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
       responses:
         "200":
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.ListBagsResp'
+                type: array
+                items:
+                  $ref: '#/components/schemas/apis.Bag'
+                x-content-type: application/json
     post:
       tags:
       - bags
@@ -214,6 +294,62 @@ paths:
               schema:
                 $ref: '#/components/schemas/apis.DeleteBagResp'
   /bags/{bagName}/tasks:
+    get:
+      tags:
+      - tasks
+      summary: list tasks
+      description: list tasks
+      parameters:
+      - name: bagName
+        in: path
+        description: bag's name
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: prefix
+        in: query
+        description: find all tasks which taskName with this prefix
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createAfter
+        in: query
+        description: find all tasks created after this time (ms)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: max count of tasks in result
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: idAfter
+        in: query
+        description: find all tasks which taskName greater or equal to this id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/apis.Task'
+                x-content-type: application/json
     post:
       tags:
       - tasks
@@ -294,8 +430,10 @@ components:
           type: string
         createTimeMs:
           type: integer
+          format: int64
         updateTimeMs:
           type: integer
+          format: int64
       example:
         updateTimeMs: 6
         bagName: bagName
@@ -359,8 +497,10 @@ components:
           type: string
         createTimeMs:
           type: integer
+          format: int64
         updateTimeMs:
           type: integer
+          format: int64
       example:
         updateTimeMs: 6
         bagName: bagName
@@ -382,8 +522,10 @@ components:
           type: string
         createTimeMs:
           type: integer
+          format: int64
         updateTimeMs:
           type: integer
+          format: int64
       example:
         updateTimeMs: 6
         bagName: bagName
@@ -437,23 +579,6 @@ components:
         nodeIds:
         - nodeIds
         - nodeIds
-    apis.ListBagsResp:
-      type: object
-      properties:
-        bags:
-          type: array
-          items:
-            $ref: '#/components/schemas/apis.Bag'
-      example:
-        bags:
-        - updateTimeMs: 6
-          bagName: bagName
-          bagDisplayName: bagDisplayName
-          createTimeMs: 0
-        - updateTimeMs: 6
-          bagName: bagName
-          bagDisplayName: bagDisplayName
-          createTimeMs: 0
     apis.NodeFreeReq:
       type: object
     apis.NodeInfo:
@@ -471,6 +596,43 @@ components:
       properties:
         bagName:
           type: string
+    apis.Task:
+      type: object
+      properties:
+        bagName:
+          type: string
+        createTimeMs:
+          type: integer
+          format: int64
+        finishTimeMs:
+          type: integer
+          format: int64
+        nodeId:
+          type: string
+        priority:
+          type: integer
+        scheduledTimeMs:
+          type: integer
+          format: int64
+        scriptPath:
+          type: string
+        taskDisplayName:
+          type: string
+        taskName:
+          type: string
+        workingDir:
+          type: string
+      example:
+        finishTimeMs: 6
+        scriptPath: scriptPath
+        scheduledTimeMs: 5
+        workingDir: workingDir
+        bagName: bagName
+        taskName: taskName
+        priority: 1
+        nodeId: nodeId
+        createTimeMs: 0
+        taskDisplayName: taskDisplayName
     apis.UploadFilesReq:
       type: object
       properties:

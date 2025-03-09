@@ -31,14 +31,14 @@ func (mgr *bagsManager) Init() error {
 }
 
 func (mgr *bagsManager) AddBag(bag *models.Bag) {
-	db.NewDBOperations().AddBag(bag)
+	db.NewDBOperations().Bags.Create(bag)
 	comm.GetAsyncWorksInstance().AddBag(bag.BagName)
 }
 
 func (mgr *bagsManager) GetBag(bagName string) (bag *models.Bag, err error) {
 	func() {
 		xerr.Recover(&err)
-		bag = db.NewDBOperations().GetBagByBagName(bagName)
+		bag = db.NewDBOperations().Bags.Get(bagName)
 	}()
 	return
 }
@@ -46,7 +46,7 @@ func (mgr *bagsManager) GetBag(bagName string) (bag *models.Bag, err error) {
 func (mgr *bagsManager) DeleteBag(bagName string) (err error) {
 	func() {
 		xerr.Recover(&err)
-		db.NewDBOperations().DeleteBagByBagName(bagName)
+		db.NewDBOperations().Bags.Delete(bagName)
 		comm.GetAsyncWorksInstance().DeleteBag(bagName)
 	}()
 	return

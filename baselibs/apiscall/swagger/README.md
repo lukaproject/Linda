@@ -24,14 +24,15 @@ Class | Method | HTTP request | Description
 *AgentsApi* | [**AgentsFreeNodeIdPost**](docs/AgentsApi.md#agentsfreenodeidpost) | **Post** /agents/free/{nodeId} | free node
 *AgentsApi* | [**AgentsInfoNodeIdGet**](docs/AgentsApi.md#agentsinfonodeidget) | **Get** /agents/info/{nodeId} | get node info
 *AgentsApi* | [**AgentsJoinNodeIdPost**](docs/AgentsApi.md#agentsjoinnodeidpost) | **Post** /agents/join/{nodeId} | join free node to a bag
-*AgentsApi* | [**AgentsListGet**](docs/AgentsApi.md#agentslistget) | **Get** /agents/list | list nodes, return all node ids
+*AgentsApi* | [**AgentsListidsGet**](docs/AgentsApi.md#agentslistidsget) | **Get** /agents/listids | list nodes, return node ids by query
 *AgentsApi* | [**AgentsUploadfilesPost**](docs/AgentsApi.md#agentsuploadfilespost) | **Post** /agents/uploadfiles | upload files to nodes
 *BagsApi* | [**BagnodesBagNameGet**](docs/BagsApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes
 *BagsApi* | [**BagsBagNameDelete**](docs/BagsApi.md#bagsbagnamedelete) | **Delete** /bags/{bagName} | delete bag
 *BagsApi* | [**BagsBagNameGet**](docs/BagsApi.md#bagsbagnameget) | **Get** /bags/{bagName} | get bag
-*BagsApi* | [**BagsGet**](docs/BagsApi.md#bagsget) | **Get** /bags | list bags [no implementation]
+*BagsApi* | [**BagsGet**](docs/BagsApi.md#bagsget) | **Get** /bags | list bags
 *BagsApi* | [**BagsPost**](docs/BagsApi.md#bagspost) | **Post** /bags | add bag
 *DefaultApi* | [**HealthcheckPost**](docs/DefaultApi.md#healthcheckpost) | **Post** /healthcheck | health check
+*TasksApi* | [**BagsBagNameTasksGet**](docs/TasksApi.md#bagsbagnametasksget) | **Get** /bags/{bagName}/tasks | list tasks
 *TasksApi* | [**BagsBagNameTasksPost**](docs/TasksApi.md#bagsbagnametaskspost) | **Post** /bags/{bagName}/tasks | add task
 *TasksApi* | [**BagsBagNameTasksTaskNameGet**](docs/TasksApi.md#bagsbagnametaskstasknameget) | **Get** /bags/{bagName}/tasks/{taskName} | get task
 
@@ -46,10 +47,10 @@ Class | Method | HTTP request | Description
  - [ApisGetBagResp](docs/ApisGetBagResp.md)
  - [ApisGetTaskResp](docs/ApisGetTaskResp.md)
  - [ApisListBagNodesResp](docs/ApisListBagNodesResp.md)
- - [ApisListBagsResp](docs/ApisListBagsResp.md)
  - [ApisNodeFreeReq](docs/ApisNodeFreeReq.md)
  - [ApisNodeInfo](docs/ApisNodeInfo.md)
  - [ApisNodeJoinReq](docs/ApisNodeJoinReq.md)
+ - [ApisTask](docs/ApisTask.md)
  - [ApisUploadFilesReq](docs/ApisUploadFilesReq.md)
  - [ApisUploadFilesReqFiles](docs/ApisUploadFilesReqFiles.md)
 

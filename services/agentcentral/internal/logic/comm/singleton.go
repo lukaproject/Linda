@@ -1,11 +1,15 @@
 package comm
 
 import (
+	"Linda/baselibs/abstractions"
 	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
+	"net/url"
 	"sync"
+
+	"github.com/lukaproject/xerr"
 )
 
 var (
@@ -19,10 +23,10 @@ func InitAsyncWorksInstance() {
 		bagsLocks: &sync.Map{},
 		cli:       taskqueueclient.NewRedisTaskQueueClient(config.Instance().Redis),
 	}
-
-	bagNames := db.NewDBOperations().ListBagNames()
-	for _, bagName := range bagNames {
-		asyncWorksInstance.AddBag(bagName)
+	lqp := xerr.Must(abstractions.NewListQueryPacker(url.Values{}))
+	ch := db.NewDBOperations().Bags.List(lqp)
+	for bagModel := range ch {
+		asyncWorksInstance.AddBag(bagModel.BagName)
 	}
 }
 

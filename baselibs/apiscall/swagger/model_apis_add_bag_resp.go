@@ -11,6 +11,6 @@ package swagger
 type ApisAddBagResp struct {
 	BagDisplayName string `json:"bagDisplayName,omitempty"`
 	BagName string `json:"bagName,omitempty"`
-	CreateTimeMs int32 `json:"createTimeMs,omitempty"`
-	UpdateTimeMs int32 `json:"updateTimeMs,omitempty"`
+	CreateTimeMs int64 `json:"createTimeMs,omitempty"`
+	UpdateTimeMs int64 `json:"updateTimeMs,omitempty"`
 }

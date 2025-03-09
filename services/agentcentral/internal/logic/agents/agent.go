@@ -227,7 +227,7 @@ func (ah *agentHolder) persistNodeInfo() (success bool) {
 		BagName:         ah.nodeStates.GetBagName(),
 		MaxRunningTasks: ah.maxRunningTasks,
 	}
-	err := db.NewDBOperations().CreateNodeInfo(nodeInfo)
+	err := db.NewDBOperations().NodeInfos.Create(nodeInfo)
 	if err != nil {
 		logger.Error(err)
 		return false

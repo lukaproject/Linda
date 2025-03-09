@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/antihax/optional"
 	"github.com/lukaproject/xerr"
 )
 
@@ -105,7 +106,12 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 }
 
 func (s *Stage) ListNodeIds() []string {
-	nodeIds, resp := xerr.Must2(s.Cli.AgentsApi.AgentsListGet(context.Background()))
+	nodeIds, resp := xerr.Must2(
+		s.Cli.AgentsApi.AgentsListidsGet(
+			context.Background(),
+			&swagger.AgentsApiAgentsListidsGetOpts{
+				Limit: optional.NewInt32(10),
+			}))
 	if resp.StatusCode != http.StatusOK {
 		s.t.Logf("list nodes id info failed, %d", resp.StatusCode)
 	}

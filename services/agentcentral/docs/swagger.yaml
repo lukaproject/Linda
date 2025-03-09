@@ -13,8 +13,10 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       updateTimeMs:
+        format: int64
         type: integer
     type: object
   apis.AddTaskReq:
@@ -62,8 +64,10 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       updateTimeMs:
+        format: int64
         type: integer
     type: object
   apis.DeleteBagResp:
@@ -78,8 +82,10 @@ definitions:
       bagName:
         type: string
       createTimeMs:
+        format: int64
         type: integer
       updateTimeMs:
+        format: int64
         type: integer
     type: object
   apis.GetTaskResp:
@@ -115,13 +121,6 @@ definitions:
           type: string
         type: array
     type: object
-  apis.ListBagsResp:
-    properties:
-      bags:
-        items:
-          $ref: '#/definitions/apis.Bag'
-        type: array
-    type: object
   apis.NodeFreeReq:
     type: object
   apis.NodeInfo:
@@ -134,6 +133,32 @@ definitions:
   apis.NodeJoinReq:
     properties:
       bagName:
+        type: string
+    type: object
+  apis.Task:
+    properties:
+      bagName:
+        type: string
+      createTimeMs:
+        format: int64
+        type: integer
+      finishTimeMs:
+        format: int64
+        type: integer
+      nodeId:
+        type: string
+      priority:
+        type: integer
+      scheduledTimeMs:
+        format: int64
+        type: integer
+      scriptPath:
+        type: string
+      taskDisplayName:
+        type: string
+      taskName:
+        type: string
+      workingDir:
         type: string
     type: object
   apis.UploadFilesReq:
@@ -240,10 +265,29 @@ paths:
       summary: join free node to a bag
       tags:
       - agents
-  /agents/list:
+  /agents/listids:
     get:
       consumes:
       - application/json
+      description: list nodes, return node ids by query, query format support prefix=,
+        createAfter=, idAfter=, limit=.
+      parameters:
+      - description: find all ids with this prefix
+        in: query
+        name: prefix
+        type: string
+      - description: find all ids created after this time (ms)
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of node ids in result
+        in: query
+        name: limit
+        type: integer
+      - description: find all node ids which id greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
       produces:
       - application/json
       responses:
@@ -253,7 +297,7 @@ paths:
             items:
               type: string
             type: array
-      summary: list nodes, return all node ids
+      summary: list nodes, return node ids by query
       tags:
       - agents
   /agents/uploadfiles:
@@ -279,6 +323,12 @@ paths:
       consumes:
       - application/json
       description: list all node ids which belong to this node
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -294,14 +344,33 @@ paths:
       consumes:
       - application/json
       description: list bags
+      parameters:
+      - description: find all bags which bagName with this prefix
+        in: query
+        name: prefix
+        type: string
+      - description: find all bags created after this time (ms)
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of bags in result
+        in: query
+        name: limit
+        type: integer
+      - description: find all bags which bagName greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/apis.ListBagsResp'
-      summary: list bags [no implementation]
+            items:
+              $ref: '#/definitions/apis.Bag'
+            type: array
+      summary: list bags
       tags:
       - bags
     post:
@@ -367,6 +436,44 @@ paths:
       tags:
       - bags
   /bags/{bagName}/tasks:
+    get:
+      consumes:
+      - application/json
+      description: list tasks
+      parameters:
+      - description: bag's name
+        in: path
+        name: bagName
+        required: true
+        type: string
+      - description: find all tasks which taskName with this prefix
+        in: query
+        name: prefix
+        type: string
+      - description: find all tasks created after this time (ms)
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of tasks in result
+        in: query
+        name: limit
+        type: integer
+      - description: find all tasks which taskName greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/apis.Task'
+            type: array
+      summary: list tasks
+      tags:
+      - tasks
     post:
       consumes:
       - application/json
