@@ -1,12 +1,16 @@
 package db_test
 
 import (
+	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
 	"fmt"
+	"net/url"
 	"sort"
 	"testing"
+
+	"slices"
 
 	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
@@ -29,7 +33,12 @@ func (s *realDBOperationsTestSuite) TestListBagNames() {
 		dbo.Bags.Create(bags[i])
 	}
 
-	result := dbo.ListBagNames()
+	ch := dbo.Bags.List(xerr.Must(abstractions.NewListQueryPacker(url.Values{})))
+	result := make([]string, 0)
+	for bagModel := range ch {
+		result = append(result, bagModel.BagName)
+	}
+	slices.Sort(result)
 	s.Len(bags, len(result))
 	sort.Slice(bags, func(i, j int) bool {
 		return bags[i].BagName < bags[j].BagName
