@@ -30,6 +30,7 @@ def build_agent():
     )
     subprocess.run(
         args=[
+            "docker",
             "buildx",
             "build",
             "-f",
@@ -52,6 +53,7 @@ def build_agentcentral():
     )
     subprocess.run(
         args=[
+            "docker",
             "buildx",
             "build",
             "-f",
@@ -73,6 +75,7 @@ def build_fileservicefe():
     )
     subprocess.run(
         args=[
+            "docker",
             "buildx",
             "build",
             "-f",

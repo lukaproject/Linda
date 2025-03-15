@@ -1,0 +1,3 @@
+tools/dockerimages/agent/Dockerfile.agent,linda-agent
+tools/dockerimages/services/agentcentral/Dockerfile.agentcentral,linda-agentcentral
+tools/dockerimages/services/fileservicefe/Dockerfile.fileservicefe,linda-fileservicefe

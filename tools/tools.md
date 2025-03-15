@@ -8,6 +8,10 @@ go install golang.org/dl/go1.23.4@latest
 go1.23.4 download
 ```
 
+## Python 3.10+
+
+请保证在Linux中开发并且Python Version >= 3.10
+
 ## ENV
 ### build ENV
 
@@ -31,4 +35,23 @@ docker pull swaggerapi/swagger-codegen-cli-v3
 在根目录下使用下面这个命令生成swagger client
 ```bash
 ./baselibs/apiscall/renew-swagger.sh
+```
+
+### docker buildx install
+
+- [buildx release](https://github.com/docker/buildx/releases)
+
+1. 需要将下载下来的二进制重命名为docker-buildx后放入~/.docker/cli-plugins/
+2. 需要修改docker配置文件, 增加experimental: "enabled"这条
+```bash
+cat .docker/config.json
+{
+    "experimental": "enabled"
+}
+
+# 重启docker reload配置文件
+systemctl restart docker
+
+# 判断是否安装成功
+docker buildx version
 ```
