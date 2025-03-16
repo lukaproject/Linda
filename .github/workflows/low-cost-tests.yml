@@ -1,0 +1,36 @@
+# This workflow is used to test all tests exclude
+# E2E tests.
+name: Low Cost Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  # manually start testing.
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      testdatabase:
+        image: docker.io/bitnami/postgresql:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRESQL_DATABASE: linda_test
+          POSTGRESQL_PASSWORD: 123456
+          POSTGRESQL_USERNAME: dxyinme
+
+    steps:
+      - uses: actions/checkout@v3
+      - 
+        name: Setup Go Environment
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23.4
+
+      -
+        name: Test
+        run: ./tools/builder/run-tests.sh
