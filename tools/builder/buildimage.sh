@@ -18,7 +18,6 @@ do
     echo "dockerfile: $dockerfilePath image name: $imageName"
     docker rmi $imageName:latest
     $buildTool build -f $dockerfilePath -t $imageName .
-    docker image inspect "$imageName"
     failed=$?
     if [ $failed == 0 ]; then  
         echo "build success: $imageName"
