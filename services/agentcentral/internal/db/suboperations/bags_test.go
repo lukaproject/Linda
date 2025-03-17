@@ -6,6 +6,8 @@ import (
 	"Linda/services/agentcentral/internal/db"
 	"fmt"
 	"net/url"
+	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"testing"
@@ -73,6 +75,34 @@ func (s *bagsTestSuite) TestList() {
 	check("prefix2", 10, 5)
 	check("prefix1", 10, 15)
 	check("prefix2", 10, 15)
+}
+
+func (s *bagsTestSuite) TestListBagNames() {
+	dbo := db.NewDBOperations()
+	n := 55
+	bags := make([]*models.Bag, n)
+	for i := range n {
+		bags[i] = &models.Bag{
+			BagName: fmt.Sprintf("test-list-bag-%d", i),
+		}
+		dbo.Bags.Create(bags[i])
+	}
+
+	ch := dbo.Bags.List(xerr.Must(abstractions.NewListQueryPacker(url.Values{
+		"prefix": []string{"test-list-bag"},
+	})))
+	result := make([]string, 0)
+	for bagModel := range ch {
+		result = append(result, bagModel.BagName)
+	}
+	slices.Sort(result)
+	s.Len(bags, len(result))
+	sort.Slice(bags, func(i, j int) bool {
+		return bags[i].BagName < bags[j].BagName
+	})
+	for i := range n {
+		s.Equal(result[i], bags[i].BagName)
+	}
 }
 
 func (s *bagsTestSuite) SetupSuite() {
