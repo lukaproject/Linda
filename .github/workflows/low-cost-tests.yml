@@ -34,3 +34,11 @@ jobs:
       -
         name: Test
         run: ./tools/builder/run-tests.sh
+      
+      -
+        name: Upload codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./output/cover/coverageall.out
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
