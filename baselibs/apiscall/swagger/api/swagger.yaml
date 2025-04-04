@@ -31,7 +31,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/apis.NodeFreeReq'
+              $ref: "#/components/schemas/apis.NodeFreeReq"
         required: true
       responses:
         "200":
@@ -63,7 +63,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.NodeInfo'
+                $ref: "#/components/schemas/apis.NodeInfo"
   /agents/join/{nodeId}:
     post:
       tags:
@@ -84,7 +84,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/apis.NodeJoinReq'
+              $ref: "#/components/schemas/apis.NodeJoinReq"
         required: true
       responses:
         "200":
@@ -150,7 +150,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/apis.NodeInfo'
+                  $ref: "#/components/schemas/apis.NodeInfo"
                 x-content-type: application/json
   /agents/listids:
     get:
@@ -213,7 +213,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/apis.UploadFilesReq'
+              $ref: "#/components/schemas/apis.UploadFilesReq"
         required: true
       x-codegen-request-body-name: uploadFilesReq
   /bagnodes/{bagName}:
@@ -237,7 +237,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.ListBagNodesResp'
+                $ref: "#/components/schemas/apis.ListBagNodesResp"
   /bags:
     get:
       tags:
@@ -285,7 +285,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/apis.Bag'
+                  $ref: "#/components/schemas/apis.Bag"
                 x-content-type: application/json
     post:
       tags:
@@ -297,7 +297,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/apis.AddBagReq'
+              $ref: "#/components/schemas/apis.AddBagReq"
         required: true
       responses:
         "200":
@@ -305,7 +305,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.AddBagResp'
+                $ref: "#/components/schemas/apis.AddBagResp"
       x-codegen-request-body-name: addBagReq
   /bags/{bagName}:
     get:
@@ -328,7 +328,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.GetBagResp'
+                $ref: "#/components/schemas/apis.GetBagResp"
     delete:
       tags:
       - bags
@@ -349,7 +349,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.DeleteBagResp'
+                $ref: "#/components/schemas/apis.DeleteBagResp"
   /bags/{bagName}/tasks:
     get:
       tags:
@@ -405,7 +405,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/apis.Task'
+                  $ref: "#/components/schemas/apis.Task"
                 x-content-type: application/json
     post:
       tags:
@@ -426,7 +426,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/apis.AddTaskReq'
+              $ref: "#/components/schemas/apis.AddTaskReq"
         required: true
       responses:
         "200":
@@ -434,7 +434,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.AddTaskResp'
+                $ref: "#/components/schemas/apis.AddTaskResp"
       x-codegen-request-body-name: addTaskReq
   /bags/{bagName}/tasks/{taskName}:
     get:
@@ -465,7 +465,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/apis.GetTaskResp'
+                $ref: "#/components/schemas/apis.GetTaskResp"
   /healthcheck:
     post:
       summary: health check

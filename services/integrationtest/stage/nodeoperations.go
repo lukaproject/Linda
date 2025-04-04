@@ -3,6 +3,7 @@ package stage
 import (
 	"Linda/baselibs/apiscall/swagger"
 	"context"
+	"errors"
 	"net/http"
 	"testing"
 	"time"
@@ -59,11 +60,14 @@ func (no *NodeOperations) ListNodes(limit int32) []swagger.ApisNodeInfo {
 	return nodeInfos
 }
 
-func (no *NodeOperations) GetNodeInfo(nodeId string) swagger.ApisNodeInfo {
-	nodeInfo, _ := xerr.Must2(no.cli.AgentsApi.AgentsInfoNodeIdGet(
+func (no *NodeOperations) GetNodeInfo(nodeId string) (swagger.ApisNodeInfo, error) {
+	nodeInfo, resp := xerr.Must2(no.cli.AgentsApi.AgentsInfoNodeIdGet(
 		context.Background(), nodeId,
 	))
-	return nodeInfo
+	if resp.StatusCode != http.StatusOK {
+		return nodeInfo, errors.New("Get node info failed")
+	}
+	return nodeInfo, nil
 }
 
 func (no *NodeOperations) joinBag(bagName, nodeId string) (statusCode int) {

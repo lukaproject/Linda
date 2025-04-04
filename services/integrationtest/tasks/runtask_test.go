@@ -1,15 +1,12 @@
 package tasks_test
 
 import (
-	"Linda/baselibs/apiscall/swagger"
 	"Linda/baselibs/testcommon/testenv"
 	"Linda/services/integrationtest/stage"
-	"context"
 	"fmt"
 	"testing"
 	"time"
 
-	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -35,15 +32,15 @@ func (s *runTaskTestSuite) TestRunTask() {
 	// upload file to node
 	filePath := "block1/test.sh"
 	s.Nil(currentStage.FileOperations.Upload("echo test > test.txt", filePath))
-	_ = xerr.Must(currentStage.Cli.AgentsApi.AgentsUploadfilesPost(context.Background(), swagger.ApisUploadFilesReq{
-		Nodes: []string{testNodeId},
-		Files: []swagger.ApisUploadFilesReqFiles{
+	currentStage.UploadFilesToNodes(
+		[]string{testNodeId},
+		[]struct{ Uri, LocationPath string }{
 			{
 				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
 				LocationPath: "/bin/test.sh",
 			},
-		},
-	}))
+		})
+
 	// add task
 	<-time.After(3 * time.Second)
 	taskName := currentStage.TasksOperations.Add(bagName, "test-task", "/bin/test.sh", "/")
