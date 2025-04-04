@@ -34,7 +34,7 @@ func walkValuesImpl(fieldName string, tags reflect.StructTag, t reflect.Type, v 
 	if v.Kind() != reflect.Struct {
 		return
 	}
-	for i := 0; i < v.NumField(); i++ {
+	for i := range v.NumField() {
 		walkValuesImpl(t.Field(i).Name, t.Field(i).Tag, t.Field(i).Type, v.Field(i), walkFunc)
 	}
 }
