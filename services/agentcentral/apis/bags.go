@@ -78,10 +78,10 @@ func deleteBag(w http.ResponseWriter, r *http.Request) {
 //
 //	@Summary		list bags
 //	@Description	list bags
-//	@Param			prefix		query		string	false	"find all bags which bagName with this prefix"
-//	@Param			createAfter	query		int64	false	"find all bags created after this time (ms)"
-//	@Param			limit		query		int		false	"max count of bags in result"
-//	@Param			idAfter		query		string	false	"find all bags which bagName greater or equal to this id"
+//	@Param			prefix		query	string	false	"find all bags which bagName with this prefix"
+//	@Param			createAfter	query	int64	false	"find all bags created after this time (ms)"
+//	@Param			limit		query	int		false	"max count of bags in result"
+//	@Param			idAfter		query	string	false	"find all bags which bagName greater or equal to this id"
 //	@Tags			bags
 //	@Accept			json
 //	@Produce		json

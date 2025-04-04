@@ -80,11 +80,11 @@ func getTask(w http.ResponseWriter, r *http.Request) {
 //	@Summary		list tasks
 //	@Description	list tasks
 //	@Tags			tasks
-//	@Param			bagName	path	string	true	"bag's name"
-//	@Param			prefix		query		string	false	"find all tasks which taskName with this prefix"
-//	@Param			createAfter	query		int64	false	"find all tasks created after this time (ms)"
-//	@Param			limit		query		int		false	"max count of tasks in result"
-//	@Param			idAfter		query		string	false	"find all tasks which taskName greater or equal to this id"
+//	@Param			bagName		path	string	true	"bag's name"
+//	@Param			prefix		query	string	false	"find all tasks which taskName with this prefix"
+//	@Param			createAfter	query	int64	false	"find all tasks created after this time (ms)"
+//	@Param			limit		query	int		false	"max count of tasks in result"
+//	@Param			idAfter		query	string	false	"find all tasks which taskName greater or equal to this id"
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{object}	[]apis.Task

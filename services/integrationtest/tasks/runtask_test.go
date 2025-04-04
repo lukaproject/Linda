@@ -24,10 +24,7 @@ func (s *runTaskTestSuite) TestRunTask() {
 	bagName := currentStage.CreateBag("testbag")
 	defer currentStage.DeleteBag(bagName)
 	s.T().Logf("bag name %s", bagName)
-	testNodeId := currentStage.ListNodeIds()[0]
-	// join bag
-	currentStage.NodeOperations.JoinBag(bagName, testNodeId)
-	<-currentStage.WaitForNodeJoinFinished(testNodeId, bagName)
+	testNodeId := currentStage.SelectOneNodeJoinToBag(bagName)
 	defer func() {
 		// free node
 		s.T().Logf("free node %s", testNodeId)
@@ -42,7 +39,7 @@ func (s *runTaskTestSuite) TestRunTask() {
 		Nodes: []string{testNodeId},
 		Files: []swagger.ApisUploadFilesReqFiles{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:5555/files/%s", filePath),
+				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		},

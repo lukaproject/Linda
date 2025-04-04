@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/antihax/optional"
 	"github.com/lukaproject/xerr"
 )
 
@@ -105,17 +104,25 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 	return ch
 }
 
-func (s *Stage) ListNodeIds() []string {
-	nodeIds, resp := xerr.Must2(
-		s.Cli.AgentsApi.AgentsListidsGet(
-			context.Background(),
-			&swagger.AgentsApiAgentsListidsGetOpts{
-				Limit: optional.NewInt32(10),
-			}))
-	if resp.StatusCode != http.StatusOK {
-		s.t.Logf("list nodes id info failed, %d", resp.StatusCode)
+func (s *Stage) SelectOneNodeJoinToBag(bagName string) (selectedNodeId string) {
+	for {
+		nodeInfos := s.NodeOperations.ListNodes(1000)
+		for _, nodeInfo := range nodeInfos {
+			nodeId := nodeInfo.NodeId
+			if nodeInfo.BagName == "" {
+				if !s.NodeOperations.JoinBagWithTimeout(bagName, nodeId, time.Second*20) {
+					continue
+				} else {
+					s.t.Logf("successfully send join bag %s request to node %s", bagName, nodeId)
+					<-s.WaitForNodeJoinFinished(nodeId, bagName)
+					selectedNodeId = nodeId
+					s.t.Logf("success join node %s to bag %s", nodeId, bagName)
+					return
+				}
+			}
+		}
+		<-time.After(3 * time.Second)
 	}
-	return nodeIds
 }
 
 // DownloadFromURL

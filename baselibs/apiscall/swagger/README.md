@@ -24,6 +24,7 @@ Class | Method | HTTP request | Description
 *AgentsApi* | [**AgentsFreeNodeIdPost**](docs/AgentsApi.md#agentsfreenodeidpost) | **Post** /agents/free/{nodeId} | free node
 *AgentsApi* | [**AgentsInfoNodeIdGet**](docs/AgentsApi.md#agentsinfonodeidget) | **Get** /agents/info/{nodeId} | get node info
 *AgentsApi* | [**AgentsJoinNodeIdPost**](docs/AgentsApi.md#agentsjoinnodeidpost) | **Post** /agents/join/{nodeId} | join free node to a bag
+*AgentsApi* | [**AgentsListGet**](docs/AgentsApi.md#agentslistget) | **Get** /agents/list | list nodes, return node infos by query
 *AgentsApi* | [**AgentsListidsGet**](docs/AgentsApi.md#agentslistidsget) | **Get** /agents/listids | list nodes, return node ids by query
 *AgentsApi* | [**AgentsUploadfilesPost**](docs/AgentsApi.md#agentsuploadfilespost) | **Post** /agents/uploadfiles | upload files to nodes
 *BagsApi* | [**BagnodesBagNameGet**](docs/BagsApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes

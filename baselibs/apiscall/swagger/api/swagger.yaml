@@ -94,7 +94,64 @@ paths:
               schema:
                 type: string
                 x-content-type: application/json
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
       x-codegen-request-body-name: nodeJoinReq
+  /agents/list:
+    get:
+      tags:
+      - agents
+      summary: "list nodes, return node infos by query"
+      description: "list nodes, return node infos by query, query format support prefix=,\
+        \ createAfter=, idAfter=, limit=."
+      parameters:
+      - name: prefix
+        in: query
+        description: find all infos with this prefix
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: createAfter
+        in: query
+        description: find all infos created after this time (ms)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: limit
+        in: query
+        description: max count of node infos in result
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: idAfter
+        in: query
+        description: find all node infos which id greater or equal to this id
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/apis.NodeInfo'
+                x-content-type: application/json
   /agents/listids:
     get:
       tags:
@@ -588,8 +645,11 @@ components:
           type: string
         maxRunningTasks:
           type: integer
+        nodeId:
+          type: string
       example:
         bagName: bagName
+        nodeId: nodeId
         maxRunningTasks: 0
     apis.NodeJoinReq:
       type: object

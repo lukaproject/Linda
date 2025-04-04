@@ -62,6 +62,7 @@ type NodeFreeReq struct {
 }
 
 type NodeInfo struct {
+	NodeId          string `json:"nodeId"`
 	BagName         string `json:"bagName"`
 	MaxRunningTasks int    `json:"maxRunningTasks"`
 }

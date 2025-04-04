@@ -3,6 +3,7 @@ package nodecontrol
 import (
 	"Linda/baselibs/apiscall/swagger"
 	"Linda/services/integrationtest/stage"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
@@ -16,15 +17,13 @@ type nodeControlTestSuite struct {
 
 func (s *nodeControlTestSuite) TestNormalScenario() {
 	conf := swagger.NewConfiguration()
-	conf.BasePath = "http://localhost:5883/api"
+	conf.BasePath = fmt.Sprintf("http://localhost:%d/api", stage.AgentCentralPort)
 	cli := swagger.NewAPIClient(conf)
 
 	currentStage := &stage.Stage{}
 	currentStage.SetUp(s.T(), cli)
-	testNodeId := currentStage.ListNodeIds()[0]
 	testBagName := currentStage.CreateBag("test-current-bag")
-	currentStage.NodeOperations.JoinBag(testBagName, testNodeId)
-	<-currentStage.WaitForNodeJoinFinished(testNodeId, testBagName)
+	testNodeId := currentStage.SelectOneNodeJoinToBag(testBagName)
 	s.T().Log("join bag finished")
 	currentStage.NodeOperations.FreeNode(testNodeId)
 	<-currentStage.WaitForNodeFree(testNodeId)

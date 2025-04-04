@@ -24,7 +24,11 @@ var (
 type Mgr interface {
 	NewNode(nodeId string, w http.ResponseWriter, r *http.Request)
 	RemoveNode(nodeId string) error
-	AddNodeToBag(nodeId, bagName string)
+
+	// AddNodeToBag
+	// 将 Node 加入 Bag 中.
+	// 有可能会返回 error, 用于检查 Node 是否被其他的 Bag 占用
+	AddNodeToBag(nodeId, bagName string) (err error)
 	FreeNode(nodeId string)
 
 	GetNodeInfo(nodeId string) *models.NodeInfo
@@ -80,12 +84,13 @@ func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	return nil
 }
 
-func (mgr *agentsmgr) AddNodeToBag(nodeId, bagName string) {
+func (mgr *agentsmgr) AddNodeToBag(nodeId, bagName string) (err error) {
 	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if agent, exist := mgr.agents[nodeId]; exist {
-			agent.Join(bagName)
+			err = agent.Join(bagName)
 		}
 	})
+	return
 }
 
 func (mgr *agentsmgr) FreeNode(nodeId string) {
