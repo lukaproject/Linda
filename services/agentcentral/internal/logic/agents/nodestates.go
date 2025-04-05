@@ -26,6 +26,9 @@ func (ns *nodeStates) Join(bagName string) (err error) {
 	if ns.State == node_STATES_FREE {
 		ns.BagName = bagName
 		ns.State = node_STATES_JOINING
+	} else if ns.State == node_STATES_JOINING && ns.BagName == bagName {
+		// TODO
+		// it is ok for rejoin with same bagName
 	} else {
 		return errno.ErrNodeBelongsToAnotherBag
 	}

@@ -13,7 +13,7 @@ type FileDownloader struct {
 }
 
 func (fs *FileDownloader) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "GET" {
+	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

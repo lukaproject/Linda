@@ -13,7 +13,7 @@ type FileUploader struct {
 }
 
 func (fs *FileUploader) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
+	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
