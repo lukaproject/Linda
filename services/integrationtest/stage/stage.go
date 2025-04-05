@@ -9,7 +9,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/antihax/optional"
 	"github.com/lukaproject/xerr"
 )
 
@@ -69,14 +68,15 @@ func (s *Stage) WaitForNodeJoinFinished(nodeId, bagName string) (ch chan any) {
 	ch = make(chan any, 1)
 	go func() {
 		for {
-			nodeInfo, httpResp := xerr.Must2(s.Cli.AgentsApi.AgentsInfoNodeIdGet(context.Background(), nodeId))
-			if httpResp.StatusCode != http.StatusOK {
-				s.t.Logf("get node info failed, %d", httpResp.StatusCode)
-			}
-			s.t.Log(nodeInfo)
-			if nodeInfo.BagName != "" {
-				s.t.Logf("join bag %s", nodeInfo.BagName)
-				break
+			nodeInfo, err := s.NodeOperations.GetNodeInfo(nodeId)
+			if err != nil {
+				s.t.Log(err)
+			} else {
+				s.t.Log(nodeInfo)
+				if nodeInfo.BagName != "" {
+					s.t.Logf("join bag %s", nodeInfo.BagName)
+					break
+				}
 			}
 			<-time.After(5 * time.Second)
 		}
@@ -89,14 +89,15 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 	ch = make(chan any, 1)
 	go func() {
 		for {
-			nodeInfo, httpResp := xerr.Must2(s.Cli.AgentsApi.AgentsInfoNodeIdGet(context.Background(), nodeId))
-			if httpResp.StatusCode != http.StatusOK {
-				s.t.Logf("get node info failed, %d", httpResp.StatusCode)
-			}
-			s.t.Log(nodeInfo)
-			if nodeInfo.BagName == "" {
-				s.t.Logf("free node %s", nodeId)
-				break
+			nodeInfo, err := s.NodeOperations.GetNodeInfo(nodeId)
+			if err != nil {
+				s.t.Log(err)
+			} else {
+				s.t.Log(nodeInfo)
+				if nodeInfo.BagName == "" {
+					s.t.Logf("free node %s", nodeId)
+					break
+				}
 			}
 			<-time.After(5 * time.Second)
 		}
@@ -105,17 +106,39 @@ func (s *Stage) WaitForNodeFree(nodeId string) (ch chan any) {
 	return ch
 }
 
-func (s *Stage) ListNodeIds() []string {
-	nodeIds, resp := xerr.Must2(
-		s.Cli.AgentsApi.AgentsListidsGet(
-			context.Background(),
-			&swagger.AgentsApiAgentsListidsGetOpts{
-				Limit: optional.NewInt32(10),
-			}))
-	if resp.StatusCode != http.StatusOK {
-		s.t.Logf("list nodes id info failed, %d", resp.StatusCode)
+func (s *Stage) SelectOneNodeJoinToBag(bagName string) (selectedNodeId string) {
+	for {
+		nodeInfos := s.NodeOperations.ListNodes(1000)
+		for _, nodeInfo := range nodeInfos {
+			nodeId := nodeInfo.NodeId
+			if nodeInfo.BagName == "" {
+				if !s.NodeOperations.JoinBagWithTimeout(bagName, nodeId, time.Second*20) {
+					continue
+				} else {
+					s.t.Logf("successfully send join bag %s request to node %s", bagName, nodeId)
+					<-s.WaitForNodeJoinFinished(nodeId, bagName)
+					selectedNodeId = nodeId
+					s.t.Logf("success join node %s to bag %s", nodeId, bagName)
+					return
+				}
+			}
+		}
+		<-time.After(3 * time.Second)
 	}
-	return nodeIds
+}
+
+func (s *Stage) UploadFilesToNodes(nodeIds []string, files []struct{ Uri, LocationPath string }) {
+	req := swagger.ApisUploadFilesReq{
+		Nodes: nodeIds,
+		Files: []swagger.ApisUploadFilesReqFiles{},
+	}
+	for _, f := range files {
+		req.Files = append(req.Files, swagger.ApisUploadFilesReqFiles{
+			Uri:          f.Uri,
+			LocationPath: f.LocationPath,
+		})
+	}
+	xerr.Must(s.Cli.AgentsApi.AgentsUploadfilesPost(context.Background(), req))
 }
 
 // DownloadFromURL

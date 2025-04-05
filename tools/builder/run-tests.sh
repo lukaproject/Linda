@@ -36,10 +36,12 @@ function InstallGocovmerge {
 RunModTests agent agent
 RunModTests services/agentcentral agentcentral
 RunModTests baselibs/multifs multifs
+RunModTests baselibs/testcommon testcommon
 RunModTests baselibs/abstractions abstractions
 
 InstallGocovmerge
 
 gocovmerge $CoverageOutputPath/agent.out $CoverageOutputPath/agentcentral.out \
            $CoverageOutputPath/multifs.out $CoverageOutputPath/abstractions.out \
+           $CoverageOutputPath/testcommon.out \
            > $CoverageOutputPath/coverageall.out

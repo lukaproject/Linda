@@ -4,6 +4,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"path/filepath"
 
 	"github.com/lukaproject/xerr"
 )
@@ -44,6 +45,8 @@ func ReadStringFromFile(path string) string {
 // a unix-like operation `touch xxxx`,
 // to create an empty file in this path.
 func Touch(path string) error {
+	dir := filepath.Dir(path)
+	MkdirAll(dir, fs.ModePerm)
 	f, err := os.Create(path)
 	if err != nil {
 		if os.IsExist(err) {

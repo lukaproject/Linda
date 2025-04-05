@@ -11,4 +11,5 @@ package swagger
 type ApisNodeInfo struct {
 	BagName string `json:"bagName,omitempty"`
 	MaxRunningTasks int32 `json:"maxRunningTasks,omitempty"`
+	NodeId string `json:"nodeId,omitempty"`
 }

@@ -20,7 +20,7 @@ type Agent interface {
 	StartServe()
 
 	// 把当前Agent加入某个bag
-	Join(bagName string)
+	Join(bagName string) error
 
 	// 把当前Agent设置为空闲
 	Free()
@@ -66,8 +66,8 @@ func (ah *agentHolder) AddFilesUploadToNode(files []models.FileDescription) {
 	ah.noUploadFiles = append(ah.noUploadFiles, files...)
 }
 
-func (ah *agentHolder) Join(bagName string) {
-	ah.nodeStates.Join(bagName)
+func (ah *agentHolder) Join(bagName string) (err error) {
+	return ah.nodeStates.Join(bagName)
 }
 
 func (ah *agentHolder) Free() {

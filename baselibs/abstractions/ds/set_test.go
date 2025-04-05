@@ -14,7 +14,7 @@ type testSetSuite struct {
 func (s *testSetSuite) TestListByChan() {
 	testSet := make(ds.Set[int])
 	expectedList := make([]int, 0)
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		testSet.Insert(i)
 		expectedList = append(expectedList, i)
 	}
@@ -32,6 +32,19 @@ func (s *testSetSuite) TestListByChan() {
 		}
 	}
 	s.ElementsMatch(expectedList, actualList)
+}
+
+func (s *testSetSuite) TestGeneralScenario() {
+	testSet := make(ds.Set[int])
+	for i := range 100 {
+		testSet.Insert(i)
+	}
+	s.Equal(100, testSet.Len())
+	for i := 0; i < 100; i += 2 {
+		testSet.Remove(i)
+	}
+	s.Equal(50, testSet.Len())
+	s.True(testSet.Exist(77))
 }
 
 func Test_testSetSuiteMain(t *testing.T) {

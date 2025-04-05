@@ -1,6 +1,9 @@
 package agents
 
-import "sync"
+import (
+	"Linda/baselibs/codes/errno"
+	"sync"
+)
 
 const (
 	node_STATES_JOINING = "node_STATES_JOINING"
@@ -17,13 +20,19 @@ type nodeStates struct {
 	mut sync.Mutex
 }
 
-func (ns *nodeStates) Join(bagName string) {
+func (ns *nodeStates) Join(bagName string) (err error) {
 	ns.mut.Lock()
 	defer ns.mut.Unlock()
 	if ns.State == node_STATES_FREE {
 		ns.BagName = bagName
 		ns.State = node_STATES_JOINING
+	} else if ns.State == node_STATES_JOINING && ns.BagName == bagName {
+		// TODO
+		// it is ok for rejoin with same bagName
+	} else {
+		return errno.ErrNodeBelongsToAnotherBag
 	}
+	return
 }
 
 func (ns *nodeStates) JoinFinished(bagName string) {

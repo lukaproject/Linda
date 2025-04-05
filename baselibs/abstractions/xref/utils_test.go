@@ -17,10 +17,11 @@ func (s *testXrefUtilsSuite) TestWalk() {
 		X string `xenv:"inner_x"`
 	}
 	type TestStruct struct {
-		A   int `xenv:"linda_test_rp"`
-		B   int
-		C   string
-		TS2 TestStruct2
+		A          int `xenv:"linda_test_rp"`
+		B          int
+		C          string
+		TS2        TestStruct2
+		TS2Pointer *TestStruct2
 	}
 
 	testStruct := &TestStruct{}
@@ -48,6 +49,7 @@ func (s *testXrefUtilsSuite) TestWalk() {
 	s.Equal(100, testStruct.B)
 	s.Equal("test", testStruct.C)
 	s.Equal("test", testStruct.TS2.X)
+	s.Equal("test", testStruct.TS2Pointer.X)
 }
 
 func (s *testXrefUtilsSuite) TestKind() {

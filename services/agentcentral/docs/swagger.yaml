@@ -129,6 +129,8 @@ definitions:
         type: string
       maxRunningTasks:
         type: integer
+      nodeId:
+        type: string
     type: object
   apis.NodeJoinReq:
     properties:
@@ -262,7 +264,46 @@ paths:
           description: OK
           schema:
             type: string
+        "409":
+          description: Conflict
+          schema:
+            type: string
       summary: join free node to a bag
+      tags:
+      - agents
+  /agents/list:
+    get:
+      consumes:
+      - application/json
+      description: list nodes, return node infos by query, query format support prefix=,
+        createAfter=, idAfter=, limit=.
+      parameters:
+      - description: find all infos with this prefix
+        in: query
+        name: prefix
+        type: string
+      - description: find all infos created after this time (ms)
+        in: query
+        name: createAfter
+        type: integer
+      - description: max count of node infos in result
+        in: query
+        name: limit
+        type: integer
+      - description: find all node infos which id greater or equal to this id
+        in: query
+        name: idAfter
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/apis.NodeInfo'
+            type: array
+      summary: list nodes, return node infos by query
       tags:
       - agents
   /agents/listids:

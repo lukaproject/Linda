@@ -1,8 +1,9 @@
 package apis
 
 import (
-	"Linda/baselibs/abstractions"
+	"Linda/baselibs/codes/errno"
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/apis/validator"
 	"Linda/services/agentcentral/internal/logic/agents"
 	"net/http"
 
@@ -14,6 +15,7 @@ func EnableAgents(r *mux.Router) {
 	r.HandleFunc("/api/agents/free/{nodeId}", nodeFree).Methods(http.MethodPost)
 	r.HandleFunc("/api/agents/info/{nodeId}", nodeInfo).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/listids", listNodeIds).Methods(http.MethodGet)
+	r.HandleFunc("/api/agents/list", listNodes).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/uploadfiles", uploadFilesToNodes).Methods(http.MethodPost)
 }
 
@@ -27,13 +29,23 @@ func EnableAgents(r *mux.Router) {
 //	@Accept			json
 //	@Produce		json
 //	@Success		200	{string}	OK
+//	@Failure		409 {string}	Conflict
 //	@Router			/agents/join/{nodeId} [post]
 func nodeJoin(w http.ResponseWriter, r *http.Request) {
 	nodeId := mux.Vars(r)["nodeId"]
 	req := NodeJoinReq{}
 	models.ReadJSON(r.Body, &req)
-	agents.GetMgrInstance().AddNodeToBag(nodeId, req.BagName)
-	w.WriteHeader(http.StatusOK)
+	err := agents.GetMgrInstance().AddNodeToBag(nodeId, req.BagName)
+	statusCode := http.StatusOK
+	if err != nil {
+		logger.Errorf("node join bag failed, err=%v", err)
+		if err == errno.ErrNodeBelongsToAnotherBag {
+			statusCode = http.StatusConflict
+		} else {
+			statusCode = http.StatusInternalServerError
+		}
+	}
+	w.WriteHeader(statusCode)
 }
 
 // node free godoc
@@ -77,7 +89,7 @@ func nodeInfo(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// nodes list godoc
+// nodeIds list godoc
 //
 //	@Summary		list nodes, return node ids by query
 //	@Description	list nodes, return node ids by query, query format support prefix=, createAfter=, idAfter=, limit=.
@@ -91,15 +103,7 @@ func nodeInfo(w http.ResponseWriter, r *http.Request) {
 //	@Success		200			{object}	[]string
 //	@Router			/agents/listids [get]
 func listNodeIds(w http.ResponseWriter, r *http.Request) {
-	query := r.URL.Query()
-	logger.Infof("query is %v", query)
-	lqp, err := abstractions.NewListQueryPacker(query)
-	if err != nil {
-		logger.Error(err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	ch, err := agents.GetMgrInstance().List(lqp)
+	ch, err := validator.NodesListRequest(r)
 	if err != nil {
 		logger.Error(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -108,6 +112,37 @@ func listNodeIds(w http.ResponseWriter, r *http.Request) {
 	result := make([]string, 0)
 	for nodeinfo := range ch {
 		result = append(result, nodeinfo.NodeId)
+	}
+	w.Write(models.Serialize(result))
+}
+
+// nodes list godoc
+//
+//	@Summary		list nodes, return node infos by query
+//	@Description	list nodes, return node infos by query, query format support prefix=, createAfter=, idAfter=, limit=.
+//	@Tags			agents
+//	@Accept			json
+//	@Produce		json
+//	@Param			prefix		query		string	false	"find all infos with this prefix"
+//	@Param			createAfter	query		int64	false	"find all infos created after this time (ms)"
+//	@Param			limit		query		int		false	"max count of node infos in result"
+//	@Param			idAfter		query		string	false	"find all node infos which id greater or equal to this id"
+//	@Success		200			{object}	[]NodeInfo
+//	@Router			/agents/list [get]
+func listNodes(w http.ResponseWriter, r *http.Request) {
+	ch, err := validator.NodesListRequest(r)
+	if err != nil {
+		logger.Error(err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	result := make([]NodeInfo, 0)
+	for nodeinfo := range ch {
+		result = append(result, NodeInfo{
+			NodeId:          nodeinfo.NodeId,
+			BagName:         nodeinfo.BagName,
+			MaxRunningTasks: nodeinfo.MaxRunningTasks,
+		})
 	}
 	w.Write(models.Serialize(result))
 }

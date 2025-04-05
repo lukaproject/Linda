@@ -123,6 +123,64 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/list": {
+            "get": {
+                "description": "list nodes, return node infos by query, query format support prefix=, createAfter=, idAfter=, limit=.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "list nodes, return node infos by query",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "find all infos with this prefix",
+                        "name": "prefix",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "find all infos created after this time (ms)",
+                        "name": "createAfter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "max count of node infos in result",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "find all node infos which id greater or equal to this id",
+                        "name": "idAfter",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/apis.NodeInfo"
+                            }
+                        }
                     }
                 }
             }
@@ -725,6 +783,9 @@
                 },
                 "maxRunningTasks": {
                     "type": "integer"
+                },
+                "nodeId": {
+                    "type": "string"
                 }
             }
         },
