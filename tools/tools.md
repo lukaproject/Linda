@@ -28,6 +28,24 @@ source .profile
 
 需要docker环境，docker中安装pgsql / redis. 目前使用的pgsql版本为15，redis版本为7.0
 
+
+### Setup pqsql
+```bash
+docker pull postgres:15
+```
+
+```bash
+
+docker run -d \
+  --name pgsql15 \
+  -e POSTGRES_USER=dxyinme \
+  -e POSTGRES_PASSWORD=123456 \
+  -e POSTGRES_DB=linda \
+  -p 5432:5432 \
+  postgres:15
+
+```
+
 ### swagger codegen
 ```bash
 docker pull swaggerapi/swagger-codegen-cli-v3
