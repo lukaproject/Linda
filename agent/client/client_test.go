@@ -25,7 +25,7 @@ func (s *agentCentralClientTestSuite) TestNormal() {
 	s.Nil(err)
 	s.Equal(models.OK, resp.Result)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		serverHB, err := cli.HeartBeat(&models.HeartBeatFromAgent{
 			SeqId: int64(i),
 		})

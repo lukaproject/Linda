@@ -1,6 +1,7 @@
 package filemanager
 
 import (
+	"Linda/baselibs/codes/errno"
 	"errors"
 	"os"
 	"path"
@@ -45,7 +46,7 @@ func (fmgr *mgr) Download(input DownloadInput) (err error) {
 	} else if input.Type.IsInternal() {
 		panic("not implementation")
 	} else {
-		return errors.New("no such download type")
+		return errno.ErrInvalidDownloadType
 	}
 }
 
@@ -72,18 +73,18 @@ func (fmgr *mgr) Initial() {
 
 func (fmgr *mgr) validateDownloadInput(input *DownloadInput) (err error) {
 	if input.TargetPath == "" {
-		return errors.New("target path is empty")
+		return errno.ErrTargetPathIsEmpty
 	}
 	if input.Type.IsPublic() {
 		if input.SourceURL == "" {
-			return errors.New("source URL is empty")
+			return errno.ErrSourceURLIsEmpty
 		}
 	} else if input.Type.IsInternal() {
 		if input.Block == "" {
 			return errors.New("input block should not be empty")
 		}
 		if input.FileName == "" {
-			return errors.New("input fileName should not be empty")
+			return errno.ErrFileNameIsEmpty
 		}
 	}
 	return

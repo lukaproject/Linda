@@ -5,13 +5,14 @@ import (
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/handler"
 	"Linda/agent/internal/localdb"
-	"Linda/baselibs/abstractions/xconfig"
 	"Linda/baselibs/abstractions/xlog"
+	"flag"
 )
 
 func main() {
-	config.SetInstance(xconfig.NewFromOSEnv[config.Config]())
-	config.Instance().SetupNodeId()
+	flag.Usage = usage
+	flag.Parse()
+	config.Initial()
 	xlog.Initial()
 	localdb.Initial()
 	data.Initial()

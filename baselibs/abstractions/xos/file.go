@@ -38,7 +38,11 @@ func MkdirAll(path string, mode fs.FileMode) {
 }
 
 func ReadStringFromFile(path string) string {
-	return string(xerr.Must(io.ReadAll(xerr.Must(os.Open(path)))))
+	return string(ReadBytesFromFile(path))
+}
+
+func ReadBytesFromFile(path string) []byte {
+	return xerr.Must(io.ReadAll(xerr.Must(os.Open(path))))
 }
 
 // Touch
