@@ -4,6 +4,8 @@ import (
 	"Linda/protocol/models"
 )
 
+// MockClient
+// 是一个专门用作做测试的Client组件，可以通过模拟HBFromServer/Agent或者修改HBHandleFunc来做测试
 type MockClient struct {
 	HBFromServersList []*models.HeartBeatFromServer
 	HBFromAgentsList  []*models.HeartBeatFromAgent
