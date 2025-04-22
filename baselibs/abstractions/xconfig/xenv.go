@@ -2,6 +2,7 @@ package xconfig
 
 import (
 	"Linda/baselibs/abstractions/defaultor"
+	"Linda/baselibs/abstractions/ds"
 	"Linda/baselibs/abstractions/xref"
 	"os"
 	"reflect"
@@ -13,6 +14,30 @@ import (
 const (
 	xenvTagKey = "xenv"
 )
+
+// NewFromOSEnv
+// 读取环境变量中的值，设置在对应的xenv tag上
+func NewFromOSEnv[T any]() *T {
+	x := defaultor.New[T]()
+	xref.WalkValues(x, walkToSetFromOSEnv)
+	return x
+}
+
+// GetEnvs
+// 获取这个type所有的环境变量，并返回
+func GetEnvs[T any]() (envs ds.Set[string]) {
+	envs = make(ds.Set[string])
+	walkToGetOSEnv := func(input xref.WalkFuncInput) {
+		_, tags := input.Value, input.FieldTag
+		tagValue, ok := tags.Lookup(xenvTagKey)
+		if !ok {
+			return
+		}
+		envs.Insert(tagValue)
+	}
+	xref.WalkValues(defaultor.New[T](), walkToGetOSEnv)
+	return
+}
 
 func walkToSetFromOSEnv(input xref.WalkFuncInput) {
 	v, tags := input.Value, input.FieldTag
@@ -41,10 +66,4 @@ func walkToSetFromOSEnv(input xref.WalkFuncInput) {
 			v.SetBool(xerr.Must(strconv.ParseBool(envValue)))
 		}
 	}
-}
-
-func NewFromOSEnv[T any]() *T {
-	x := defaultor.New[T]()
-	xref.WalkValues(x, walkToSetFromOSEnv)
-	return x
 }

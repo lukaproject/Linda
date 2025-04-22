@@ -8,27 +8,24 @@ import (
 )
 
 type Logger interface {
-	Debug(args ...interface{})
-	Debugf(format string, args ...interface{})
+	Debug(args ...any)
+	Debugf(format string, args ...any)
 
-	Info(args ...interface{})
-	Infof(format string, args ...interface{})
+	Info(args ...any)
+	Infof(format string, args ...any)
 
-	Warn(args ...interface{})
-	Warnf(format string, args ...interface{})
+	Warn(args ...any)
+	Warnf(format string, args ...any)
 
-	Error(args ...interface{})
-	Errorf(format string, args ...interface{})
+	Error(args ...any)
+	Errorf(format string, args ...any)
 
-	Fatal(args ...interface{})
-	Fatalf(format string, args ...interface{})
+	Fatal(args ...any)
+	Fatalf(format string, args ...any)
 }
 
 func Initial() {
-	logrus.SetLevel(logrus.DebugLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp: true,
-	})
+	setUpForDev()
 }
 
 func NewForPackage() Logger {
@@ -42,4 +39,11 @@ func NewForPackage() Logger {
 		packageName = strings.Join(parts[0:pl-1], ".")
 	}
 	return logrus.WithField("package", packageName)
+}
+
+func setUpForDev() {
+	logrus.SetLevel(logrus.DebugLevel)
+	logrus.SetFormatter(&logrus.TextFormatter{
+		FullTimestamp: true,
+	})
 }

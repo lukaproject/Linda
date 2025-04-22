@@ -1,5 +1,9 @@
 package ds
 
+import (
+	"github.com/ecodeclub/ekit/mapx"
+)
+
 type empty struct{}
 type Set[T comparable] map[T]empty
 
@@ -25,4 +29,8 @@ func (s *Set[T]) Remove(v T) {
 func (s *Set[T]) Exist(v T) bool {
 	_, ok := (*s)[v]
 	return ok
+}
+
+func (s *Set[T]) ToArray() []T {
+	return mapx.Keys(*s)
 }

@@ -14,17 +14,24 @@ var (
 	logger = xlog.NewForPackage()
 )
 
+const (
+	agentHeartBeatUrlFormat = "ws://%s/api/agent/heartbeat/%s"
+)
+
 type Config struct {
 	AgentCentralEndPoint string `xdefault:"localhost:5883" xenv:"LINDA_AGENT_CENTRAL_ENDPOINT"`
 	NodeId               string `xdefault:"" xenv:"LINDA_NODE_ID"`
-	LocalDBDir           string `xdefault:"/tmp/linda-agent/db" xenv:"LINDA_LOCAL_DB_DIR"`
+	LocalDBDir           string `xdefault:"/linda/db" xenv:"LINDA_LOCAL_DB_DIR"`
 	HeartbeatPeriodMs    int    `xdefault:"50" xenv:"LINDA_HB_PERIOD_MS"`
 	NodeName             string `xdefault:"test-node-name" xenv:"LINDA_NODE_NAME"`
 	TasksDir             string `xdefault:"/linda/tasks" xenv:"LINDA_TASKS_DIR"`
 }
 
 func (c *Config) AgentHeartBeatUrl() string {
-	return fmt.Sprintf("ws://%s/api/agent/heartbeat/%s", c.AgentCentralEndPoint, c.NodeId)
+	return fmt.Sprintf(
+		agentHeartBeatUrlFormat,
+		c.AgentCentralEndPoint,
+		c.NodeId)
 }
 
 func (c *Config) HeartbeatPeriod() time.Duration {
