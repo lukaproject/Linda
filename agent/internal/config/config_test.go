@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path"
+	"slices"
 	"testing"
 
 	"github.com/lukaproject/xerr"
@@ -36,6 +37,22 @@ func (s *testConfigTestSuite) TestLoadFromOSEnvAndConfigFile() {
 	s.Equal("test-node-id", c.NodeId)
 	s.Equal("/linda/tasks", c.TasksDir)
 	s.Equal(50, c.HeartbeatPeriodMs)
+}
+
+func (s *testConfigTestSuite) TestGetOSEnvs() {
+	envs := GetOSEnvs()
+	actual := envs.ToArray()
+	expected := []string{
+		"LINDA_AGENT_CENTRAL_ENDPOINT",
+		"LINDA_NODE_ID",
+		"LINDA_LOCAL_DB_DIR",
+		"LINDA_HB_PERIOD_MS",
+		"LINDA_NODE_NAME",
+		"LINDA_TASKS_DIR",
+	}
+	slices.Sort(expected)
+	slices.Sort(actual)
+	s.Equal(expected, actual)
 }
 
 func TestConfigMain(t *testing.T) {
