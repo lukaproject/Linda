@@ -4,6 +4,7 @@ import (
 	"Linda/agent/internal/localdb"
 	"Linda/protocol/models"
 	"encoding/json"
+	"strings"
 
 	"github.com/lukaproject/xerr"
 )
@@ -27,6 +28,7 @@ type TaskData struct {
 	Bag          string
 	Resource     int
 	PathToScript string
+	Script       string
 
 	// script running dir
 	WorkingDir string
@@ -40,7 +42,20 @@ func (t *TaskData) FromTaskModel(taskModel *models.Task) {
 	t.Name = taskModel.TaskName
 	t.PathToScript = taskModel.ScriptPath
 	t.WorkingDir = taskModel.WorkingDir
+	t.Script = taskModel.Script
 	t.Resource = 1
+}
+
+// GetCommands
+// return Script if task is a script only task, or return PathToScript
+func (t *TaskData) GetCommands(defaultShell string) []string {
+	if t.PathToScript != "" && t.Script != "" {
+		panic("invalid task data")
+	}
+	if t.PathToScript != "" {
+		return []string{defaultShell, t.PathToScript}
+	}
+	return strings.Split(t.Script, " ")
 }
 
 func (t *TaskData) getPersistor() (p *localdb.Persistor[*KeyType, *TaskData]) {

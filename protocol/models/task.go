@@ -12,6 +12,7 @@ type Task struct {
 	TaskDisplayName string
 	BagName         string `gorm:"index"`
 	ScriptPath      string
+	Script          string
 	Priority        int16
 	WorkingDir      string
 	CreateTimeMs    int64

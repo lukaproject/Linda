@@ -16,7 +16,7 @@ type taskTestLinuxSuite struct {
 	testBase
 }
 
-func (s *taskTestLinuxSuite) TestRunNormalTask() {
+func (s *taskTestLinuxSuite) TestRunNormalTask_ScriptPath() {
 	s.writeStrToTempShellFile(
 		`
 echo 1
@@ -41,6 +41,26 @@ echo 3
 	s.Equal(
 		expectOutput,
 		s.getStrFromFile(path.Join(td.TaskDir, ConstStdOutFile)))
+	s.Equal("", s.getStrFromFile(path.Join(td.TaskDir, ConstStdErrFile)))
+}
+
+func (s *taskTestLinuxSuite) TestRunNormalTask_Script() {
+	currDir := s.TempDir()
+	td := data.TaskData{
+		Name:       "testtask",
+		Bag:        "testbag",
+		Resource:   1,
+		Script:     "echo 1",
+		WorkingDir: currDir,
+		TaskDir:    currDir,
+	}
+
+	nowtask := NewTask(td)
+	xerr.Must0(nowtask.Start())
+	xerr.Must0(nowtask.Wait())
+
+	expectOutput := "1\n"
+	s.Equal(expectOutput, s.getStrFromFile(path.Join(td.TaskDir, ConstStdOutFile)))
 	s.Equal("", s.getStrFromFile(path.Join(td.TaskDir, ConstStdErrFile)))
 }
 

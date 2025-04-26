@@ -5,6 +5,7 @@ type Task struct {
 	TaskDisplayName string `json:"taskDisplayName"`
 	BagName         string `json:"bagName"`
 	ScriptPath      string `json:"scriptPath"`
+	Script          string `json:"script"`
 	Priority        int16  `json:"priority"`
 	WorkingDir      string `json:"workingDir"`
 	CreateTimeMs    int64  `swaggertype:"integer" format:"int64" json:"createTimeMs"`
@@ -24,9 +25,12 @@ type AddBagReq struct {
 	BagDisplayName string `example:"test-bagDisplayName"`
 }
 
+// AddTaskReq:
+// script 和 scriptPath 必须有一个存在并且不能够同时存在
 type AddTaskReq struct {
 	TaskDisplayName string `example:"test-taskDisplayName"`
 	ScriptPath      string `example:"/bin/test.sh"`
+	Script          string `example:"echo 1"`
 	WorkingDir      string `example:"/bin/testWorkingDir/working"`
 }
 

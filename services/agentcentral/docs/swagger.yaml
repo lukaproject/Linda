@@ -21,6 +21,9 @@ definitions:
     type: object
   apis.AddTaskReq:
     properties:
+      script:
+        example: echo 1
+        type: string
       scriptPath:
         example: /bin/test.sh
         type: string
@@ -48,6 +51,8 @@ definitions:
       scheduledTimeMs:
         format: int64
         type: integer
+      script:
+        type: string
       scriptPath:
         type: string
       taskDisplayName:
@@ -105,6 +110,8 @@ definitions:
       scheduledTimeMs:
         format: int64
         type: integer
+      script:
+        type: string
       scriptPath:
         type: string
       taskDisplayName:
@@ -154,6 +161,8 @@ definitions:
       scheduledTimeMs:
         format: int64
         type: integer
+      script:
+        type: string
       scriptPath:
         type: string
       taskDisplayName:

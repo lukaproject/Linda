@@ -9,6 +9,7 @@
 package swagger
 
 type ApisAddTaskReq struct {
+	Script string `json:"script,omitempty"`
 	ScriptPath string `json:"scriptPath,omitempty"`
 	TaskDisplayName string `json:"taskDisplayName,omitempty"`
 	WorkingDir string `json:"workingDir,omitempty"`

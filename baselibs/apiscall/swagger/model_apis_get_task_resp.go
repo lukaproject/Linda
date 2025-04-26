@@ -15,6 +15,7 @@ type ApisGetTaskResp struct {
 	NodeId string `json:"nodeId,omitempty"`
 	Priority int32 `json:"priority,omitempty"`
 	ScheduledTimeMs int64 `json:"scheduledTimeMs,omitempty"`
+	Script string `json:"script,omitempty"`
 	ScriptPath string `json:"scriptPath,omitempty"`
 	TaskDisplayName string `json:"taskDisplayName,omitempty"`
 	TaskName string `json:"taskName,omitempty"`

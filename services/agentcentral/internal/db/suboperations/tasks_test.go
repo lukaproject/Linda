@@ -35,6 +35,22 @@ func (s *tasksTestSuite) TestCreateTask() {
 	}
 }
 
+func (s *tasksTestSuite) TestCreateTask_Script() {
+	dbo := db.NewDBOperations()
+	n := 10
+	for i := range n {
+		t := &models.Task{
+			TaskDisplayName: fmt.Sprintf("testtask-%d", i),
+			BagName:         "test-addtask-bag",
+			Script:          "echo 1",
+			WorkingDir:      "bin/workingdir",
+		}
+		dbo.Tasks.Create(t)
+		s.NotNil(t.TaskName)
+		s.True(t.CreateTimeMs != 0)
+	}
+}
+
 // 这个测试里面测了update和get task的操作
 func (s *tasksTestSuite) TestGetBagEnqueuedTaskNumber() {
 	dbo := db.NewDBOperations()

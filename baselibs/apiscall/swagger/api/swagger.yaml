@@ -499,6 +499,9 @@ components:
     apis.AddTaskReq:
       type: object
       properties:
+        script:
+          type: string
+          example: echo 1
         scriptPath:
           type: string
           example: /bin/test.sh
@@ -526,6 +529,8 @@ components:
         scheduledTimeMs:
           type: integer
           format: int64
+        script:
+          type: string
         scriptPath:
           type: string
         taskDisplayName:
@@ -544,6 +549,7 @@ components:
         priority: 1
         nodeId: nodeId
         createTimeMs: 0
+        script: script
         taskDisplayName: taskDisplayName
     apis.Bag:
       type: object
@@ -606,6 +612,8 @@ components:
         scheduledTimeMs:
           type: integer
           format: int64
+        script:
+          type: string
         scriptPath:
           type: string
         taskDisplayName:
@@ -624,6 +632,7 @@ components:
         priority: 1
         nodeId: nodeId
         createTimeMs: 0
+        script: script
         taskDisplayName: taskDisplayName
     apis.ListBagNodesResp:
       type: object
@@ -674,6 +683,8 @@ components:
         scheduledTimeMs:
           type: integer
           format: int64
+        script:
+          type: string
         scriptPath:
           type: string
         taskDisplayName:
@@ -692,6 +703,7 @@ components:
         priority: 1
         nodeId: nodeId
         createTimeMs: 0
+        script: script
         taskDisplayName: taskDisplayName
     apis.UploadFilesReq:
       type: object
