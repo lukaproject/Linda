@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]
 then 
 	echo "Usage: "
@@ -18,6 +18,8 @@ do
     imageName=${arr[1]}
     echo "dockerfile: $dockerfilePath image name: $imageName"
     docker rmi $imageName:latest
+    set -e
     $buildTool build -f $dockerfilePath -t $imageName .
     echo "build success: $imageName"
+    set +e
 done
