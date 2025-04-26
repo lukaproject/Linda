@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 if [[ ( $@ == "--help") ||  $@ == "-h" ]]
 then 
 	echo "Usage: "
@@ -18,11 +19,5 @@ do
     echo "dockerfile: $dockerfilePath image name: $imageName"
     docker rmi $imageName:latest
     $buildTool build -f $dockerfilePath -t $imageName .
-    failed=$?
-    if [ $failed == 0 ]; then  
-        echo "build success: $imageName"
-    else
-        echo "build failed: $imageName"
-        exit 1
-    fi
+    echo "build success: $imageName"
 done
