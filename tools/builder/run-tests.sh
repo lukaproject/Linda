@@ -15,6 +15,7 @@ mkdir -p $CoverageOutputPath
 echo "run tests in $GoVersion"
 
 function RunModTests {
+    set -e
     local path=$Root/$1
     local outname=$2
     local outpath=$CoverageOutputPath/$outname.out
@@ -23,6 +24,7 @@ function RunModTests {
     $GO test ./... -coverprofile=$outpath
     cd $Root
     echo "test finished for $path"
+    set +e
 }
 
 function InstallGocovmerge {
