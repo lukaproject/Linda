@@ -20,5 +20,4 @@ func InitTasksMgr() {
 
 func InitAsyncWorks() {
 	comm.InitAsyncWorksInstance()
-	comm.InitFileSaver()
 }

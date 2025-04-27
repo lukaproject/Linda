@@ -21,6 +21,10 @@ func (no *NodeOperations) JoinBag(bagName, nodeId string) {
 	xerr.MustOk[int](0, no.joinBag(bagName, nodeId) == http.StatusOK)
 }
 
+func (no *NodeOperations) JoinBagWithStatusCode(bagName, nodeId string) int {
+	return no.joinBag(bagName, nodeId)
+}
+
 func (no *NodeOperations) FreeNode(nodeId string) {
 	_, resp := xerr.Must2(no.cli.AgentsApi.AgentsFreeNodeIdPost(
 		context.Background(), swagger.ApisNodeFreeReq{}, nodeId))
@@ -71,10 +75,10 @@ func (no *NodeOperations) GetNodeInfo(nodeId string) (swagger.ApisNodeInfo, erro
 }
 
 func (no *NodeOperations) joinBag(bagName, nodeId string) (statusCode int) {
-	_, resp := xerr.Must2(no.cli.AgentsApi.AgentsJoinNodeIdPost(
+	_, resp, _ := no.cli.AgentsApi.AgentsJoinNodeIdPost(
 		context.Background(), swagger.ApisNodeJoinReq{
 			BagName: bagName,
-		}, nodeId))
+		}, nodeId)
 	statusCode = resp.StatusCode
 	return
 }
