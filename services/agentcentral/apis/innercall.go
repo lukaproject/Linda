@@ -16,12 +16,14 @@ func EnableInnerCall(r *mux.Router) {
 	r.HandleFunc("/api/agent/innercall/bags/{bagName}/tasks/{taskName}", innerCallGetTask).Methods(http.MethodGet)
 }
 
+// nodeIdGen
+// be used in agent start to fetch node id if not exists.
 func nodeIdGen(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(agents.GenNodeId()))
 }
 
 // innerCallGetTask
-// used in agent fetch task
+// be used in agent fetch task
 func innerCallGetTask(w http.ResponseWriter, r *http.Request) {
 	bagName := mux.Vars(r)["bagName"]
 	taskName := mux.Vars(r)["taskName"]
