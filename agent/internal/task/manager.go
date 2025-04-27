@@ -74,7 +74,7 @@ func (m *Mgr) getTaskUrl(bagName, taskName string) string {
 	return strings.Join(
 		[]string{
 			config.Instance().AgentAPIUrl("http"),
-			"bags",
+			"agent/innercall/bags",
 			bagName,
 			"tasks",
 			taskName,

@@ -632,6 +632,10 @@ const docTemplate = `{
         "apis.AddTaskReq": {
             "type": "object",
             "properties": {
+                "script": {
+                    "type": "string",
+                    "example": "echo 1"
+                },
                 "scriptPath": {
                     "type": "string",
                     "example": "/bin/test.sh"
@@ -669,6 +673,9 @@ const docTemplate = `{
                 "scheduledTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "script": {
+                    "type": "string"
                 },
                 "scriptPath": {
                     "type": "string"
@@ -754,6 +761,9 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "int64"
                 },
+                "script": {
+                    "type": "string"
+                },
                 "scriptPath": {
                     "type": "string"
                 },
@@ -827,6 +837,9 @@ const docTemplate = `{
                 "scheduledTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "script": {
+                    "type": "string"
                 },
                 "scriptPath": {
                     "type": "string"

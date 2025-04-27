@@ -15,6 +15,7 @@ func FromTaskModelToTask(taskModel *models.Task, task *Task) {
 	task.Priority = taskModel.Priority
 	task.ScheduledTimeMs = taskModel.ScheduledTimeMs
 	task.ScriptPath = taskModel.ScriptPath
+	task.Script = taskModel.Script
 	task.TaskDisplayName = taskModel.TaskDisplayName
 	task.TaskName = taskModel.TaskName
 	task.WorkingDir = taskModel.WorkingDir

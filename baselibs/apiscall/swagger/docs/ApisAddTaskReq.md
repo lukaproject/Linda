@@ -3,6 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
+**Script** | **string** |  | [optional] [default to null]
 **ScriptPath** | **string** |  | [optional] [default to null]
 **TaskDisplayName** | **string** |  | [optional] [default to null]
 **WorkingDir** | **string** |  | [optional] [default to null]

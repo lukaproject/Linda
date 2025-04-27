@@ -14,9 +14,8 @@ type runTaskTestSuite struct {
 	testenv.TestBase
 }
 
-// TestRunTask
 // about 20s for whole test case.
-func (s *runTaskTestSuite) TestRunTask() {
+func (s *runTaskTestSuite) TestRunTask_ScriptPath() {
 	currentStage := stage.NewStageT(s.T())
 	bagName := currentStage.CreateBag("testbag")
 	defer currentStage.DeleteBag(bagName)
@@ -43,14 +42,35 @@ func (s *runTaskTestSuite) TestRunTask() {
 
 	// add task
 	<-time.After(3 * time.Second)
-	taskName := currentStage.TasksOperations.Add(bagName, "test-task", "/bin/test.sh", "/")
-	// verify task finished
+	taskName := currentStage.TasksOperations.Add(bagName, "test-task", "/bin/test.sh", "", "/")
+
 	for {
-		resp := currentStage.TasksOperations.Get(bagName, taskName)
-		s.T().Logf(
-			"task %s, finished time %d, create time %d, schedule time %d",
-			resp.TaskName, resp.FinishTimeMs, resp.CreateTimeMs, resp.ScheduledTimeMs)
-		if resp.FinishTimeMs != 0 {
+		if currentStage.TasksOperations.VerifyTaskIsFinished(bagName, taskName) {
+			break
+		}
+		<-time.After(2 * time.Second)
+	}
+}
+
+func (s *runTaskTestSuite) TestRunTask_Script() {
+	currentStage := stage.NewStageT(s.T())
+	bagName := currentStage.CreateBag("testbag")
+	defer currentStage.DeleteBag(bagName)
+	s.T().Logf("bag name %s", bagName)
+	testNodeId := currentStage.SelectOneNodeJoinToBag(bagName)
+	defer func() {
+		// free node
+		s.T().Logf("free node %s", testNodeId)
+		currentStage.NodeOperations.FreeNode(testNodeId)
+		s.T().Log("free node request sent")
+		<-currentStage.WaitForNodeFree(testNodeId)
+	}()
+	// add task
+	<-time.After(3 * time.Second)
+	taskName := currentStage.TasksOperations.Add(bagName, "test-task", "", "echo 1", "/")
+
+	for {
+		if currentStage.TasksOperations.VerifyTaskIsFinished(bagName, taskName) {
 			break
 		}
 		<-time.After(2 * time.Second)

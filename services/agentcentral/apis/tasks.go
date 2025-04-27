@@ -35,6 +35,7 @@ func addTask(w http.ResponseWriter, r *http.Request) {
 		TaskDisplayName: addTaskReq.TaskDisplayName,
 		BagName:         bagName,
 		ScriptPath:      addTaskReq.ScriptPath,
+		Script:          addTaskReq.Script,
 		WorkingDir:      addTaskReq.WorkingDir,
 	}
 

@@ -625,6 +625,10 @@
         "apis.AddTaskReq": {
             "type": "object",
             "properties": {
+                "script": {
+                    "type": "string",
+                    "example": "echo 1"
+                },
                 "scriptPath": {
                     "type": "string",
                     "example": "/bin/test.sh"
@@ -662,6 +666,9 @@
                 "scheduledTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "script": {
+                    "type": "string"
                 },
                 "scriptPath": {
                     "type": "string"
@@ -747,6 +754,9 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "script": {
+                    "type": "string"
+                },
                 "scriptPath": {
                     "type": "string"
                 },
@@ -820,6 +830,9 @@
                 "scheduledTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "script": {
+                    "type": "string"
                 },
                 "scriptPath": {
                     "type": "string"

@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **NodeId** | **string** |  | [optional] [default to null]
 **Priority** | **int32** |  | [optional] [default to null]
 **ScheduledTimeMs** | **int64** |  | [optional] [default to null]
+**Script** | **string** |  | [optional] [default to null]
 **ScriptPath** | **string** |  | [optional] [default to null]
 **TaskDisplayName** | **string** |  | [optional] [default to null]
 **TaskName** | **string** |  | [optional] [default to null]

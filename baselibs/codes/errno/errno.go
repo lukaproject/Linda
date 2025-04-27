@@ -11,4 +11,5 @@ var (
 	ErrTargetPathIsEmpty       = errors.New("target path is empty")
 	ErrSourceURLIsEmpty        = errors.New("source URL is empty")
 	ErrFileNameIsEmpty         = errors.New("input fileName should not be empty")
+	ErrInvalidTaskData         = errors.New("invalid task data")
 )

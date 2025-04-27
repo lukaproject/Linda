@@ -104,7 +104,8 @@ func NewTask(
 		TaskData: taskData,
 	}
 
-	t.cmd = exec.Command(utils.GetDefaultShell(), t.PathToScript)
+	cmds := t.GetCommands(utils.GetDefaultShell())
+	t.cmd = exec.Command(cmds[0], cmds[1:]...)
 	t.cmd.Dir = taskData.WorkingDir
 	return t
 }
