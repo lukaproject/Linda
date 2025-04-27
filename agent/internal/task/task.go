@@ -105,9 +105,6 @@ func NewTask(
 	}
 
 	cmds := t.GetCommands(utils.GetDefaultShell())
-	if len(cmds) <= 1 {
-		panic("generated len(cmds) must greater than 1")
-	}
 	t.cmd = exec.Command(cmds[0], cmds[1:]...)
 	t.cmd.Dir = taskData.WorkingDir
 	return t

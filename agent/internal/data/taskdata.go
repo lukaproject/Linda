@@ -2,6 +2,7 @@ package data
 
 import (
 	"Linda/agent/internal/localdb"
+	"Linda/baselibs/codes/errno"
 	"Linda/protocol/models"
 	"encoding/json"
 	"strings"
@@ -50,7 +51,7 @@ func (t *TaskData) FromTaskModel(taskModel *models.Task) {
 // return Script if task is a script only task, or return PathToScript
 func (t *TaskData) GetCommands(defaultShell string) []string {
 	if t.PathToScript != "" && t.Script != "" {
-		panic("invalid task data")
+		panic(errno.ErrInvalidTaskData)
 	}
 	if t.PathToScript != "" {
 		return []string{defaultShell, t.PathToScript}

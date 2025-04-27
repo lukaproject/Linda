@@ -2,6 +2,7 @@ package task
 
 import (
 	"Linda/agent/internal/data"
+	"fmt"
 	"os"
 	"path"
 	"runtime"
@@ -60,6 +61,26 @@ func (s *taskTestLinuxSuite) TestRunNormalTask_Script() {
 	xerr.Must0(nowtask.Wait())
 
 	expectOutput := "1\n"
+	s.Equal(expectOutput, s.getStrFromFile(path.Join(td.TaskDir, ConstStdOutFile)))
+	s.Equal("", s.getStrFromFile(path.Join(td.TaskDir, ConstStdErrFile)))
+}
+
+func (s *taskTestLinuxSuite) TestRunNormalTask_ScriptOnly1Command() {
+	currDir := s.TempDir()
+	td := data.TaskData{
+		Name:       "testtask",
+		Bag:        "testbag",
+		Resource:   1,
+		Script:     "pwd",
+		WorkingDir: currDir,
+		TaskDir:    currDir,
+	}
+
+	nowtask := NewTask(td)
+	xerr.Must0(nowtask.Start())
+	xerr.Must0(nowtask.Wait())
+
+	expectOutput := fmt.Sprintf("%s\n", td.WorkingDir)
 	s.Equal(expectOutput, s.getStrFromFile(path.Join(td.TaskDir, ConstStdOutFile)))
 	s.Equal("", s.getStrFromFile(path.Join(td.TaskDir, ConstStdErrFile)))
 }

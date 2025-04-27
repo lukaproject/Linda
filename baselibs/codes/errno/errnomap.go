@@ -10,6 +10,7 @@ var (
 		ErrTargetPathIsEmpty:       20006,
 		ErrSourceURLIsEmpty:        20007,
 		ErrFileNameIsEmpty:         20008,
+		ErrInvalidTaskData:         20009,
 	}
 
 	ErrMapNumberErr = map[int]error{
@@ -21,5 +22,6 @@ var (
 		20006: ErrTargetPathIsEmpty,
 		20007: ErrSourceURLIsEmpty,
 		20008: ErrFileNameIsEmpty,
+		20009: ErrInvalidTaskData,
 	}
 )
