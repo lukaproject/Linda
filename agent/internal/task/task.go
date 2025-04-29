@@ -79,7 +79,20 @@ func (t *task) Wait() error {
 	if t.cmd == nil {
 		return errors.New("cmd is nil")
 	}
-	return t.cmd.Wait()
+
+	err := t.cmd.Wait()
+
+	if t.stdoutFile != nil {
+		xerr.Must0(t.stdoutFile.Close())
+		t.stdoutFile = nil
+	}
+
+	if t.stderrFile != nil {
+		xerr.Must0(t.stderrFile.Close())
+		t.stderrFile = nil
+	}
+
+	return err
 }
 
 func (t *task) Stop() (err error) {
@@ -87,8 +100,16 @@ func (t *task) Stop() (err error) {
 		defer xerr.Recover(&err)
 		xerr.Must0(t.cmd.Process.Kill())
 		t.isFinished = true
-		xerr.Must0(t.stdoutFile.Close())
-		xerr.Must0(t.stderrFile.Close())
+
+		if t.stdoutFile != nil {
+			xerr.Must0(t.stdoutFile.Close())
+			t.stdoutFile = nil
+		}
+
+		if t.stderrFile != nil {
+			xerr.Must0(t.stderrFile.Close())
+			t.stderrFile = nil
+		}
 	}()
 	return
 }
