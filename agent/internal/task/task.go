@@ -75,23 +75,24 @@ func (t *task) Start() (err error) {
 	return
 }
 
-func (t *task) Wait() error {
+func (t *task) Wait() (err error) {
 	if t.cmd == nil {
 		return errors.New("cmd is nil")
 	}
+	func() {
+		defer xerr.Recover(&err)
+		xerr.Must0(t.cmd.Wait())
 
-	err := t.cmd.Wait()
+		if t.stdoutFile != nil {
+			xerr.Must0(t.stdoutFile.Close())
+			t.stdoutFile = nil
+		}
 
-	if t.stdoutFile != nil {
-		xerr.Must0(t.stdoutFile.Close())
-		t.stdoutFile = nil
-	}
-
-	if t.stderrFile != nil {
-		xerr.Must0(t.stderrFile.Close())
-		t.stderrFile = nil
-	}
-
+		if t.stderrFile != nil {
+			xerr.Must0(t.stderrFile.Close())
+			t.stderrFile = nil
+		}
+	}()
 	return err
 }
 
