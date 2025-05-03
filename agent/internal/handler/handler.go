@@ -58,10 +58,13 @@ func (h *Handler) keepAlive() {
 }
 
 func (h *Handler) unPackResp(resp *models.HeartBeatFromServer) {
-	if len(resp.ScheduledTaskNames) != 0 {
+	if len(resp.ScheduledTasks) != 0 {
 		go func() {
-			for _, taskName := range resp.ScheduledTaskNames {
-				h.taskMgr.AddTask(taskName)
+			for _, taskInfo := range resp.ScheduledTasks {
+				h.taskMgr.AddTask(task.AddTaskInput{
+					Name:      taskInfo.Name,
+					AccessKey: taskInfo.AccessKey,
+				})
 			}
 		}()
 	}

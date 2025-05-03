@@ -48,20 +48,41 @@ func (t *Tasks) UpdateFinishedTime(
 func (t *Tasks) UpdateScheduledTime(
 	bagName string,
 	taskNames []string,
+	accessKeys []string,
 	nodeId string,
 	scheduledTimeMs int64,
 ) {
-	xerr.Must0(t.dbi.
+	n := len(taskNames)
+	xerr.MustOk[int](0, n == len(accessKeys))
+	for i := range n {
+		xerr.Must0(
+			t.updateScheduledTimeSingleTask(
+				bagName,
+				taskNames[i],
+				accessKeys[i],
+				nodeId,
+				scheduledTimeMs,
+			))
+	}
+}
+
+func (t *Tasks) updateScheduledTimeSingleTask(
+	bagName, taskName, accessKey, nodeId string,
+	scheduledTimeMs int64,
+) error {
+	return t.dbi.
 		Model(&models.Task{}).
-		Where("task_name IN ?", taskNames).
+		Where("task_name = ?", taskName).
+		Where("bag_name = ?", bagName).
 		Where("order_id IS NOT NULL").
 		Where("order_id != 0").
 		Where("finish_time_ms IS NOT NULL").
 		Updates(map[string]any{
 			"scheduled_time_ms": scheduledTimeMs,
 			"node_id":           nodeId,
+			"access_key":        accessKey,
 		}).
-		Error)
+		Error
 }
 
 // get by primary key.

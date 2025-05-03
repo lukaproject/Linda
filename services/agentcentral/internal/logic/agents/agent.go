@@ -165,20 +165,22 @@ func (ah *agentHolder) scheduleTasks(
 		return
 	}
 	numOfRestResource := ah.maxRunningTasks - len(hbFromAgent.RunningTaskNames)
-	for i := 0; i < numOfRestResource; i++ {
+	for range numOfRestResource {
 		taskName, err := ah.tasksClient.Deque(bagName)
 		if err != nil {
 			logger.Errorf("deque task from bag %s failed, err %v", bagName, err)
 			break
 		}
-		if hb.ScheduledTaskNames == nil {
-			hb.ScheduledTaskNames = make([]string, 0)
+		if hb.ScheduledTasks == nil {
+			hb.ScheduledTasks = make([]models.ScheduledTaskInfo, 0)
 		}
-		hb.ScheduledTaskNames = append(hb.ScheduledTaskNames, taskName)
+		hb.ScheduledTasks = append(hb.ScheduledTasks, models.ScheduledTaskInfo{
+			Name: taskName,
+		})
 	}
-	if hb.ScheduledTaskNames != nil {
-		logger.Infof("taskNames scheduled to %s is %v", ah.nodeId, hb.ScheduledTaskNames)
-		ah.processScheduledTask(bagName, hb.ScheduledTaskNames)
+	if hb.ScheduledTasks != nil {
+		logger.Infof("taskNames scheduled to %s is %v", ah.nodeId, hb.ScheduledTasks)
+		ah.processScheduledTask(bagName, hb.ScheduledTasks)
 	} else {
 		logger.Infof("no task scheduled to %s", ah.nodeId)
 	}
@@ -208,14 +210,14 @@ func (ah *agentHolder) processFinishedTask(bagName string, msg *models.HeartBeat
 	return
 }
 
-func (ah *agentHolder) processScheduledTask(bagName string, scheduledTaskNames []string) (err error) {
+func (ah *agentHolder) processScheduledTask(bagName string, scheduledTasks []models.ScheduledTaskInfo) (err error) {
 	if bagName == emptyBagName {
 		return nil
 	}
-	if len(scheduledTaskNames) > 0 {
-		go comm.
+	if len(scheduledTasks) > 0 {
+		comm.
 			GetAsyncWorksInstance().
-			PersistScheduledTasks(bagName, scheduledTaskNames, ah.nodeId)
+			PersistScheduledTasks(bagName, scheduledTasks, ah.nodeId)
 	}
 	return
 }

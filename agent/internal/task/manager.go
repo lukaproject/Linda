@@ -13,8 +13,13 @@ import (
 	"github.com/lukaproject/xerr"
 )
 
+type AddTaskInput struct {
+	Name      string
+	AccessKey string
+}
+
 type IMgr interface {
-	AddTask(taskName string)
+	AddTask(addTaskInput AddTaskInput)
 	PopFinishedTasks() (finishedTaskNames []string)
 }
 
@@ -22,8 +27,8 @@ type Mgr struct {
 	taskRunner *runner
 }
 
-func (m *Mgr) AddTask(taskName string) {
-	taskData, err := m.fetchTaskDataByTaskName(taskName)
+func (m *Mgr) AddTask(addTaskInput AddTaskInput) {
+	taskData, err := m.fetchTaskDataByTaskName(addTaskInput.Name)
 	if err != nil {
 		logger.Error(err)
 		return
