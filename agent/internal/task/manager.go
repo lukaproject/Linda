@@ -6,6 +6,7 @@ import (
 	"Linda/baselibs/abstractions/xos"
 	"Linda/protocol/models"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -28,7 +29,7 @@ type Mgr struct {
 }
 
 func (m *Mgr) AddTask(addTaskInput AddTaskInput) {
-	taskData, err := m.fetchTaskDataByTaskName(addTaskInput.Name)
+	taskData, err := m.fetchTaskDataByTaskName(addTaskInput.Name, addTaskInput.AccessKey)
 	if err != nil {
 		logger.Error(err)
 		return
@@ -56,12 +57,16 @@ func (m *Mgr) PopFinishedTasks() (finishedTaskNames []string) {
 	return
 }
 
-func (m *Mgr) fetchTaskDataByTaskName(taskName string) (taskData data.TaskData, err error) {
+func (m *Mgr) fetchTaskDataByTaskName(taskName string, accessKey string) (taskData data.TaskData, err error) {
 	func() {
 		defer xerr.Recover(&err)
 		bagName := data.Instance().NodeData.BagName
 		taskUrl := m.getTaskUrl(bagName, taskName)
-		resp := xerr.Must(http.Get(taskUrl))
+		resp := xerr.Must(http.PostForm(
+			taskUrl,
+			url.Values{
+				"accessKey": []string{accessKey},
+			}))
 		if resp.StatusCode != http.StatusOK {
 			logger.Errorf(
 				"can not to fetch task body, task name %s, bag name %s, status %s",

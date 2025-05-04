@@ -1,6 +1,7 @@
 package agents
 
 import (
+	"Linda/baselibs/testcommon/gen"
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/config"
@@ -174,12 +175,20 @@ func (ah *agentHolder) scheduleTasks(
 		if hb.ScheduledTasks == nil {
 			hb.ScheduledTasks = make([]models.ScheduledTaskInfo, 0)
 		}
-		hb.ScheduledTasks = append(hb.ScheduledTasks, models.ScheduledTaskInfo{
-			Name: taskName,
-		})
+		accessKey, err := gen.StrGenerate(gen.CharsetDigit+gen.CharsetLowerCase, 10, 10)
+		if err != nil {
+			logger.Error(err)
+			continue
+		}
+		hb.ScheduledTasks = append(
+			hb.ScheduledTasks,
+			models.ScheduledTaskInfo{
+				Name:      taskName,
+				AccessKey: accessKey,
+			})
 	}
 	if hb.ScheduledTasks != nil {
-		logger.Infof("taskNames scheduled to %s is %v", ah.nodeId, hb.ScheduledTasks)
+		logger.Infof("tasks scheduled to %s is %v", ah.nodeId, hb.ScheduledTasks)
 		ah.processScheduledTask(bagName, hb.ScheduledTasks)
 	} else {
 		logger.Infof("no task scheduled to %s", ah.nodeId)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/lukaproject/xerr"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 type Tasks struct {
@@ -45,6 +46,7 @@ func (t *Tasks) UpdateFinishedTime(
 		Error)
 }
 
+// Update Scheduled Time
 func (t *Tasks) UpdateScheduledTime(
 	bagName string,
 	taskNames []string,
@@ -54,35 +56,37 @@ func (t *Tasks) UpdateScheduledTime(
 ) {
 	n := len(taskNames)
 	xerr.MustOk[int](0, n == len(accessKeys))
+	scheduledTasks := make([]map[string]any, n)
 	for i := range n {
-		xerr.Must0(
-			t.updateScheduledTimeSingleTask(
-				bagName,
-				taskNames[i],
-				accessKeys[i],
-				nodeId,
-				scheduledTimeMs,
-			))
-	}
-}
-
-func (t *Tasks) updateScheduledTimeSingleTask(
-	bagName, taskName, accessKey, nodeId string,
-	scheduledTimeMs int64,
-) error {
-	return t.dbi.
-		Model(&models.Task{}).
-		Where("task_name = ?", taskName).
-		Where("bag_name = ?", bagName).
-		Where("order_id IS NOT NULL").
-		Where("order_id != 0").
-		Where("finish_time_ms IS NOT NULL").
-		Updates(map[string]any{
-			"scheduled_time_ms": scheduledTimeMs,
+		scheduledTasks[i] = map[string]any{
+			"task_name":         taskNames[i],
+			"bag_name":          bagName,
+			"access_key":        accessKeys[i],
 			"node_id":           nodeId,
-			"access_key":        accessKey,
-		}).
-		Error
+			"scheduled_time_ms": scheduledTimeMs,
+		}
+	}
+
+	clauses := clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "task_name"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"access_key",
+			"node_id",
+			"scheduled_time_ms",
+		}),
+	}
+
+	xerr.Must0(
+		t.dbi.
+			Model(&models.Task{}).
+			Clauses(clauses).
+			Where("order_id IS NOT NULL").
+			Where("order_id != 0").
+			Where("finish_time_ms IS NOT NULL").
+			Create(scheduledTasks).
+			Error)
 }
 
 // get by primary key.
