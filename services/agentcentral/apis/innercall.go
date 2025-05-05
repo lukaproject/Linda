@@ -4,8 +4,8 @@ package apis
 
 import (
 	"Linda/protocol/models"
+	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/agents"
-	"Linda/services/agentcentral/internal/logic/tasks"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -32,8 +32,9 @@ func innerCallGetTask(w http.ResponseWriter, r *http.Request) {
 	logger.Infof(
 		"bagName=%s, taskName=%s, accessKey=%s",
 		bagName, taskName, accessKey)
-	taskModel := tasks.
-		GetBagsMgrInstance().
-		GetTasksMgr(bagName).GetTask(taskName)
+	taskModel := db.
+		NewDBOperations().
+		Tasks.
+		GetByAccessKey(bagName, taskName, accessKey)
 	w.Write(models.Serialize(taskModel))
 }

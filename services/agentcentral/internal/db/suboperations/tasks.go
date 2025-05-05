@@ -99,6 +99,18 @@ func (t *Tasks) Get(bagName, taskName string) *models.Task {
 	return task
 }
 
+func (t *Tasks) GetByAccessKey(bagName, taskName, accessKey string) *models.Task {
+	task := &models.Task{
+		BagName:  bagName,
+		TaskName: taskName,
+		TaskBusiness: models.TaskBusiness{
+			AccessKey: accessKey,
+		},
+	}
+	xerr.Must0(t.dbi.First(task).Error)
+	return task
+}
+
 // List By MultiFields
 // list all tasks which suit for thie fieldsMap,
 // tips:
