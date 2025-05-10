@@ -129,6 +129,25 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 	}
 }
 
+func (s *tasksTestSuite) TestTasks_GetByAccessKey() {
+	dbo := db.NewDBOperations()
+	testBagName := "test-bag-name"
+	testAccessKey := "test-access-key"
+	for i := range 10 {
+		s.Nil(dbo.Tasks.Create(&models.Task{
+			TaskName: "prefix1_" + fmt.Sprintf("%05d", i),
+			BagName:  testBagName,
+			TaskBusiness: models.TaskBusiness{
+				AccessKey: testAccessKey + "_" + strconv.Itoa(i),
+			},
+		}))
+	}
+	task := dbo.Tasks.GetByAccessKey(testBagName, "prefix1_00008", testAccessKey+"_8")
+	s.Equal(testAccessKey+"_8", task.AccessKey)
+	s.Equal("prefix1_00008", task.TaskName)
+	s.Equal(testBagName, task.BagName)
+}
+
 func (s *tasksTestSuite) TestListTasks_Prefix_Limit() {
 	dbo := db.NewDBOperations()
 	testBagName := "test-bag-name"

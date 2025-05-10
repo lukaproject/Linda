@@ -62,6 +62,7 @@ func (m *Mgr) fetchTaskDataByTaskName(taskName string, accessKey string) (taskDa
 		defer xerr.Recover(&err)
 		bagName := data.Instance().NodeData.BagName
 		taskUrl := m.getTaskUrl(bagName, taskName)
+		// agent访问 task 必须 accessKey
 		resp := xerr.Must(http.PostForm(
 			taskUrl,
 			url.Values{
