@@ -2,6 +2,7 @@ package suboperations_test
 
 import (
 	"Linda/baselibs/abstractions"
+	"Linda/baselibs/testcommon/gen"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"fmt"
@@ -88,6 +89,7 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 	dbo := db.NewDBOperations()
 	n := 10
 	taskNames := make([]string, n)
+	accessKeys := make([]string, n)
 	bagName := "test-task-scheduled-finished-scenario"
 	for i := range n {
 		task := &models.Task{
@@ -100,6 +102,9 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 		s.NotNil(task.TaskName)
 		s.True(task.CreateTimeMs != 0)
 		taskNames[i] = task.TaskName
+		var err error
+		accessKeys[i], err = gen.StrGenerate(gen.CharsetLowerCase, 5, 10)
+		s.Nil(err)
 	}
 	for i := range n {
 		dbo.Tasks.UpdateOrderId(
@@ -111,7 +116,7 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 	nodeId := "test-bag-nodeid"
 	scheduledTime := time.Now().UnixMilli()
 	finishTime := time.Now().UnixMilli()
-	dbo.Tasks.UpdateScheduledTime(bagName, taskNames, nodeId, scheduledTime)
+	dbo.Tasks.UpdateScheduledTime(bagName, taskNames, accessKeys, nodeId, scheduledTime)
 	dbo.Tasks.UpdateFinishedTime(bagName, taskNames, finishTime)
 	taskResults := dbo.Tasks.ListByMultiFields(map[string]any{
 		"bag_name": bagName,
@@ -122,6 +127,25 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 		s.Equal(finishTime, task.FinishTimeMs)
 		s.Equal(scheduledTime, task.ScheduledTimeMs)
 	}
+}
+
+func (s *tasksTestSuite) TestTasks_GetByAccessKey() {
+	dbo := db.NewDBOperations()
+	testBagName := "test-bag-name"
+	testAccessKey := "test-access-key"
+	for i := range 10 {
+		s.Nil(dbo.Tasks.Create(&models.Task{
+			TaskName: "test_access_key_" + fmt.Sprintf("%05d", i),
+			BagName:  testBagName,
+			TaskBusiness: models.TaskBusiness{
+				AccessKey: testAccessKey + "_" + strconv.Itoa(i),
+			},
+		}))
+	}
+	task := dbo.Tasks.GetByAccessKey(testBagName, "test_access_key_00008", testAccessKey+"_8")
+	s.Equal(testAccessKey+"_8", task.AccessKey)
+	s.Equal("test_access_key_00008", task.TaskName)
+	s.Equal(testBagName, task.BagName)
 }
 
 func (s *tasksTestSuite) TestListTasks_Prefix_Limit() {

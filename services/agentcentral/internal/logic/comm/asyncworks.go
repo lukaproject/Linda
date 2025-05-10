@@ -1,6 +1,7 @@
 package comm
 
 import (
+	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 	"sync"
@@ -40,8 +41,14 @@ func (aw *AsyncWorks) PersistFinishedTasks(bagName string, taskNames []string) {
 	db.NewDBOperations().Tasks.UpdateFinishedTime(bagName, taskNames, time.Now().UnixMilli())
 }
 
-func (aw *AsyncWorks) PersistScheduledTasks(bagName string, taskNames []string, nodeId string) {
-	db.NewDBOperations().Tasks.UpdateScheduledTime(bagName, taskNames, nodeId, time.Now().UnixMilli())
+func (aw *AsyncWorks) PersistScheduledTasks(bagName string, tasks []models.ScheduledTaskInfo, nodeId string) {
+	taskNames := make([]string, 0)
+	accessKeys := make([]string, 0)
+	for _, taskInfo := range tasks {
+		taskNames = append(taskNames, taskInfo.Name)
+		accessKeys = append(accessKeys, taskInfo.AccessKey)
+	}
+	db.NewDBOperations().Tasks.UpdateScheduledTime(bagName, taskNames, accessKeys, nodeId, time.Now().UnixMilli())
 }
 
 // operations for locks, so it is not a async method.

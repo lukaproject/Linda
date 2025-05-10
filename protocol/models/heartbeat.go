@@ -22,7 +22,7 @@ type HeartBeatFromAgent struct {
 type HeartBeatFromServer struct {
 	SeqId int64
 
-	ScheduledTaskNames []string
+	ScheduledTasks []ScheduledTaskInfo
 	// 需要下载的文件
 	DownloadFiles []FileDescription
 
@@ -56,4 +56,10 @@ type FileDescription struct {
 type UploadFiles struct {
 	OperationId string
 	Files       []FileDescription
+}
+
+type ScheduledTaskInfo struct {
+	Name string
+	// agent只有拿到这个AccessKey才能去访问task
+	AccessKey string
 }
