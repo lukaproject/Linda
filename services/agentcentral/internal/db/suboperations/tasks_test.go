@@ -135,16 +135,16 @@ func (s *tasksTestSuite) TestTasks_GetByAccessKey() {
 	testAccessKey := "test-access-key"
 	for i := range 10 {
 		s.Nil(dbo.Tasks.Create(&models.Task{
-			TaskName: "prefix1_" + fmt.Sprintf("%05d", i),
+			TaskName: "test_access_key_" + fmt.Sprintf("%05d", i),
 			BagName:  testBagName,
 			TaskBusiness: models.TaskBusiness{
 				AccessKey: testAccessKey + "_" + strconv.Itoa(i),
 			},
 		}))
 	}
-	task := dbo.Tasks.GetByAccessKey(testBagName, "prefix1_00008", testAccessKey+"_8")
+	task := dbo.Tasks.GetByAccessKey(testBagName, "test_access_key_00008", testAccessKey+"_8")
 	s.Equal(testAccessKey+"_8", task.AccessKey)
-	s.Equal("prefix1_00008", task.TaskName)
+	s.Equal("test_access_key_00008", task.TaskName)
 	s.Equal(testBagName, task.BagName)
 }
 
