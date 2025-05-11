@@ -1,6 +1,7 @@
 package comm
 
 import (
+	"Linda/baselibs/abstractions/xctx"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
@@ -26,7 +27,7 @@ func (aw *AsyncWorks) TaskEnque(
 			logger.Error(err)
 		}
 	}()
-	NewLocker(xerr.MustOk[*sync.Mutex](aw.bagsLocks.Load(bagName))).
+	xctx.NewLocker(xerr.MustOk[*sync.Mutex](aw.bagsLocks.Load(bagName))).
 		Run(func() {
 			logger.Infof("bag %s, task %s, enque start", bagName, taskName)
 			dbo := db.NewDBOperations()

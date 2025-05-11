@@ -4,6 +4,7 @@ import (
 	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
+	"Linda/services/agentcentral/internal/db/dbtestcommon"
 	"Linda/services/agentcentral/internal/logic/agents"
 	"fmt"
 	"net/url"
@@ -16,7 +17,7 @@ import (
 )
 
 type nodeInfosTestSuite struct {
-	CommonTestSuite
+	dbtestcommon.CommonTestSuite
 }
 
 func (s *nodeInfosTestSuite) TestCreateNodeInfo_Success() {
@@ -79,7 +80,7 @@ func (s *nodeInfosTestSuite) TestListNodeInfo_Prefix_Limit() {
 func (s *nodeInfosTestSuite) SetupSuite() {
 	s.HealthCheckAndSetup()
 	s.DropTables()
-	db.ReInitialWithDSN(s.dsn)
+	db.ReInitialWithDSN(s.DSN)
 }
 
 func TestNodeInfosTestSuite(t *testing.T) {

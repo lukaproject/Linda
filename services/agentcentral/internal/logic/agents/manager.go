@@ -2,10 +2,10 @@ package agents
 
 import (
 	"Linda/baselibs/abstractions"
+	"Linda/baselibs/abstractions/xctx"
 	"Linda/baselibs/codes/errno"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
-	"Linda/services/agentcentral/internal/logic/comm"
 	"errors"
 	"net/http"
 	"sync"
@@ -57,7 +57,7 @@ func (mgr *agentsmgr) addNewNodeToMem(
 	w http.ResponseWriter,
 	r *http.Request,
 ) (agent Agent, err error) {
-	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
+	xctx.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if _, exist := mgr.agents[nodeId]; exist {
 			panic(errno.ErrNodeIdExists)
 		}
@@ -72,7 +72,7 @@ func (mgr *agentsmgr) addNewNodeToMem(
 }
 
 func (mgr *agentsmgr) RemoveNode(nodeId string) error {
-	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
+	xctx.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if _, ok := mgr.agents[nodeId]; ok {
 			delete(mgr.agents, nodeId)
 			db.NewDBOperations().NodeInfos.Delete(nodeId)
@@ -85,7 +85,7 @@ func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 }
 
 func (mgr *agentsmgr) AddNodeToBag(nodeId, bagName string) (err error) {
-	comm.NewLocker(&mgr.agentsRWMut).Run(func() {
+	xctx.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if agent, exist := mgr.agents[nodeId]; exist {
 			err = agent.Join(bagName)
 		}

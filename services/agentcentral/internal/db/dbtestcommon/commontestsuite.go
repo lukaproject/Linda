@@ -1,4 +1,4 @@
-package suboperations_test
+package dbtestcommon
 
 import (
 	"Linda/services/agentcentral/internal/config"
@@ -10,7 +10,7 @@ import (
 )
 
 type CommonTestSuite struct {
-	dsn string
+	DSN string
 
 	suite.Suite
 }
@@ -18,9 +18,9 @@ type CommonTestSuite struct {
 func (cts *CommonTestSuite) HealthCheckAndSetup() {
 	var err error
 	func() {
-		cts.dsn = config.TestConfig().PGSQL_DSN
+		cts.DSN = config.TestConfig().PGSQL_DSN
 		defer xerr.Recover(&err)
-		db.InitialWithDSN(cts.dsn)
+		db.InitialWithDSN(cts.DSN)
 	}()
 	if err != nil {
 		cts.T().Logf("failed to connect db, err is %v", err)

@@ -5,6 +5,7 @@ import (
 	"Linda/baselibs/testcommon/gen"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
+	"Linda/services/agentcentral/internal/db/dbtestcommon"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -17,7 +18,7 @@ import (
 )
 
 type tasksTestSuite struct {
-	CommonTestSuite
+	dbtestcommon.CommonTestSuite
 }
 
 func (s *tasksTestSuite) TestCreateTask() {
@@ -193,7 +194,7 @@ func (s *tasksTestSuite) TestListTasks_Prefix_Limit() {
 func (s *tasksTestSuite) SetupSuite() {
 	s.HealthCheckAndSetup()
 	s.DropTables()
-	db.ReInitialWithDSN(s.dsn)
+	db.ReInitialWithDSN(s.DSN)
 }
 
 func TestTaskstestSuite(t *testing.T) {

@@ -1,6 +1,9 @@
 package data
 
-import "sync"
+import (
+	"Linda/baselibs/abstractions/xctx"
+	"sync"
+)
 
 type InstanceManager struct {
 	// 我们只需要保证不要同时写就OK了，同时读没关系
@@ -24,8 +27,8 @@ func Instance() *InstanceManager {
 }
 
 func (im *InstanceManager) UpdateNodeData(updateFunc func(*NodeData) *NodeData) {
-	im.ndMut.Lock()
-	defer im.ndMut.Unlock()
-	im.NodeData = updateFunc(im.NodeData)
-	im.NodeData.Store()
+	xctx.NewLocker(&im.ndMut).Run(func() {
+		im.NodeData = updateFunc(im.NodeData)
+		im.NodeData.Store()
+	})
 }
