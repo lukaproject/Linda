@@ -29,3 +29,10 @@ func (m *tasksManager) GetTask(taskName string) (task *models.Task) {
 	task = db.NewDBOperations().Tasks.Get(m.BagName, taskName)
 	return
 }
+
+func NewTasksMgr(bagName string, queCli taskqueueclient.Client) TasksMgr {
+	return &tasksManager{
+		BagName: bagName,
+		queCli:  queCli,
+	}
+}

@@ -4,6 +4,7 @@ import (
 	"Linda/baselibs/abstractions"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
+	"Linda/services/agentcentral/internal/db/dbtestcommon"
 	"fmt"
 	"net/url"
 	"slices"
@@ -18,7 +19,7 @@ import (
 )
 
 type bagsTestSuite struct {
-	CommonTestSuite
+	dbtestcommon.CommonTestSuite
 }
 
 func (s *bagsTestSuite) TestBagCURD() {
@@ -108,7 +109,7 @@ func (s *bagsTestSuite) TestListBagNames() {
 func (s *bagsTestSuite) SetupSuite() {
 	s.HealthCheckAndSetup()
 	s.DropTables()
-	db.ReInitialWithDSN(s.dsn)
+	db.ReInitialWithDSN(s.DSN)
 }
 
 func TestBagsTestSuite(t *testing.T) {
