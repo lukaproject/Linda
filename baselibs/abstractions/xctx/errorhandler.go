@@ -14,3 +14,9 @@ func (eh *ErrorHandler) Run(f func()) {
 func NewErrHandler() *ErrorHandler {
 	return &ErrorHandler{}
 }
+
+func NewErrHandleRun(f func()) *ErrorHandler {
+	eh := NewErrHandler()
+	eh.Run(f)
+	return eh
+}

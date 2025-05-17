@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
+	"Linda/baselibs/abstractions/xdebug"
 	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/apis"
 	"Linda/services/agentcentral/apis/middlewares"
@@ -50,6 +51,9 @@ func main() {
 	apis.EnableTasks(r)
 	apis.EnableAgents(r)
 	apis.EnableInnerCall(r)
+	if config.Instance().Env == "debug" {
+		xdebug.EnablePprof(r)
+	}
 	r.Use(
 		middlewares.LogRequest,
 		middlewares.SetHeaderJSON,
@@ -59,7 +63,7 @@ func main() {
 	logic.InitTasksMgr()
 	logic.InitAsyncWorks()
 	port := fmt.Sprintf(":%d", config.Instance().Port)
-	xlog.Infof("serve in %s", port)
+	xlog.Infof("serve in %s, environments is %s", port, config.Instance().Env)
 	c := config.Instance()
 	if !c.SSL.Enabled {
 		xlog.Fatal(http.ListenAndServe(port, r))

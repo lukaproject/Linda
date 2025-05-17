@@ -1,10 +1,12 @@
 package client
 
 import (
+	"Linda/baselibs/abstractions/xctx"
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
 
 	"github.com/gorilla/websocket"
+	"github.com/lukaproject/xerr"
 )
 
 type IClient interface {
@@ -18,24 +20,20 @@ type Client struct {
 }
 
 func (c *Client) HeartBeat(agentHB *models.HeartBeatFromAgent) (serverHB *models.HeartBeatFromServer, err error) {
-	if err = hbconn.WriteMessage(c.conn, agentHB); err != nil {
-		return
-	}
-	serverHB = &models.HeartBeatFromServer{}
-	if err = hbconn.ReadMessage(c.conn, serverHB); err != nil {
-		return
-	}
+	err = xctx.NewErrHandleRun(func() {
+		xerr.Must0(hbconn.WriteMessage(c.conn, agentHB))
+		serverHB = &models.HeartBeatFromServer{}
+		xerr.Must0(hbconn.ReadMessage(c.conn, serverHB))
+	}).Err
 	return
 }
 
 func (c *Client) HeartBeatStart(req *models.HeartBeatStart) (resp *models.HeartBeatStartResponse, err error) {
-	if err = hbconn.WriteMessage(c.conn, req); err != nil {
-		return
-	}
-	resp = &models.HeartBeatStartResponse{}
-	if err = hbconn.ReadMessage(c.conn, resp); err != nil {
-		return
-	}
+	err = xctx.NewErrHandleRun(func() {
+		xerr.Must0(hbconn.WriteMessage(c.conn, req))
+		resp = &models.HeartBeatStartResponse{}
+		xerr.Must0(hbconn.ReadMessage(c.conn, resp))
+	}).Err
 	return
 }
 
