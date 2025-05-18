@@ -7,9 +7,10 @@ a TVMs cluster manager.
 [![Low Cost Tests](https://github.com/lukaproject/Linda/actions/workflows/low-cost-tests.yml/badge.svg)](https://github.com/lukaproject/Linda/actions/workflows/low-cost-tests.yml)
 [![codecov](https://codecov.io/gh/lukaproject/Linda/graph/badge.svg?token=I9LZV6GaLS)](https://codecov.io/gh/lukaproject/Linda)
 
-# Environment preparation
+# Tools
 
 - [Tools](tools/tools.md)
+- [pprof](tools/pprof.md)
 
 # Design doc
 
