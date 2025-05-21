@@ -6,7 +6,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/websocket v1.5.3
 	github.com/lukaproject/xerr v0.0.0-20240622080714-d12bd2b3a6fc
-	gorm.io/gorm v1.25.12
+	gorm.io/gorm v1.26.1
 )
 
 require (
