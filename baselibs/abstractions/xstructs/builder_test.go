@@ -56,7 +56,7 @@ func (s *testBuilderSuites) TestCyclingDependency() {
 	s.NotNil(builder.Build())
 }
 
-func (s *testBuilderSuites) TestNormalScenario() {
+func (s *testBuilderSuites) TestNormalScenario_0() {
 	builder := xstructs.NewDepStructsBuilder()
 	ac := &AClass{
 		DepStructHelper: xstructs.DepStructHelper{
@@ -73,6 +73,30 @@ func (s *testBuilderSuites) TestNormalScenario() {
 
 	ac.AddDeps(bc)
 	bc.AddDeps(cc)
+	builder.AddDepStructs(ac, bc, cc)
+	s.Nil(builder.Build())
+
+	s.True(ac.inited)
+	s.True(bc.inited)
+	s.True(cc.inited)
+}
+
+func (s *testBuilderSuites) TestNormalScenario_1() {
+	builder := xstructs.NewDepStructsBuilder()
+	ac := &AClass{
+		DepStructHelper: xstructs.DepStructHelper{
+			NameStr: "a",
+		}}
+	bc := &BClass{
+		DepStructHelper: xstructs.DepStructHelper{
+			NameStr: "b",
+		}}
+	cc := &CClass{
+		DepStructHelper: xstructs.DepStructHelper{
+			NameStr: "c",
+		}}
+
+	ac.AddDeps(bc, cc)
 	builder.AddDepStructs(ac, bc, cc)
 	s.Nil(builder.Build())
 
