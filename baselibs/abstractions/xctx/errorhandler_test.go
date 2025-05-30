@@ -11,8 +11,7 @@ import (
 var errTest = errors.New("test error")
 
 func TestErrorHandler_Run(t *testing.T) {
-	eh := xctx.NewErrHandler()
-	eh.Run(
+	eh := xctx.NewErrHandleRun(
 		func() {
 			panic(errTest)
 		})
