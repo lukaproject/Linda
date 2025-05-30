@@ -39,11 +39,11 @@ func main() {
 	flag.Parse()
 	config.Initial(*configfile)
 	xlog.Initial()
+	c := config.Instance()
 
-	db.InitialWithDSN(config.Instance().PGSQL_DSN)
+	db.InitialWithDSN(c.PGSQL_DSN)
 	r := mux.NewRouter()
-	r.PathPrefix("/swagger").Handler(
-		httpSwagger.Handler()).Methods(http.MethodGet)
+	r.PathPrefix("/swagger").Handler(httpSwagger.Handler()).Methods(http.MethodGet)
 
 	apis.EnableHeartBeat(r)
 	apis.EnableHealthCheck(r)
@@ -51,7 +51,7 @@ func main() {
 	apis.EnableTasks(r)
 	apis.EnableAgents(r)
 	apis.EnableInnerCall(r)
-	if config.Instance().Env == "debug" {
+	if c.Env == "debug" {
 		xdebug.EnablePprof(r)
 	}
 	r.Use(
@@ -62,9 +62,9 @@ func main() {
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()
 	logic.InitAsyncWorks()
-	port := fmt.Sprintf(":%d", config.Instance().Port)
-	xlog.Infof("serve in %s, environments is %s", port, config.Instance().Env)
-	c := config.Instance()
+
+	port := fmt.Sprintf(":%d", c.Port)
+	xlog.Infof("serve in %s, environments is %s", port, c.Env)
 	if !c.SSL.Enabled {
 		xlog.Fatal(http.ListenAndServe(port, r))
 	} else {
