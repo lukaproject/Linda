@@ -16,7 +16,7 @@ type IClient interface {
 
 // 请注意，这并不是一个协程安全的client
 type Client struct {
-	conn *websocket.Conn
+	conn hbconn.IWSConn
 }
 
 func (c *Client) HeartBeat(agentHB *models.HeartBeatFromAgent) (serverHB *models.HeartBeatFromServer, err error) {
@@ -42,12 +42,15 @@ func (c *Client) Close() {
 }
 
 func New(url string) (*Client, error) {
-	cli := &Client{}
 	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
-
 	if err != nil {
 		return nil, err
 	}
+	return NewClientWithWSConn(conn), nil
+}
+
+func NewClientWithWSConn(conn hbconn.IWSConn) *Client {
+	cli := &Client{}
 	cli.conn = conn
-	return cli, nil
+	return cli
 }
