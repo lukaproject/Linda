@@ -1,7 +1,7 @@
 package config
 
 type Config struct {
-	Env       string `xdefault:"test" xenv:"env"`
+	Env       string `xdefault:"debug" xenv:"env"`
 	PGSQL_DSN string `xdefault:"host=localhost user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai"`
 	Port      int    `xdefault:"5883"`
 	Redis     *RedisConfig

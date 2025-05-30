@@ -12,6 +12,8 @@ services:
     image: linda-agentcentral:latest
     restart: always
     network_mode: host
+    environment:
+      - env=debug
     depends_on:
       - redis
       - fileservicefe

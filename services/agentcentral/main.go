@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
+	"Linda/baselibs/abstractions/xdebug"
 	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/apis"
 	"Linda/services/agentcentral/apis/middlewares"
@@ -38,11 +39,11 @@ func main() {
 	flag.Parse()
 	config.Initial(*configfile)
 	xlog.Initial()
+	c := config.Instance()
 
-	db.InitialWithDSN(config.Instance().PGSQL_DSN)
+	db.InitialWithDSN(c.PGSQL_DSN)
 	r := mux.NewRouter()
-	r.PathPrefix("/swagger").Handler(
-		httpSwagger.Handler()).Methods(http.MethodGet)
+	r.PathPrefix("/swagger").Handler(httpSwagger.Handler()).Methods(http.MethodGet)
 
 	apis.EnableHeartBeat(r)
 	apis.EnableHealthCheck(r)
@@ -50,6 +51,9 @@ func main() {
 	apis.EnableTasks(r)
 	apis.EnableAgents(r)
 	apis.EnableInnerCall(r)
+	if c.Env == "debug" {
+		xdebug.EnablePprof(r)
+	}
 	r.Use(
 		middlewares.LogRequest,
 		middlewares.SetHeaderJSON,
@@ -58,9 +62,9 @@ func main() {
 	logic.InitAgentsMgr()
 	logic.InitTasksMgr()
 	logic.InitAsyncWorks()
-	port := fmt.Sprintf(":%d", config.Instance().Port)
-	xlog.Infof("serve in %s", port)
-	c := config.Instance()
+
+	port := fmt.Sprintf(":%d", c.Port)
+	xlog.Infof("serve in %s, environments is %s", port, c.Env)
 	if !c.SSL.Enabled {
 		xlog.Fatal(http.ListenAndServe(port, r))
 	} else {
