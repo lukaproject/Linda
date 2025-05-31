@@ -3,7 +3,6 @@ package task
 import (
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/utils"
-	"errors"
 	"io"
 	"os"
 	"os/exec"
@@ -80,7 +79,7 @@ func (t *task) Start() (err error) {
 
 func (t *task) Wait() (err error) {
 	if t.cmd == nil {
-		return errors.New("cmd is nil")
+		return ErrCommandIsNil
 	}
 	closeFunc := func(closer io.Closer) {
 		if closer != nil {
@@ -94,6 +93,7 @@ func (t *task) Wait() (err error) {
 	closeFunc(t.stdoutFile)
 	closeFunc(t.stderrFile)
 	t.saveExitCode(err)
+	t.isFinished = true
 	return err
 }
 
@@ -122,19 +122,21 @@ func (t *task) IsFinished() bool {
 
 func (t *task) ExitCode() int {
 	if t.IsFinished() {
-		return 0
+		return t.exitCode
 	}
-	return 1
+	return -1
 }
 
 func (t *task) saveExitCode(err error) {
-	if err != nil {
+	if err == nil {
 		t.exitCode = 0
 		return
 	}
 	// 把抛出的exitcode记录一下
-	if err, ok := err.(*exec.ExitError); ok {
-		t.exitCode = err.ExitCode()
+	if err1, ok := err.(*exec.ExitError); ok {
+		t.exitCode = err1.ExitCode()
+	} else {
+		logger.Errorf("not a exit code error, err is %v", err)
 	}
 }
 

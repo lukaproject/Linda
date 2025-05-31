@@ -121,7 +121,7 @@ done
 func (s *taskTestLinuxSuite) TestRunTask_ExitCodeNonZero() {
 	s.writeStrToTempShellFile(
 		`
-exit 1
+exit 9
 		`)
 	td := data.TaskData{
 		Name:         "testtask3",
@@ -135,7 +135,7 @@ exit 1
 	xerr.Must0(nowtask.Start())
 	err := nowtask.Wait()
 	s.NotNil(err)
-	s.Equal(1, nowtask.ExitCode())
+	s.Equal(9, nowtask.ExitCode())
 }
 
 func TestTaskTestLinuxSuiteMain(t *testing.T) {
