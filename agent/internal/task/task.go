@@ -4,6 +4,7 @@ import (
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/utils"
 	"errors"
+	"io"
 	"os"
 	"os/exec"
 	"path"
@@ -81,20 +82,17 @@ func (t *task) Wait() (err error) {
 	if t.cmd == nil {
 		return errors.New("cmd is nil")
 	}
+	closeFunc := func(closer io.Closer) {
+		if closer != nil {
+			closer.Close()
+		}
+	}
 	func() {
 		defer xerr.Recover(&err)
 		xerr.Must0(t.cmd.Wait())
-
-		if t.stdoutFile != nil {
-			xerr.Must0(t.stdoutFile.Close())
-			t.stdoutFile = nil
-		}
-
-		if t.stderrFile != nil {
-			xerr.Must0(t.stderrFile.Close())
-			t.stderrFile = nil
-		}
 	}()
+	closeFunc(t.stdoutFile)
+	closeFunc(t.stderrFile)
 	t.saveExitCode(err)
 	return err
 }
