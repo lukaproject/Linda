@@ -8,6 +8,8 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  # manually start testing.
+  workflow_dispatch:
 
 jobs:
 
