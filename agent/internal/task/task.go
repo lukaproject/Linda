@@ -3,7 +3,7 @@ package task
 import (
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/utils"
-	"io"
+	"Linda/baselibs/abstractions/xctx"
 	"os"
 	"os/exec"
 	"path"
@@ -81,38 +81,17 @@ func (t *task) Wait() (err error) {
 	if t.cmd == nil {
 		return ErrCommandIsNil
 	}
-	closeFunc := func(closer io.Closer) {
-		if closer != nil {
-			closer.Close()
-		}
-	}
-	func() {
-		defer xerr.Recover(&err)
-		xerr.Must0(t.cmd.Wait())
-	}()
-	closeFunc(t.stdoutFile)
-	closeFunc(t.stderrFile)
-	t.saveExitCode(err)
+	err = t.saveExitCode(t.cmd.Wait())
+	xctx.Close(t.stdoutFile)
+	xctx.Close(t.stderrFile)
 	t.isFinished = true
 	return err
 }
 
 func (t *task) Stop() (err error) {
-	func() {
-		defer xerr.Recover(&err)
-		xerr.Must0(t.cmd.Process.Kill())
-		t.isFinished = true
-
-		if t.stdoutFile != nil {
-			xerr.Must0(t.stdoutFile.Close())
-			t.stdoutFile = nil
-		}
-
-		if t.stderrFile != nil {
-			xerr.Must0(t.stderrFile.Close())
-			t.stderrFile = nil
-		}
-	}()
+	err = t.cmd.Process.Kill()
+	xctx.Close(t.stdoutFile)
+	xctx.Close(t.stderrFile)
 	return
 }
 
@@ -127,17 +106,21 @@ func (t *task) ExitCode() int {
 	return -1
 }
 
-func (t *task) saveExitCode(err error) {
+// saveExitCode 如果是nil或者是exitError，那么就记录exitCode，
+// 原封不动的返回error
+func (t *task) saveExitCode(err error) error {
 	if err == nil {
 		t.exitCode = 0
-		return
+		return nil
 	}
 	// 把抛出的exitcode记录一下
 	if err1, ok := err.(*exec.ExitError); ok {
+		logger.Errorf("exit code is not zero, exit code is %d", err1.ExitCode())
 		t.exitCode = err1.ExitCode()
 	} else {
 		logger.Errorf("not a exit code error, err is %v", err)
 	}
+	return err
 }
 
 func NewTask(

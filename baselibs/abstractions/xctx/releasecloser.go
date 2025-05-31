@@ -19,3 +19,9 @@ func NewCloser(closer io.Closer) *ReleaseCloser {
 		closer: closer,
 	}
 }
+
+func Close(closer io.Closer) {
+	if closer != nil {
+		closer.Close()
+	}
+}

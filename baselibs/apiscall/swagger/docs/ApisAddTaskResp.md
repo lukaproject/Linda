@@ -5,6 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **BagName** | **string** |  | [optional] [default to null]
 **CreateTimeMs** | **int64** |  | [optional] [default to null]
+**ExitCode** | **int32** |  | [optional] [default to null]
 **FinishTimeMs** | **int64** |  | [optional] [default to null]
 **NodeId** | **string** |  | [optional] [default to null]
 **Priority** | **int32** |  | [optional] [default to null]

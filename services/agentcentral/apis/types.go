@@ -12,6 +12,7 @@ type Task struct {
 	FinishTimeMs    int64  `swaggertype:"integer" format:"int64" json:"finishTimeMs"`
 	ScheduledTimeMs int64  `swaggertype:"integer" format:"int64" json:"scheduledTimeMs"`
 	NodeId          string `json:"nodeId"`
+	ExitCode        int32  `swaggertype:"integer" format:"int32" json:"exitCode"`
 }
 
 type Bag struct {

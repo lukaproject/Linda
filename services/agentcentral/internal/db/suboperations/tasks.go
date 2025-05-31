@@ -32,21 +32,42 @@ func (t *Tasks) UpdateOrderId(
 		Update("order_id", orderId).Error)
 }
 
-func (t *Tasks) UpdateFinishedTime(
+func (t *Tasks) PersistFinishedTasks(
 	bagName string,
-	taskNames []string,
-	finishTimeMs int64,
+	taskResults []models.FinishedTaskResult,
+	finishedTimeMs int64,
 ) {
-	xerr.Must0(t.dbi.
-		Model(&models.Task{}).
-		Where("task_name IN ?", taskNames).
-		Where("order_id IS NOT NULL").
-		Where("order_id != 0").
-		Update("finish_time_ms", finishTimeMs).
-		Error)
+	n := len(taskResults)
+	finshedTasks := make([]map[string]any, n)
+	for i := range n {
+		finshedTasks[i] = map[string]any{
+			"task_name":      taskResults[i].Name,
+			"bag_name":       bagName,
+			"finish_time_ms": finishedTimeMs,
+			"exit_code":      taskResults[i].ExitCode,
+		}
+	}
+	clauses := clause.OnConflict{
+		Columns: []clause.Column{
+			{Name: "task_name"},
+		},
+		DoUpdates: clause.AssignmentColumns([]string{
+			"finish_time_ms",
+			"exit_code",
+		}),
+	}
+
+	xerr.Must0(
+		t.dbi.
+			Model(&models.Task{}).
+			Clauses(clauses).
+			Where("order_id IS NOT NULL").
+			Where("order_id != 0").
+			Create(finshedTasks).
+			Error)
 }
 
-// Update Scheduled Time
+// Update Scheduled Time and node_ids and accesskeys.
 func (t *Tasks) UpdateScheduledTime(
 	bagName string,
 	taskNames []string,

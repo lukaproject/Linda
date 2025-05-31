@@ -660,6 +660,10 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "int64"
                 },
+                "exitCode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
                 "finishTimeMs": {
                     "type": "integer",
                     "format": "int64"
@@ -747,6 +751,10 @@ const docTemplate = `{
                     "type": "integer",
                     "format": "int64"
                 },
+                "exitCode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
                 "finishTimeMs": {
                     "type": "integer",
                     "format": "int64"
@@ -823,6 +831,10 @@ const docTemplate = `{
                 "createTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "exitCode": {
+                    "type": "integer",
+                    "format": "int32"
                 },
                 "finishTimeMs": {
                     "type": "integer",

@@ -3,11 +3,17 @@ package xctx
 import "github.com/lukaproject/xerr"
 
 type ErrorHandler struct {
-	Err error
+	Err         error
+	FinallyFunc func(err error)
 }
 
 func (eh *ErrorHandler) Run(f func()) {
-	defer xerr.Recover(&eh.Err)
+	defer func() {
+		xerr.Recover(&eh.Err)
+		if eh.FinallyFunc != nil {
+			eh.FinallyFunc(eh.Err)
+		}
+	}()
 	f()
 }
 

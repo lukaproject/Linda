@@ -11,6 +11,7 @@ package swagger
 type ApisTask struct {
 	BagName string `json:"bagName,omitempty"`
 	CreateTimeMs int64 `json:"createTimeMs,omitempty"`
+	ExitCode int32 `json:"exitCode,omitempty"`
 	FinishTimeMs int64 `json:"finishTimeMs,omitempty"`
 	NodeId string `json:"nodeId,omitempty"`
 	Priority int32 `json:"priority,omitempty"`

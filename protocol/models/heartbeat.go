@@ -13,9 +13,8 @@ type HeartBeatStartResponse struct {
 type HeartBeatFromAgent struct {
 	SeqId int64
 
-	RunningTaskNames  []string
-	FinishedTaskNames []string
-	FinishedTasks     []FinishedTaskResult
+	RunningTaskNames []string
+	FinishedTasks    []FinishedTaskResult
 
 	Node NodeInfo
 }
@@ -67,5 +66,5 @@ type ScheduledTaskInfo struct {
 
 type FinishedTaskResult struct {
 	Name     string
-	ExitCode string
+	ExitCode int32
 }

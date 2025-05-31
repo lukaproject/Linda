@@ -653,6 +653,10 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "exitCode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
                 "finishTimeMs": {
                     "type": "integer",
                     "format": "int64"
@@ -740,6 +744,10 @@
                     "type": "integer",
                     "format": "int64"
                 },
+                "exitCode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
                 "finishTimeMs": {
                     "type": "integer",
                     "format": "int64"
@@ -816,6 +824,10 @@
                 "createTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                },
+                "exitCode": {
+                    "type": "integer",
+                    "format": "int32"
                 },
                 "finishTimeMs": {
                     "type": "integer",
