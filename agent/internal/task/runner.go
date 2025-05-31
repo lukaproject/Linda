@@ -11,7 +11,7 @@ import (
 type runner struct {
 	FinishedTasksCount atomic.Int32
 	// 完成的任务会被塞入这个channel中
-	FinishedTaskChan chan string
+	FinishedTaskChan chan FinishedTaskResult
 	ResourceCount    atomic.Int32
 	MaxResourceCount int
 
@@ -24,7 +24,7 @@ func NewRunner(initer RunnerIniter) *runner {
 	runner := &runner{
 		runningTasksMap:  make(map[string]Task),
 		MaxResourceCount: initer.MaxResourceCount,
-		FinishedTaskChan: make(chan string, 32),
+		FinishedTaskChan: make(chan FinishedTaskResult, 32),
 	}
 	runner.initial()
 	return runner
@@ -78,7 +78,10 @@ func (r *runner) taskRunningCallback(t Task) {
 	}()
 	r.ResourceCount.Add(int32(-t.GetResource()))
 	r.FinishedTasksCount.Add(1)
-	r.FinishedTaskChan <- t.GetName()
+	r.FinishedTaskChan <- FinishedTaskResult{
+		Name:     t.GetName(),
+		ExitCode: int32(t.ExitCode()),
+	}
 }
 
 func (r *runner) createWorkingDir(t Task) (err error) {

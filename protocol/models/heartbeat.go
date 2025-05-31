@@ -15,6 +15,7 @@ type HeartBeatFromAgent struct {
 
 	RunningTaskNames  []string
 	FinishedTaskNames []string
+	FinishedTasks     []FinishedTaskResult
 
 	Node NodeInfo
 }
@@ -62,4 +63,9 @@ type ScheduledTaskInfo struct {
 	Name string
 	// agent只有拿到这个AccessKey才能去访问task
 	AccessKey string
+}
+
+type FinishedTaskResult struct {
+	Name     string
+	ExitCode string
 }

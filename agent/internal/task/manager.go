@@ -49,7 +49,7 @@ func (m *Mgr) PopFinishedTasks() (finishedTaskNames []string) {
 	for ; count > 0; count-- {
 		t, ok := <-m.taskRunner.FinishedTaskChan
 		if ok {
-			finishedTaskNames = append(finishedTaskNames, t)
+			finishedTaskNames = append(finishedTaskNames, t.Name)
 		} else {
 			break
 		}

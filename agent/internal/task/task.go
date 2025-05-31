@@ -27,6 +27,7 @@ type Task interface {
 	Start() error
 	Stop() error
 	Wait() error
+	ExitCode() int
 	IsFinished() bool
 }
 
@@ -34,6 +35,7 @@ type task struct {
 	data.TaskData
 	TaskMetrics
 	isFinished bool
+	exitCode   int
 	cmd        *exec.Cmd
 
 	stdoutFile *os.File
@@ -93,6 +95,7 @@ func (t *task) Wait() (err error) {
 			t.stderrFile = nil
 		}
 	}()
+	t.saveExitCode(err)
 	return err
 }
 
@@ -117,6 +120,24 @@ func (t *task) Stop() (err error) {
 
 func (t *task) IsFinished() bool {
 	return t.isFinished
+}
+
+func (t *task) ExitCode() int {
+	if t.IsFinished() {
+		return 0
+	}
+	return 1
+}
+
+func (t *task) saveExitCode(err error) {
+	if err != nil {
+		t.exitCode = 0
+		return
+	}
+	// 把抛出的exitcode记录一下
+	if err, ok := err.(*exec.ExitError); ok {
+		t.exitCode = err.ExitCode()
+	}
 }
 
 func NewTask(
