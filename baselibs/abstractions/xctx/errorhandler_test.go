@@ -17,3 +17,19 @@ func TestErrorHandler_Run(t *testing.T) {
 		})
 	assert.Equal(t, errTest, eh.Err)
 }
+
+func TestErrorHandler_RunWithFinallyFunc(t *testing.T) {
+	count := 0
+	eh := xctx.ErrorHandler{
+		FinallyFunc: func() {
+			count++
+		},
+	}
+
+	eh.Run(func() {
+		panic(errTest)
+	})
+
+	assert.Equal(t, errTest, eh.Err)
+	assert.Equal(t, 1, count)
+}
