@@ -8,12 +8,10 @@ type ErrorHandler struct {
 }
 
 func (eh *ErrorHandler) Run(f func()) {
-	defer func() {
-		xerr.Recover(&eh.Err)
-		if eh.FinallyFunc != nil {
-			eh.FinallyFunc(eh.Err)
-		}
-	}()
+	defer xerr.Recover(&eh.Err)
+	if eh.FinallyFunc != nil {
+		defer eh.FinallyFunc(eh.Err)
+	}
 	f()
 }
 
