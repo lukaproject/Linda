@@ -86,15 +86,15 @@ for ($i = 1; $i -le 10; $i++) {
 }
 
 func (s *taskTestWindowsSuite) TestRunTask_ExitCodeNonZero() {
-	s.writeStrToTempShellFile(
+	s.writeStrToTempPowerShellFile(
 		`
-Exit 1
+Exit 5
 		`)
 	td := data.TaskData{
 		Name:         "testtask3",
 		Bag:          "testbag",
 		Resource:     1,
-		PathToScript: s.tempShellPath(),
+		PathToScript: s.tempPowerShellPath(),
 		WorkingDir:   s.TempDir(),
 		TaskDir:      s.TempDir(),
 	}
@@ -102,7 +102,7 @@ Exit 1
 	xerr.Must0(nowtask.Start())
 	err := nowtask.Wait()
 	s.NotNil(err)
-	s.Equal(1, nowtask.ExitCode())
+	s.Equal(5, nowtask.ExitCode())
 }
 
 func TestTaskTestWindowsSuiteMain(t *testing.T) {
