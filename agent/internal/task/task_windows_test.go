@@ -85,6 +85,26 @@ for ($i = 1; $i -le 10; $i++) {
 	s.T().Log(s.getStrFromFile(path.Join(td.TaskDir, ConstStdErrFile)))
 }
 
+func (s *taskTestWindowsSuite) TestRunTask_ExitCodeNonZero() {
+	s.writeStrToTempPowerShellFile(
+		`
+Exit 5
+		`)
+	td := data.TaskData{
+		Name:         "testtask3",
+		Bag:          "testbag",
+		Resource:     1,
+		PathToScript: s.tempPowerShellPath(),
+		WorkingDir:   s.TempDir(),
+		TaskDir:      s.TempDir(),
+	}
+	nowtask := NewTask(td)
+	xerr.Must0(nowtask.Start())
+	err := nowtask.Wait()
+	s.NotNil(err)
+	s.Equal(5, nowtask.ExitCode())
+}
+
 func TestTaskTestWindowsSuiteMain(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		suite.Run(t, new(taskTestWindowsSuite))

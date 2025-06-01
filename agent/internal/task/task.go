@@ -3,7 +3,7 @@ package task
 import (
 	"Linda/agent/internal/data"
 	"Linda/agent/internal/utils"
-	"errors"
+	"Linda/baselibs/abstractions/xctx"
 	"os"
 	"os/exec"
 	"path"
@@ -27,6 +27,7 @@ type Task interface {
 	Start() error
 	Stop() error
 	Wait() error
+	ExitCode() int
 	IsFinished() bool
 }
 
@@ -34,6 +35,7 @@ type task struct {
 	data.TaskData
 	TaskMetrics
 	isFinished bool
+	exitCode   int
 	cmd        *exec.Cmd
 
 	stdoutFile *os.File
@@ -77,46 +79,48 @@ func (t *task) Start() (err error) {
 
 func (t *task) Wait() (err error) {
 	if t.cmd == nil {
-		return errors.New("cmd is nil")
+		return ErrCommandIsNil
 	}
-	func() {
-		defer xerr.Recover(&err)
-		xerr.Must0(t.cmd.Wait())
-
-		if t.stdoutFile != nil {
-			xerr.Must0(t.stdoutFile.Close())
-			t.stdoutFile = nil
-		}
-
-		if t.stderrFile != nil {
-			xerr.Must0(t.stderrFile.Close())
-			t.stderrFile = nil
-		}
-	}()
+	err = t.saveExitCode(t.cmd.Wait())
+	xctx.Close(t.stdoutFile)
+	xctx.Close(t.stderrFile)
+	t.isFinished = true
 	return err
 }
 
 func (t *task) Stop() (err error) {
-	func() {
-		defer xerr.Recover(&err)
-		xerr.Must0(t.cmd.Process.Kill())
-		t.isFinished = true
-
-		if t.stdoutFile != nil {
-			xerr.Must0(t.stdoutFile.Close())
-			t.stdoutFile = nil
-		}
-
-		if t.stderrFile != nil {
-			xerr.Must0(t.stderrFile.Close())
-			t.stderrFile = nil
-		}
-	}()
+	err = t.cmd.Process.Kill()
+	xctx.Close(t.stdoutFile)
+	xctx.Close(t.stderrFile)
 	return
 }
 
 func (t *task) IsFinished() bool {
 	return t.isFinished
+}
+
+func (t *task) ExitCode() int {
+	if t.IsFinished() {
+		return t.exitCode
+	}
+	return -1
+}
+
+// saveExitCode 如果是nil或者是exitError，那么就记录exitCode，
+// 原封不动的返回error
+func (t *task) saveExitCode(err error) error {
+	if err == nil {
+		t.exitCode = 0
+		return nil
+	}
+	// 把抛出的exitcode记录一下
+	if err1, ok := err.(*exec.ExitError); ok {
+		logger.Errorf("exit code is not zero, exit code is %d", err1.ExitCode())
+		t.exitCode = err1.ExitCode()
+	} else {
+		logger.Errorf("not a exit code error, err is %v", err)
+	}
+	return err
 }
 
 func NewTask(

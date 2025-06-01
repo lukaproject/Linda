@@ -519,6 +519,9 @@ components:
         createTimeMs:
           type: integer
           format: int64
+        exitCode:
+          type: integer
+          format: int32
         finishTimeMs:
           type: integer
           format: int64
@@ -540,13 +543,14 @@ components:
         workingDir:
           type: string
       example:
-        finishTimeMs: 6
+        finishTimeMs: 1
         scriptPath: scriptPath
         scheduledTimeMs: 5
         workingDir: workingDir
+        exitCode: 6
         bagName: bagName
         taskName: taskName
-        priority: 1
+        priority: 5
         nodeId: nodeId
         createTimeMs: 0
         script: script
@@ -602,6 +606,9 @@ components:
         createTimeMs:
           type: integer
           format: int64
+        exitCode:
+          type: integer
+          format: int32
         finishTimeMs:
           type: integer
           format: int64
@@ -623,13 +630,14 @@ components:
         workingDir:
           type: string
       example:
-        finishTimeMs: 6
+        finishTimeMs: 1
         scriptPath: scriptPath
         scheduledTimeMs: 5
         workingDir: workingDir
+        exitCode: 6
         bagName: bagName
         taskName: taskName
-        priority: 1
+        priority: 5
         nodeId: nodeId
         createTimeMs: 0
         script: script
@@ -673,6 +681,9 @@ components:
         createTimeMs:
           type: integer
           format: int64
+        exitCode:
+          type: integer
+          format: int32
         finishTimeMs:
           type: integer
           format: int64
@@ -694,13 +705,14 @@ components:
         workingDir:
           type: string
       example:
-        finishTimeMs: 6
+        finishTimeMs: 1
         scriptPath: scriptPath
         scheduledTimeMs: 5
         workingDir: workingDir
+        exitCode: 6
         bagName: bagName
         taskName: taskName
-        priority: 1
+        priority: 5
         nodeId: nodeId
         createTimeMs: 0
         script: script

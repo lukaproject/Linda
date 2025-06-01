@@ -211,10 +211,8 @@ func (ah *agentHolder) processFinishedTask(bagName string, msg *models.HeartBeat
 	if bagName == emptyBagName {
 		return nil
 	}
-	if len(msg.FinishedTaskNames) > 0 {
-		go comm.
-			GetAsyncWorksInstance().
-			PersistFinishedTasks(bagName, msg.FinishedTaskNames)
+	if len(msg.FinishedTasks) > 0 {
+		go comm.GetAsyncWorksInstance().PersistFinishedTasks(bagName, msg.FinishedTasks)
 	}
 	return
 }

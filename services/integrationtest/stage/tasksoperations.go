@@ -39,10 +39,14 @@ func (to *TasksOperations) Get(bagName, taskName string) swagger.ApisGetTaskResp
 }
 
 // True for finished, false for not finished.
-func (to *TasksOperations) VerifyTaskIsFinished(bagName, taskName string) bool {
+func (to *TasksOperations) VerifyTaskIsFinished(bagName, taskName string, exitCode int32) bool {
 	resp := to.Get(bagName, taskName)
 	to.t.Logf(
-		"task %s, finished time %d, create time %d, schedule time %d",
-		resp.TaskName, resp.FinishTimeMs, resp.CreateTimeMs, resp.ScheduledTimeMs)
-	return resp.FinishTimeMs != 0
+		"task %s, finished time %d, create time %d, schedule time %d, exit code %d",
+		resp.TaskName,
+		resp.FinishTimeMs,
+		resp.CreateTimeMs,
+		resp.ScheduledTimeMs,
+		resp.ExitCode)
+	return resp.FinishTimeMs != 0 && resp.ExitCode == exitCode
 }

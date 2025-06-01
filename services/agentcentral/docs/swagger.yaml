@@ -41,6 +41,9 @@ definitions:
       createTimeMs:
         format: int64
         type: integer
+      exitCode:
+        format: int32
+        type: integer
       finishTimeMs:
         format: int64
         type: integer
@@ -100,6 +103,9 @@ definitions:
       createTimeMs:
         format: int64
         type: integer
+      exitCode:
+        format: int32
+        type: integer
       finishTimeMs:
         format: int64
         type: integer
@@ -150,6 +156,9 @@ definitions:
         type: string
       createTimeMs:
         format: int64
+        type: integer
+      exitCode:
+        format: int32
         type: integer
       finishTimeMs:
         format: int64

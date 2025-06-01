@@ -19,6 +19,7 @@ func FromTaskModelToTask(taskModel *models.Task, task *Task) {
 	task.TaskDisplayName = taskModel.TaskDisplayName
 	task.TaskName = taskModel.TaskName
 	task.WorkingDir = taskModel.WorkingDir
+	task.ExitCode = taskModel.ExitCode
 }
 
 func FromBagModelToBag(bagModel *models.Bag, bag *Bag) {

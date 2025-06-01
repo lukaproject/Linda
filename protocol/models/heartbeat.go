@@ -13,8 +13,8 @@ type HeartBeatStartResponse struct {
 type HeartBeatFromAgent struct {
 	SeqId int64
 
-	RunningTaskNames  []string
-	FinishedTaskNames []string
+	RunningTaskNames []string
+	FinishedTasks    []FinishedTaskResult
 
 	Node NodeInfo
 }
@@ -62,4 +62,9 @@ type ScheduledTaskInfo struct {
 	Name string
 	// agent只有拿到这个AccessKey才能去访问task
 	AccessKey string
+}
+
+type FinishedTaskResult struct {
+	Name     string
+	ExitCode int32
 }

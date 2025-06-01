@@ -38,8 +38,8 @@ func (aw *AsyncWorks) TaskEnque(
 		})
 }
 
-func (aw *AsyncWorks) PersistFinishedTasks(bagName string, taskNames []string) {
-	db.NewDBOperations().Tasks.UpdateFinishedTime(bagName, taskNames, time.Now().UnixMilli())
+func (aw *AsyncWorks) PersistFinishedTasks(bagName string, tasks []models.FinishedTaskResult) {
+	db.NewDBOperations().Tasks.PersistFinishedTasks(bagName, tasks, time.Now().UnixMilli())
 }
 
 func (aw *AsyncWorks) PersistScheduledTasks(bagName string, tasks []models.ScheduledTaskInfo, nodeId string) {

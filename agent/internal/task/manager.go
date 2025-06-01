@@ -21,7 +21,7 @@ type AddTaskInput struct {
 
 type IMgr interface {
 	AddTask(addTaskInput AddTaskInput)
-	PopFinishedTasks() (finishedTaskNames []string)
+	PopFinishedTasks() (finishedTasks []FinishedTaskResult)
 }
 
 type Mgr struct {
@@ -43,16 +43,19 @@ func (m *Mgr) AddTask(addTaskInput AddTaskInput) {
 	}
 }
 
-func (m *Mgr) PopFinishedTasks() (finishedTaskNames []string) {
+func (m *Mgr) PopFinishedTasks() (finishedTasks []FinishedTaskResult) {
 	count := len(m.taskRunner.FinishedTaskChan)
-	finishedTaskNames = make([]string, 0, count)
+	finishedTasks = make([]FinishedTaskResult, 0, count)
 	for ; count > 0; count-- {
 		t, ok := <-m.taskRunner.FinishedTaskChan
 		if ok {
-			finishedTaskNames = append(finishedTaskNames, t)
+			finishedTasks = append(finishedTasks, t)
 		} else {
 			break
 		}
+	}
+	if len(finishedTasks) > 0 {
+		logger.Infof("finished tasks = %v", finishedTasks)
 	}
 	return
 }

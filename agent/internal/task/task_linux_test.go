@@ -118,6 +118,26 @@ done
 	s.T().Log(s.getStrFromFile(path.Join(td.TaskDir, ConstStdErrFile)))
 }
 
+func (s *taskTestLinuxSuite) TestRunTask_ExitCodeNonZero() {
+	s.writeStrToTempShellFile(
+		`
+exit 9
+		`)
+	td := data.TaskData{
+		Name:         "testtask3",
+		Bag:          "testbag",
+		Resource:     1,
+		PathToScript: s.tempShellPath(),
+		WorkingDir:   s.TempDir(),
+		TaskDir:      s.TempDir(),
+	}
+	nowtask := NewTask(td)
+	xerr.Must0(nowtask.Start())
+	err := nowtask.Wait()
+	s.NotNil(err)
+	s.Equal(9, nowtask.ExitCode())
+}
+
 func TestTaskTestLinuxSuiteMain(t *testing.T) {
 	if runtime.GOOS == "linux" {
 		suite.Run(t, new(taskTestLinuxSuite))

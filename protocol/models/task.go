@@ -19,6 +19,7 @@ type Task struct {
 	FinishTimeMs    int64
 	ScheduledTimeMs int64
 	NodeId          string
+	ExitCode        int32
 
 	TaskBusiness
 }

@@ -82,7 +82,15 @@ func (h *Handler) packReq() (req *models.HeartBeatFromAgent) {
 		BagName: nodeData.BagName,
 	}
 	if h.taskMgr != nil {
-		req.FinishedTaskNames = h.taskMgr.PopFinishedTasks()
+		finishedTaskResult := h.taskMgr.PopFinishedTasks()
+		req.FinishedTasks = make([]models.FinishedTaskResult, 0, len(finishedTaskResult))
+		for _, result := range finishedTaskResult {
+			req.FinishedTasks = append(req.FinishedTasks,
+				models.FinishedTaskResult{
+					Name:     result.Name,
+					ExitCode: result.ExitCode,
+				})
+		}
 	}
 	return
 }

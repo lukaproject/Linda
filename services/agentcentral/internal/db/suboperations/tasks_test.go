@@ -7,12 +7,14 @@ import (
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/db/dbtestcommon"
 	"fmt"
+	"math/rand"
 	"net/url"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/ecodeclub/ekit/slice"
 	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
 )
@@ -89,7 +91,8 @@ func (s *tasksTestSuite) TestGetBagEnqueuedTaskNumber() {
 func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 	dbo := db.NewDBOperations()
 	n := 10
-	taskNames := make([]string, n)
+	tasks := make([]models.FinishedTaskResult, n)
+	mapTasksExitCode := make(map[string]int32)
 	accessKeys := make([]string, n)
 	bagName := "test-task-scheduled-finished-scenario"
 	for i := range n {
@@ -102,7 +105,9 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 		dbo.Tasks.Create(task)
 		s.NotNil(task.TaskName)
 		s.True(task.CreateTimeMs != 0)
-		taskNames[i] = task.TaskName
+		tasks[i].Name = task.TaskName
+		tasks[i].ExitCode = int32(rand.Int() % 10)
+		mapTasksExitCode[tasks[i].Name] = tasks[i].ExitCode
 		var err error
 		accessKeys[i], err = gen.StrGenerate(gen.CharsetLowerCase, 5, 10)
 		s.Nil(err)
@@ -110,15 +115,23 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 	for i := range n {
 		dbo.Tasks.UpdateOrderId(
 			bagName,
-			taskNames[i],
+			tasks[i].Name,
 			dbo.GetBagEnqueuedTaskNumber(bagName)+1,
 		)
 	}
 	nodeId := "test-bag-nodeid"
 	scheduledTime := time.Now().UnixMilli()
 	finishTime := time.Now().UnixMilli()
-	dbo.Tasks.UpdateScheduledTime(bagName, taskNames, accessKeys, nodeId, scheduledTime)
-	dbo.Tasks.UpdateFinishedTime(bagName, taskNames, finishTime)
+	dbo.Tasks.UpdateScheduledTime(
+		bagName,
+		slice.Map(tasks,
+			func(_ int, taskResult models.FinishedTaskResult) string {
+				return taskResult.Name
+			}),
+		accessKeys,
+		nodeId,
+		scheduledTime)
+	dbo.Tasks.PersistFinishedTasks(bagName, tasks, finishTime)
 	taskResults := dbo.Tasks.ListByMultiFields(map[string]any{
 		"bag_name": bagName,
 		"node_id":  nodeId,
@@ -127,6 +140,7 @@ func (s *tasksTestSuite) TestTaskScheduledAndFinishScenario() {
 	for _, task := range taskResults {
 		s.Equal(finishTime, task.FinishTimeMs)
 		s.Equal(scheduledTime, task.ScheduledTimeMs)
+		s.Equal(mapTasksExitCode[task.TaskName], task.ExitCode)
 	}
 }
 

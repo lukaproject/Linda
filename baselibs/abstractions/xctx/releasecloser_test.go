@@ -23,6 +23,16 @@ func (tc *testCloser) AddCount() {
 	}
 }
 
+func TestClose_NilCloser(t *testing.T) {
+	xctx.Close(nil)
+}
+
+func TestClose_NotNilCloser(t *testing.T) {
+	tc := testCloser{}
+	xctx.Close(&tc)
+	assert.True(t, tc.isClosed)
+}
+
 func TestReleaseCloser_Run(t *testing.T) {
 	tc := testCloser{}
 	xctx.NewCloser(&tc).Run(func() {
