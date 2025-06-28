@@ -16,7 +16,7 @@ func GetBagsMgrInstance() BagsMgr {
 func InitBagsMgrInstance() {
 	bagsMgrInstance = &bagsManager{
 		tasksMgrs: make(map[string]TasksMgr),
-		queCli:    taskqueueclient.NewRedisTaskQueueClient(config.Instance().Redis),
+		queCli:    taskqueueclient.NewRedisQuesManageClient(config.Instance().Redis),
 	}
 	bagsMgrInstance.Init()
 }

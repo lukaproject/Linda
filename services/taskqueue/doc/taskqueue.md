@@ -8,3 +8,6 @@
 
 # V0
 可以暂时使用Redis的ZSet来代替，key值设置为 Priority * 1e10 + orderId
+
+# V1
+重新设计taskqueueclient的接口

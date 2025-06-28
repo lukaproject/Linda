@@ -19,8 +19,8 @@ var (
 
 func InitAsyncWorksInstance() {
 	asyncWorksInstance = &AsyncWorks{
-		bagsLocks: &sync.Map{},
-		cli:       taskqueueclient.NewRedisTaskQueueClient(config.Instance().Redis),
+		bagsLocks:     &sync.Map{},
+		quesManageCli: taskqueueclient.NewRedisQuesManageClient(config.Instance().Redis),
 	}
 	lqp := xerr.Must(abstractions.NewListQueryPacker(url.Values{}))
 	ch := db.NewDBOperations().Bags.List(lqp)

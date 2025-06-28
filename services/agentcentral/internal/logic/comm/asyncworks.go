@@ -12,8 +12,8 @@ import (
 )
 
 type AsyncWorks struct {
-	bagsLocks *sync.Map
-	cli       taskqueueclient.Client
+	bagsLocks     *sync.Map
+	quesManageCli taskqueueclient.QuesManageClient
 }
 
 // 同一时刻对于每一个bag，只能有一个task入队
@@ -33,7 +33,8 @@ func (aw *AsyncWorks) TaskEnque(
 			dbo := db.NewDBOperations()
 			count := dbo.GetBagEnqueuedTaskNumber(bagName)
 			dbo.Tasks.UpdateOrderId(bagName, taskName, count+1)
-			xerr.Must0(aw.cli.Enque(taskName, bagName, priority, count+1))
+			// xerr.Must0(aw.cli.Enque(taskName, bagName, priority, count+1))
+			xerr.Must0(xerr.Must(aw.quesManageCli.Get(bagName)).Enque(taskName, priority, count+1))
 			logger.Infof("bag %s, task %s, enque success", bagName, taskName)
 		})
 }

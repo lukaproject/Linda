@@ -25,7 +25,7 @@ func (s *tasksMgrTestSuite) TestTaskMgr_AddTask() {
 	aw := comm.GetAsyncWorksInstance()
 	testBagName := "testBag"
 	testTaskName := "testTask"
-	queCli := taskqueueclient.NewRedisTaskQueueClient(config.Instance().Redis)
+	queCli := taskqueueclient.NewRedisQuesManageClient(config.Instance().Redis)
 	aw.AddBag(testBagName)
 	tasksMgr := tasks.NewTasksMgr(testBagName, queCli)
 

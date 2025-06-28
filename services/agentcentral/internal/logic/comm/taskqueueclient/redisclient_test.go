@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/alicebob/miniredis/v2"
+	"github.com/lukaproject/xerr"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -23,7 +24,7 @@ func (s *redisClientTestSuite) SetupSuite() {
 }
 
 func (s *redisClientTestSuite) TestGeneralWorkFlow() {
-	cli := taskqueueclient.NewRedisTaskQueueClient(s.rdsTestConfig)
+	cli := taskqueueclient.NewRedisQuesManageClient(s.rdsTestConfig)
 	bagName := s.T().Name()
 	enques := map[string]struct {
 		taskName string
@@ -43,12 +44,12 @@ func (s *redisClientTestSuite) TestGeneralWorkFlow() {
 	}
 
 	for taskName, enqueItem := range enques {
-		cli.Enque(taskName, bagName, enqueItem.priority, enqueItem.orderId)
+		xerr.Must(cli.Get(bagName)).Enque(taskName, enqueItem.priority, enqueItem.orderId)
 	}
 
 	last := ""
 	for id := 0; id < len(enques); id++ {
-		taskName, err := cli.Deque(bagName)
+		taskName, err := xerr.Must(cli.Get(bagName)).Deque()
 		s.Nil(err)
 		if last != "" {
 			if enques[taskName].priority == enques[last].priority {
@@ -60,7 +61,7 @@ func (s *redisClientTestSuite) TestGeneralWorkFlow() {
 		}
 	}
 
-	_, err := cli.Deque(bagName)
+	_, err := xerr.Must(cli.Get(bagName)).Deque()
 	s.NotNil(err)
 }
 
