@@ -4,10 +4,8 @@ import (
 	"Linda/baselibs/testcommon/gen"
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
-	"Linda/services/agentcentral/internal/config"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
-	"Linda/services/agentcentral/internal/logic/comm/taskqueueclient"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -42,8 +40,7 @@ type agentHolder struct {
 	lastSeqId       int64
 	maxRunningTasks int
 
-	hbAgent     chan *models.HeartBeatFromAgent
-	tasksClient taskqueueclient.QuesManageClient
+	hbAgent chan *models.HeartBeatFromAgent
 
 	noUploadFiles    []models.FileDescription
 	noUploadFilesMut sync.Mutex
@@ -168,7 +165,7 @@ func (ah *agentHolder) scheduleTasks(
 	}
 	numOfRestResource := ah.maxRunningTasks - len(hbFromAgent.RunningTaskNames)
 	for range numOfRestResource {
-		taskName, err := xerr.Must(ah.tasksClient.Get(ah.nodeStates.BagName)).Deque()
+		taskName, err := comm.GetAsyncWorksInstance().TaskDeque(bagName)
 		if err != nil {
 			logger.Errorf("deque task from bag %s failed, err %v", bagName, err)
 			break
@@ -251,7 +248,6 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 		nodeId:        nodeId,
 		hbAgent:       make(chan *models.HeartBeatFromAgent, 1),
 		lastSeqId:     -1,
-		tasksClient:   taskqueueclient.NewRedisQuesManageClient(config.Instance().Redis),
 		noUploadFiles: make([]models.FileDescription, 0),
 	}
 	hbStart := &models.HeartBeatStart{}

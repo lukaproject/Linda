@@ -33,10 +33,17 @@ func (aw *AsyncWorks) TaskEnque(
 			dbo := db.NewDBOperations()
 			count := dbo.GetBagEnqueuedTaskNumber(bagName)
 			dbo.Tasks.UpdateOrderId(bagName, taskName, count+1)
-			// xerr.Must0(aw.cli.Enque(taskName, bagName, priority, count+1))
 			xerr.Must0(xerr.Must(aw.quesManageCli.Get(bagName)).Enque(taskName, priority, count+1))
 			logger.Infof("bag %s, task %s, enque success", bagName, taskName)
 		})
+}
+
+func (aw *AsyncWorks) TaskDeque(bagName string) (taskName string, err error) {
+	queCli, err := aw.quesManageCli.Get(bagName)
+	if err != nil {
+		return
+	}
+	return queCli.Deque()
 }
 
 func (aw *AsyncWorks) PersistFinishedTasks(bagName string, tasks []models.FinishedTaskResult) {
@@ -64,4 +71,8 @@ func (aw *AsyncWorks) AddBag(bagName string) {
 func (aw *AsyncWorks) DeleteBag(bagName string) {
 	aw.bagsLocks.Delete(bagName)
 	logger.Debugf("remove bag %s 's lock", bagName)
+}
+
+func (aw *AsyncWorks) Initial() {
+
 }

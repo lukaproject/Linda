@@ -1,0 +1,3 @@
+{
+    "go.testTimeout": "5m" // extend test timeout to 5 minutes let integration test run correctly.
+}

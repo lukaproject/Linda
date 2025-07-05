@@ -10,4 +10,4 @@
 可以暂时使用Redis的ZSet来代替，key值设置为 Priority * 1e10 + orderId
 
 # V1
-重新设计taskqueueclient的接口
+重新设计taskqueueclient的接口, 把deque的逻辑从直接调用API下沉到asyncwork中

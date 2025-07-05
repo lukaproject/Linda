@@ -27,6 +27,7 @@ func InitAsyncWorksInstance() {
 	for bagModel := range ch {
 		asyncWorksInstance.AddBag(bagModel.BagName)
 	}
+	asyncWorksInstance.Initial()
 }
 
 func GetAsyncWorksInstance() *AsyncWorks {

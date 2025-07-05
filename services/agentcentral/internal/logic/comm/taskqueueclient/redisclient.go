@@ -74,3 +74,24 @@ func (rqcli *redisQueClient) Deque() (taskName string, err error) {
 	taskName = res[0].Member.(string)
 	return
 }
+
+func (rqcli *redisQueClient) Deques(count int64) (taskNames []string, err error) {
+	cmd := rqcli.rc.ZPopMin(context.Background(), rqcli.bagName, count)
+	if cmd.Err() != nil {
+		err = cmd.Err()
+		return
+	}
+	res, err := cmd.Result()
+	if err != nil {
+		return
+	}
+	if len(res) == 0 {
+		err = errno.ErrEmptyBag
+		return
+	}
+	taskNames = make([]string, 0)
+	for i := range res {
+		taskNames = append(taskNames, res[i].Member.(string))
+	}
+	return
+}
