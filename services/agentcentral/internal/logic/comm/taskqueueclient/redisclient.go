@@ -58,21 +58,11 @@ func (rqcli *redisQueClient) Enque(taskName string, priority uint16, orderId uin
 }
 
 func (rqcli *redisQueClient) Deque() (taskName string, err error) {
-	cmd := rqcli.rc.ZPopMin(context.Background(), rqcli.bagName, 1)
-	if cmd.Err() != nil {
-		err = cmd.Err()
-		return
-	}
-	res, err := cmd.Result()
+	taskNames, err := rqcli.Deques(1)
 	if err != nil {
 		return
 	}
-	if len(res) == 0 {
-		err = errno.ErrEmptyBag
-		return
-	}
-	taskName = res[0].Member.(string)
-	return
+	return taskNames[0], nil
 }
 
 func (rqcli *redisQueClient) Deques(count int64) (taskNames []string, err error) {
