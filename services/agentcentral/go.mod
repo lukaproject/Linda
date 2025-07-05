@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	github.com/alicebob/miniredis/v2 v2.34.0
+	github.com/ecodeclub/ekit v0.0.10
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/gorilla/websocket v1.5.3
