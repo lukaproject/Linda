@@ -7,8 +7,10 @@ import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"errors"
+	"fmt"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/lukaproject/xerr"
@@ -36,6 +38,8 @@ type Mgr interface {
 	CallAgent(nodeId string, callFunc func(agent Agent) error) error
 
 	List(query abstractions.ListQueryPacker) (chan *models.NodeInfo, error)
+	WaitForFileListResponse(nodeId, operationId string, timeout time.Duration) (models.FileListResponse, error)
+	WaitForFileGetResponse(nodeId, operationId string, timeout time.Duration) (*models.FileGetResponse, error)
 }
 
 type agentsmgr struct {
@@ -128,6 +132,64 @@ func (mgr *agentsmgr) List(queryPacker abstractions.ListQueryPacker) (chan *mode
 	}
 
 	return db.NewDBOperations().NodeInfos.List(queryPacker), nil
+}
+
+func (mgr *agentsmgr) WaitForFileListResponse(nodeId, operationId string, timeout time.Duration) (models.FileListResponse, error) {
+	agent, exists := mgr.agents[nodeId]
+	if !exists {
+		return models.FileListResponse{}, fmt.Errorf("node %s not found", nodeId)
+	}
+
+	ah := agent.(*agentHolder)
+	ah.responsesMutex.Lock()
+	responseChan, exists := ah.pendingFileListOps[operationId]
+	ah.responsesMutex.Unlock()
+
+	if !exists {
+		return models.FileListResponse{}, fmt.Errorf("operation %s not found", operationId)
+	}
+
+	select {
+	case response := <-responseChan:
+		return models.FileListResponse{
+			OperationId: response.OperationId,
+			Files:       response.Files,
+			Error:       response.Error,
+		}, nil
+	case <-time.After(timeout):
+		// Clean up pending operation
+		ah.responsesMutex.Lock()
+		delete(ah.pendingFileListOps, operationId)
+		ah.responsesMutex.Unlock()
+		return models.FileListResponse{}, fmt.Errorf("timeout waiting for response")
+	}
+}
+
+func (mgr *agentsmgr) WaitForFileGetResponse(nodeId, operationId string, timeout time.Duration) (*models.FileGetResponse, error) {
+	agent, exists := mgr.agents[nodeId]
+	if !exists {
+		return nil, fmt.Errorf("node %s not found", nodeId)
+	}
+
+	ah := agent.(*agentHolder)
+	ah.responsesMutex.Lock()
+	responseChan, exists := ah.pendingFileGetOps[operationId]
+	ah.responsesMutex.Unlock()
+
+	if !exists {
+		return nil, fmt.Errorf("operation %s not found", operationId)
+	}
+
+	select {
+	case response := <-responseChan:
+		return &response, nil
+	case <-time.After(timeout):
+		// Clean up pending operation
+		ah.responsesMutex.Lock()
+		delete(ah.pendingFileGetOps, operationId)
+		ah.responsesMutex.Unlock()
+		return nil, fmt.Errorf("timeout waiting for response")
+	}
 }
 
 func NewMgr() Mgr {

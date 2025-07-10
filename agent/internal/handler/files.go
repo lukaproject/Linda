@@ -32,3 +32,57 @@ func downloadFiles(logger xlog.Logger, fileMgr filemanager.Mgr, files []models.F
 	}
 	wg.Wait()
 }
+
+func listFileInfos(logger xlog.Logger, fileMgr filemanager.Mgr, files []models.FileListRequest) {
+	logger.Infof("start to download files %v", files)
+	wg := &sync.WaitGroup{}
+	n := len(files)
+	wg.Add(n)
+	responses := make([]models.FileListResponse, n)
+
+	for id, f := range files {
+		go func(responses []models.FileListResponse, idx int, req models.FileListRequest) {
+			defer wg.Done()
+			content, err := fileMgr.ListFileInfos(req.DirPath)
+			responses[idx] = models.FileListResponse{
+				OperationId: req.OperationId,
+				Error:       err.Error(),
+				Files:       content,
+			}
+		}(responses, id, f)
+	}
+
+	for i, resp := range responses {
+		if resp.Error != "" {
+			logger.Errorf("list files from path %s failed, err=%v", files[i].DirPath, resp.Error)
+		}
+	}
+	wg.Wait()
+}
+
+func getFiles(logger xlog.Logger, fileMgr filemanager.Mgr, files []models.FileGetRequest) {
+	logger.Infof("start to download files %v", files)
+	wg := &sync.WaitGroup{}
+	n := len(files)
+	wg.Add(n)
+	responses := make([]models.FileGetResponse, n)
+
+	for id, f := range files {
+		go func(responses []models.FileGetResponse, idx int, req models.FileGetRequest) {
+			defer wg.Done()
+			content, err := fileMgr.GetFile(req.FilePath)
+			responses[idx] = models.FileGetResponse{
+				OperationId: req.OperationId,
+				Content:     content,
+				Error:       err.Error(),
+			}
+		}(responses, id, f)
+	}
+
+	for i, resp := range responses {
+		if resp.Error != "" {
+			logger.Errorf("get file from path %s failed, err=%v", files[i].FilePath, resp.Error)
+		}
+	}
+	wg.Wait()
+}

@@ -1,5 +1,7 @@
 package apis
 
+import "Linda/protocol/models"
+
 type Task struct {
 	TaskName        string `json:"taskName"`
 	TaskDisplayName string `json:"taskDisplayName"`
@@ -81,4 +83,22 @@ type UploadFilesReq struct {
 	} `json:"files"`
 	// nodes id list which will receive these files.
 	Nodes []string `json:"nodes"`
+}
+
+type ListFilesReq struct {
+	// File's location path in node
+	LocationPath string `json:"locationPath"`
+}
+
+type GetFileReq struct {
+	// File's location path in node
+	LocationPath string `json:"locationPath"`
+}
+
+type ListFilesResp struct {
+	Files []models.FileInfo `json:"files"`
+}
+
+type GetFileResp struct {
+	Content models.FileContent
 }
