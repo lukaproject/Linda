@@ -1,9 +1,11 @@
 #!/bin/bash
 
-$PUSH=$1
-$PROXY=$2
-$image="ghcr.io/lukaproject/linda/linda-buildbase-image:latest"
-$dockerfilePath="tools/dockerimages/buildbase/Dockerfile.buildbase"
+set -e
+
+PUSH=$1
+PROXY=$2
+image="ghcr.io/lukaproject/linda/linda-buildbase-image:latest"
+dockerfilePath="tools/dockerimages/buildbase/Dockerfile.buildbase"
 
 echo "build image $image, push $PUSH"
 echo "dockerfile $dockerfilePath"
