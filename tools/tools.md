@@ -73,3 +73,28 @@ systemctl restart docker
 # 判断是否安装成功
 docker buildx version
 ```
+
+## Build
+
+## Build Tools
+
+构建脚本位于[builder.py](builder/builder.py)
+
+请务必在项目根目录执行builder脚本，在执行build任务之前，请先执行`python3 tools/builder/builder.py --setup` 来构建base image
+
+```bash
+python3 tools/builder/builder.py --help
+usage: builder.py [-h] [--setup | --no-setup] [--agent | --no-agent] [--agentcentral | --no-agentcentral]
+                  [--fileservicefe | --no-fileservicefe]
+
+builder input args
+
+options:
+  -h, --help            show this help message and exit
+  --setup, --no-setup   setup develop environment (default: False)
+  --agent, --no-agent   build agent (default: False)
+  --agentcentral, --no-agentcentral
+                        build agentcentral (default: False)
+  --fileservicefe, --no-fileservicefe
+                        build fileservicefe (default: False)
+```

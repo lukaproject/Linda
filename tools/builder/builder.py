@@ -11,12 +11,18 @@ parser.add_argument("--agentcentral", action=argparse.BooleanOptionalAction, def
 parser.add_argument("--fileservicefe", action=argparse.BooleanOptionalAction, default=False, help="build fileservicefe")
 args = parser.parse_args()
 
-def _install_swag():
-    print("install swag")
+def _build_base_image():
+    print("build base image")
+    subprocess.run(
+        args=[
+            "./tools/builder/build_base_image.sh",
+            "goproxy.cn"
+        ],
+    )
 
 
 def setup():
-    _install_swag()
+    _build_base_image()
 
 
 def build_agent():
@@ -90,6 +96,8 @@ if __name__ == "__main__":
     print("agent", args.agent)
     print("agent central", args.agentcentral)
     print("fileservicefe", args.fileservicefe)
+    if args.setup:
+        setup()
     if args.agent:
         build_agent()
     if args.agentcentral:

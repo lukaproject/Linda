@@ -1,0 +1,18 @@
+FROM golang:1.23.4-alpine
+
+# 定义一下默认的proxy，如果在本地构建的话用这个proxy就OK了
+# 到github上面构建应该还是需要用goproxy.io
+ARG PROXY=goproxy.cn
+
+LABEL stage=gobuilder
+ENV CGO_ENABLED=0
+ENV GOPROXY="https://$PROXY,direct"
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN apk update --no-cache && apk add --no-cache tzdata
+WORKDIR /build
+
+COPY . .
+RUN cd services/agentcentral && go mod download
+RUN cd services/fileservicefe && go mod download
+RUN cd agent && go mod download
