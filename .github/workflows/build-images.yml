@@ -26,7 +26,14 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
     -
       name: Build And Push Base Images
-      run: ./tools/builder/build_base_image.sh true goproxy.io
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/lukaproject/linda/build-base-image:latest
+        build-args: |
+          PROXY=goproxy.io
+        file: tools/dockerimages/buildbase/Dockerfile.buildbase
     -
       name: Build Images
       run: ./tools/builder/buildimage.sh ./tools/builder/subimages.txt "docker buildx"
