@@ -16,5 +16,4 @@ python3 $dir/config/config-generate.py --env dev --agentcentral
 
 echo "Number of agents: $number_of_agents"
 
-$dir/setup-agentcentral.sh
-$dir/setup-agent-cluster.sh $number_of_agents
+docker compose -f tools/dockerimages/dev/docker-compose.yml up --scale agents-cluster=$number_of_agents -d

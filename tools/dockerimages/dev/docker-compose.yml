@@ -11,12 +11,15 @@ services:
   agentcentral:
     image: linda-agentcentral:latest
     restart: always
-    network_mode: host
     environment:
       - env=debug
+    volumes:
+      - "$root_dir/output/devconfig/agentcentral.json:/app/etc/agentcentral.json"
     depends_on:
       - redis
       - fileservicefe
+    ports:
+      - "5883:5883"
     deploy:
       resources:
         limits:
@@ -29,3 +32,15 @@ services:
       resources:
         limits:
           memory: 1024M
+  agents-cluster:
+    image: linda-agent:latest
+    restart: always
+    environment:
+      - 'LINDA_AGENT_CENTRAL_ENDPOINT=agentcentral:5883'
+      - 'LINDA_HB_PERIOD_MS=3000'
+    depends_on:
+      - agentcentral
+    deploy:
+      resources:
+        limits:
+          memory: 512M

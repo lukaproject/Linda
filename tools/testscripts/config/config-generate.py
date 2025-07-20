@@ -63,7 +63,7 @@ def prep_agentcentral_config():
         "{{PGSQL_DSN}}",
         Constants.DEFAULT_PGSQL_DSN,
     )
-    content = replace(content, '"{{Redis.Addrs}}"', '"172.17.0.1:16379"')
+    content = replace(content, '"{{Redis.Addrs}}"', '"redis:6379"')
     content = replace(content, "{{Redis.Password}}", "123456")
 
     conf = json.loads(content)
