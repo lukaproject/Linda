@@ -10,8 +10,11 @@ do
     esac
 done
 
+dir="$test_script_dir"
+echo "Generate config"
+python3 $dir/config/config-generate.py --env dev --agentcentral
+
 echo "Number of agents: $number_of_agents"
 
-dir="$test_script_dir"
 $dir/setup-agentcentral.sh
 $dir/setup-agent-cluster.sh $number_of_agents
