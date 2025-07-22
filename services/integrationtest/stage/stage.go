@@ -31,7 +31,7 @@ func (s *Stage) SetUp(t *testing.T, cli *swagger.APIClient) {
 	s.FileOperations = FileOperations{
 		t:                     t,
 		cli:                   cli,
-		fileServiceFEEndPoint: fmt.Sprintf("http://localhost:%d", FileServiceFEPort),
+		fileServiceFEEndPoint: fmt.Sprintf("http://172.17.0.1:%d", FileServiceFEPort),
 	}
 	s.NodeOperations = NodeOperations{
 		t:   t,
