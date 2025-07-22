@@ -2,9 +2,12 @@ package filemanager
 
 import (
 	"Linda/baselibs/codes/errno"
+	"Linda/protocol/models"
 	"errors"
+	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 )
 
 // Mgr
@@ -29,6 +32,16 @@ type Mgr interface {
 	// will list all files in this dir.
 	// only solved for absolute dir name.
 	ListFiles(dirname string, filesCh chan string) error
+
+	// ListFileInfos
+	// will list all files and directories info in this dir.
+	// only solved for absolute dir name.
+	ListFileInfos(dirname string) ([]models.FileInfo, error)
+
+	// GetFile
+	// get file content and info by file path
+	GetFile(filePath string) (*models.FileContent, error)
+
 	Initial()
 }
 
@@ -65,6 +78,71 @@ func (fmgr *mgr) ListFiles(dir string, filesCh chan string) error {
 	}
 	fmgr.ListFileNames(dir, filesCh)
 	return nil
+}
+
+// ListFileInfos calls the operator's ListFileInfos method
+func (fmgr *mgr) ListFileInfos(dirname string) ([]models.FileInfo, error) {
+	var fileInfos []models.FileInfo
+
+	entries, err := os.ReadDir(dirname)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, entry := range entries {
+		info, err := entry.Info()
+		if err != nil {
+			logger.Errorf("failed to get info for %s: %v", entry.Name(), err)
+			continue
+		}
+
+		fileInfo := models.FileInfo{
+			Name:    entry.Name(),
+			Path:    filepath.Join(dirname, entry.Name()),
+			Size:    info.Size(),
+			ModTime: info.ModTime().Unix(),
+			IsDir:   entry.IsDir(),
+		}
+
+		fileInfos = append(fileInfos, fileInfo)
+	}
+
+	return fileInfos, nil
+}
+
+// GetFile calls the operator's GetFile method
+func (fmgr *mgr) GetFile(filePath string) (*models.FileContent, error) {
+	info, err := os.Stat(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("file not found: %s", filePath)
+		}
+		return nil, fmt.Errorf("failed to get file info: %v", err)
+	}
+
+	// Check if it's a directory
+	if info.IsDir() {
+		return nil, fmt.Errorf("path is a directory, not a file: %s", filePath)
+	}
+
+	// Read file content
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file content: %v", err)
+	}
+
+	fileInfo := models.FileInfo{
+		Name:    info.Name(),
+		Path:    filePath,
+		Size:    info.Size(),
+		ModTime: info.ModTime().Unix(),
+		IsDir:   info.IsDir(),
+	}
+
+	return &models.FileContent{
+		FileInfo: fileInfo,
+		Content:  content,
+	}, nil
 }
 
 func (fmgr *mgr) Initial() {

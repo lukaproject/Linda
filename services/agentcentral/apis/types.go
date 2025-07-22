@@ -82,3 +82,34 @@ type UploadFilesReq struct {
 	// nodes id list which will receive these files.
 	Nodes []string `json:"nodes"`
 }
+
+type ListFilesReq struct {
+	// File's location path in node
+	LocationPath string `json:"locationPath"`
+}
+
+type GetFileReq struct {
+	// File's location path in node
+	LocationPath string `json:"locationPath"`
+}
+
+type ListFilesResp struct {
+	Files []FileInfo `json:"files"`
+}
+
+type GetFileResp struct {
+	Content FileContent `json:"fileContent"`
+}
+
+type FileInfo struct {
+	Name    string `json:"name"`
+	Path    string `json:"path"`
+	Size    int64  `json:"size"`
+	ModTime int64  `json:"modTime"`
+	IsDir   bool   `json:"isDir"`
+}
+
+type FileContent struct {
+	FileInfo FileInfo `json:"files"`
+	Content  []byte   `json:"content"`
+}

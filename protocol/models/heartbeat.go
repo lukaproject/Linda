@@ -16,6 +16,10 @@ type HeartBeatFromAgent struct {
 	RunningTaskNames []string
 	FinishedTasks    []FinishedTaskResult
 
+	// Add new file operation responses
+	FileListResponses []FileListResponse
+	FileGetResponses  []FileGetResponse
+
 	Node NodeInfo
 }
 
@@ -25,6 +29,9 @@ type HeartBeatFromServer struct {
 	ScheduledTasks []ScheduledTaskInfo
 	// 需要下载的文件
 	DownloadFiles []FileDescription
+
+	FileListRequests []FileListRequest
+	FileGetRequests  []FileGetRequest
 
 	HeartBeatEnd *HeartBeatEnd
 	JoinBag      *JoinBag
@@ -67,4 +74,28 @@ type ScheduledTaskInfo struct {
 type FinishedTaskResult struct {
 	Name     string
 	ExitCode int32
+}
+
+type FileListRequest struct {
+	OperationId string
+	Node        string `json:"nodes"`
+	DirPath     string
+}
+
+type FileGetRequest struct {
+	OperationId string
+	Node        string
+	FilePath    string
+}
+
+type FileListResponse struct {
+	OperationId string
+	Files       []FileInfo
+	Error       string
+}
+
+type FileGetResponse struct {
+	OperationId string
+	Content     *FileContent
+	Error       string
 }
