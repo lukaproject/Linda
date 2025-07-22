@@ -1,7 +1,5 @@
 package apis
 
-import "Linda/protocol/models"
-
 type Task struct {
 	TaskName        string `json:"taskName"`
 	TaskDisplayName string `json:"taskDisplayName"`
@@ -96,9 +94,22 @@ type GetFileReq struct {
 }
 
 type ListFilesResp struct {
-	Files []models.FileInfo `json:"files"`
+	Files []FileInfo `json:"files"`
 }
 
 type GetFileResp struct {
-	Content models.FileContent
+	Content FileContent `json:"fileContent"`
+}
+
+type FileInfo struct {
+	Name    string `json:"name"`
+	Path    string `json:"path"`
+	Size    int64  `json:"size"`
+	ModTime int64  `json:"modTime"`
+	IsDir   bool   `json:"isDir"`
+}
+
+type FileContent struct {
+	FileInfo FileInfo `json:"files"`
+	Content  []byte   `json:"content"`
 }

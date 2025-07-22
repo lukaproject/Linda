@@ -82,12 +82,12 @@ func (h *Handler) unPackResp(resp *models.HeartBeatFromServer) {
 
 	// Handle file list requests
 	if len(resp.FileListRequests) != 0 {
-		go listFileInfos(h.logger, h.fileMgr, resp.FileListRequests)
+		go listFileInfos(h, h.logger, h.fileMgr, resp.FileListRequests)
 	}
 
 	// Handle file get requests
 	if len(resp.FileGetRequests) != 0 {
-		go getFiles(h.logger, h.fileMgr, resp.FileGetRequests)
+		go getFiles(h, h.logger, h.fileMgr, resp.FileGetRequests)
 	}
 }
 

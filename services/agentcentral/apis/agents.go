@@ -20,8 +20,8 @@ func EnableAgents(r *mux.Router) {
 	r.HandleFunc("/api/agents/listids", listNodeIds).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/list", listNodes).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/uploadfiles", uploadFilesToNodes).Methods(http.MethodPost)
-	r.HandleFunc("/api/agents/{nodeId}/files/list", listNodeFiles).Methods(http.MethodGet)
-	r.HandleFunc("/api/agents/{nodeId}/files/get", getNodeFile).Methods(http.MethodGet)
+	r.HandleFunc("/api/agents/{nodeId}/files/list", listNodeFiles).Methods(http.MethodPost)
+	r.HandleFunc("/api/agents/{nodeId}/files/get", getNodeFile).Methods(http.MethodPost)
 }
 
 // node join godoc
@@ -194,8 +194,10 @@ func uploadFilesToNodes(w http.ResponseWriter, r *http.Request) {
 //	@Accept			json
 //	@Produce		json
 //	@Param			nodeId		path	string					true	"node id"
-//	@Param			FileListResponse	body	apis.FileListResponse	true	"List files request"
+//	@Param			request		body	apis.ListFilesReq		true	"List files request"
 //	@Success		200			{object}	apis.ListFilesResp
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Failure		408			{string}	string	"Request timeout"
 //	@Router			/agents/{nodeId}/files/list [post]
 func listNodeFiles(w http.ResponseWriter, r *http.Request) {
 	nodeId := mux.Vars(r)["nodeId"]
@@ -229,11 +231,11 @@ func listNodeFiles(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := ListFilesResp{
-		Files: make([]models.FileInfo, len(response.Files)),
+		Files: make([]FileInfo, len(response.Files)),
 	}
 
 	for i, file := range response.Files {
-		resp.Files[i] = models.FileInfo{
+		resp.Files[i] = FileInfo{
 			Name:    file.Name,
 			Path:    file.Path,
 			Size:    file.Size,
@@ -255,6 +257,8 @@ func listNodeFiles(w http.ResponseWriter, r *http.Request) {
 //	@Param			nodeId		path	string					true	"node id"
 //	@Param			getFileReq	body	apis.GetFileReq		true	"Get file request"
 //	@Success		200			{object}	apis.GetFileResp
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Failure		408			{string}	string	"Request timeout"
 //	@Router			/agents/{nodeId}/files/get [post]
 func getNodeFile(w http.ResponseWriter, r *http.Request) {
 	nodeId := mux.Vars(r)["nodeId"]
@@ -288,7 +292,16 @@ func getNodeFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	resp := GetFileResp{
-		Content: *response.Content,
+		Content: FileContent{
+			FileInfo: FileInfo{
+				Name:    response.Content.FileInfo.Name,
+				Path:    response.Content.FileInfo.Path,
+				Size:    response.Content.FileInfo.Size,
+				ModTime: response.Content.FileInfo.ModTime,
+				IsDir:   response.Content.FileInfo.IsDir,
+			},
+			Content: response.Content.Content,
+		},
 	}
 
 	w.Write(models.Serialize(resp))

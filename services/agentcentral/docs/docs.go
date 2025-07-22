@@ -271,6 +271,112 @@ const docTemplate = `{
                 "responses": {}
             }
         },
+        "/agents/{nodeId}/files/get": {
+            "post": {
+                "description": "get file content from a specific node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "get file content from a node",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Get file request",
+                        "name": "getFileReq",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.GetFileReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.GetFileResp"
+                        }
+                    },
+                    "408": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/{nodeId}/files/list": {
+            "post": {
+                "description": "list files in a directory on a specific node",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "agents"
+                ],
+                "summary": "list files on a node",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node id",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "List files request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/apis.ListFilesReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/apis.ListFilesResp"
+                        }
+                    },
+                    "408": {
+                        "description": "Request timeout",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/bagnodes/{bagName}": {
             "get": {
                 "description": "list all node ids which belong to this node",
@@ -722,6 +828,40 @@ const docTemplate = `{
                 }
             }
         },
+        "apis.FileContent": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "files": {
+                    "$ref": "#/definitions/apis.FileInfo"
+                }
+            }
+        },
+        "apis.FileInfo": {
+            "type": "object",
+            "properties": {
+                "isDir": {
+                    "type": "boolean"
+                },
+                "modTime": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "integer"
+                }
+            }
+        },
         "apis.GetBagResp": {
             "type": "object",
             "properties": {
@@ -738,6 +878,23 @@ const docTemplate = `{
                 "updateTimeMs": {
                     "type": "integer",
                     "format": "int64"
+                }
+            }
+        },
+        "apis.GetFileReq": {
+            "type": "object",
+            "properties": {
+                "locationPath": {
+                    "description": "File's location path in node",
+                    "type": "string"
+                }
+            }
+        },
+        "apis.GetFileResp": {
+            "type": "object",
+            "properties": {
+                "fileContent": {
+                    "$ref": "#/definitions/apis.FileContent"
                 }
             }
         },
@@ -793,6 +950,26 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "type": "string"
+                    }
+                }
+            }
+        },
+        "apis.ListFilesReq": {
+            "type": "object",
+            "properties": {
+                "locationPath": {
+                    "description": "File's location path in node",
+                    "type": "string"
+                }
+            }
+        },
+        "apis.ListFilesResp": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/apis.FileInfo"
                     }
                 }
             }

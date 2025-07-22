@@ -73,3 +73,16 @@ systemctl restart docker
 # 判断是否安装成功
 docker buildx version
 ```
+
+###  Local Test
+build image
+```
+如果没有buildx: docker pull docker/buildx-bin
+python3 tools/builder/builder.py --agent --agentcentral --fileservicefe
+
+```
+
+```
+source .profile
+./tools/testscripts/devstart.sh
+```
