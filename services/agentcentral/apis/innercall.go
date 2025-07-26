@@ -3,9 +3,9 @@
 package apis
 
 import (
+	"Linda/baselibs/abstractions/serviceskit/generator"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
-	"Linda/services/agentcentral/internal/logic/agents"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -19,7 +19,7 @@ func EnableInnerCall(r *mux.Router) {
 // nodeIdGen
 // be used in agent start to fetch node id if not exists.
 func nodeIdGen(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(agents.GenNodeId()))
+	w.Write([]byte(generator.GetInstance().NodeId()))
 }
 
 // innerCallGetTask

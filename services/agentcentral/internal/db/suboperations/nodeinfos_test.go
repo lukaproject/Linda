@@ -2,10 +2,10 @@ package suboperations_test
 
 import (
 	"Linda/baselibs/abstractions"
+	"Linda/baselibs/abstractions/serviceskit/generator"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/db/dbtestcommon"
-	"Linda/services/agentcentral/internal/logic/agents"
 	"fmt"
 	"net/url"
 	"strconv"
@@ -24,7 +24,7 @@ func (s *nodeInfosTestSuite) TestCreateNodeInfo_Success() {
 	dbo := db.NewDBOperations()
 	for i := range 10 {
 		s.Nil(dbo.NodeInfos.Create(&models.NodeInfo{
-			NodeId:   agents.GenNodeId(),
+			NodeId:   generator.GetInstance().NodeId(),
 			NodeName: strconv.Itoa(i),
 		}))
 	}
@@ -32,7 +32,7 @@ func (s *nodeInfosTestSuite) TestCreateNodeInfo_Success() {
 
 func (s *nodeInfosTestSuite) TestCreateNodeInfo_PrimaryKeyConflict() {
 	dbo := db.NewDBOperations()
-	nodeId := agents.GenNodeId()
+	nodeId := generator.GetInstance().NodeId()
 	s.Nil(dbo.NodeInfos.Create(&models.NodeInfo{
 		NodeId:   nodeId,
 		NodeName: "1",
@@ -78,6 +78,7 @@ func (s *nodeInfosTestSuite) TestListNodeInfo_Prefix_Limit() {
 }
 
 func (s *nodeInfosTestSuite) SetupSuite() {
+	generator.Initial()
 	s.HealthCheckAndSetup()
 	s.DropTables()
 	db.ReInitialWithDSN(s.DSN)
