@@ -18,7 +18,7 @@ class Env(enum.Enum):
 
 
 class Constants:
-    DEFAULT_PGSQL_DSN = "host=172.17.0.1 user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+    DEFAULT_PGSQL_DSN = "host=postgresql user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai"
     OUTPUT_DIR = pathlib.Path(os.getenv("root_dir")) / "output" / "devconfig"
 
 

@@ -1,5 +1,19 @@
 # use this compose to start a test agentcentral.
 services:
+  postgresql:
+    image: bitnami/postgresql:15
+    restart: always
+    ports:
+      - '15432:5432'
+    environment:
+      - 'POSTGRESQL_USERNAME=dxyinme'
+      - 'POSTGRESQL_PASSWORD=123456'
+      - 'POSTGRESQL_DATABASE=linda'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d linda"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   redis:
     image: "bitnami/redis:latest"
     restart: always
@@ -16,8 +30,12 @@ services:
     volumes:
       - "$root_dir/output/devconfig/agentcentral.json:/app/etc/agentcentral.json"
     depends_on:
-      - redis
-      - fileservicefe
+      redis:
+        condition: service_started
+      fileservicefe:
+        condition: service_started
+      postgresql:
+        condition: service_healthy
     ports:
       - "5883:5883"
     deploy:
