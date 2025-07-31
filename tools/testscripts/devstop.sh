@@ -3,7 +3,4 @@
 
 dir="$test_script_dir"
 
-
-$dir/down-agent-cluster.sh
-sleep 3
-$dir/down-agentcentral.sh
+docker compose -f tools/dockerimages/dev/docker-compose.yml down

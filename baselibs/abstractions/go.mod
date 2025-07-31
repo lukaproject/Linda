@@ -4,6 +4,7 @@ go 1.23
 
 require (
 	github.com/ecodeclub/ekit v0.0.10
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/lukaproject/xerr v0.0.0-20240622080714-d12bd2b3a6fc
 	github.com/sirupsen/logrus v1.9.3

@@ -1,0 +1,62 @@
+# use this compose to start a test agentcentral.
+services:
+  postgresql:
+    image: bitnami/postgresql:15
+    restart: always
+    ports:
+      - '15432:5432'
+    environment:
+      - 'POSTGRESQL_USERNAME=dxyinme'
+      - 'POSTGRESQL_PASSWORD=123456'
+      - 'POSTGRESQL_DATABASE=linda'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d linda"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: "bitnami/redis:latest"
+    restart: always
+    environment:
+      - REDIS_PASSWORD=123456
+    command: /opt/bitnami/scripts/redis/run.sh --maxmemory 1024mb
+    ports:
+      - "16379:6379"
+  agentcentral:
+    image: linda-agentcentral:latest
+    restart: always
+    environment:
+      - env=debug
+    volumes:
+      - "$root_dir/output/devconfig/agentcentral.json:/app/etc/agentcentral.json"
+    depends_on:
+      redis:
+        condition: service_started
+      postgresql:
+        condition: service_healthy
+    ports:
+      - "5883:5883"
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+  fileservicefe:
+    image: linda-fileservicefe:latest
+    restart: always
+    network_mode: host
+    deploy:
+      resources:
+        limits:
+          memory: 1024M
+  agents-cluster:
+    image: linda-agent:latest
+    restart: always
+    environment:
+      - 'LINDA_AGENT_CENTRAL_ENDPOINT=agentcentral:5883'
+      - 'LINDA_HB_PERIOD_MS=3000'
+    depends_on:
+      - agentcentral
+    deploy:
+      resources:
+        limits:
+          memory: 512M

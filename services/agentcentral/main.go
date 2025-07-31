@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
+	"Linda/baselibs/abstractions/serviceskit/generator"
 	"Linda/baselibs/abstractions/xdebug"
 	"Linda/baselibs/abstractions/xlog"
 	"Linda/services/agentcentral/apis"
@@ -45,6 +46,7 @@ func main() {
 	r := mux.NewRouter()
 	r.PathPrefix("/swagger").Handler(httpSwagger.Handler()).Methods(http.MethodGet)
 
+	generator.Initial()
 	apis.EnableHeartBeat(r)
 	apis.EnableHealthCheck(r)
 	apis.EnableBags(r)

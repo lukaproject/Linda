@@ -1,0 +1,11 @@
+{
+    "PGSQL_DSN": "{{PGSQL_DSN}}",
+    "Redis": {
+        "Addrs": [
+            "{{Redis.Addrs}}"
+        ],
+        "Password": "{{Redis.Password}}",
+        "Db": 1
+    },
+    "Port": 5883
+}
