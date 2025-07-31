@@ -56,7 +56,7 @@ docker pull swaggerapi/swagger-codegen-cli-v3
 ```
 
 ### docker buildx install
-
+Option 1:
 - [buildx release](https://github.com/docker/buildx/releases)
 
 1. 需要将下载下来的二进制重命名为docker-buildx后放入~/.docker/cli-plugins/
@@ -73,6 +73,7 @@ systemctl restart docker
 # 判断是否安装成功
 docker buildx version
 ```
+Option 2:  docker pull docker/buildx-bin
 
 ## Build
 
@@ -97,4 +98,6 @@ options:
                         build agentcentral (default: False)
   --fileservicefe, --no-fileservicefe
                         build fileservicefe (default: False)
+                        
+./tools/testscripts/devstart.sh
 ```

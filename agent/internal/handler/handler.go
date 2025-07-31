@@ -9,6 +9,7 @@ import (
 	"Linda/baselibs/abstractions/xlog"
 	"Linda/protocol/models"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/lukaproject/xerr"
@@ -21,6 +22,11 @@ type Handler struct {
 	fileMgr filemanager.Mgr
 
 	logger xlog.Logger
+
+	// Add response queues
+	fileListResponses []models.FileListResponse
+	fileGetResponses  []models.FileGetResponse
+	responsesMutex    sync.Mutex
 }
 
 func (h *Handler) Start() {
@@ -57,6 +63,8 @@ func (h *Handler) keepAlive() {
 	}
 }
 
+// handler the heartbeat from server
+// it will handle the scheduled tasks, download files, file list requests, and file get requests
 func (h *Handler) unPackResp(resp *models.HeartBeatFromServer) {
 	if len(resp.ScheduledTasks) != 0 {
 		go func() {
@@ -71,8 +79,20 @@ func (h *Handler) unPackResp(resp *models.HeartBeatFromServer) {
 	if len(resp.DownloadFiles) != 0 {
 		go downloadFiles(h.logger, h.fileMgr, resp.DownloadFiles)
 	}
+
+	// Handle file list requests
+	if len(resp.FileListRequests) != 0 {
+		go listFileInfos(h, h.logger, h.fileMgr, resp.FileListRequests)
+	}
+
+	// Handle file get requests
+	if len(resp.FileGetRequests) != 0 {
+		go getFiles(h, h.logger, h.fileMgr, resp.FileGetRequests)
+	}
 }
 
+// Pack the heartbeat request to send to the server
+// It includes the sequence ID, node information, finished tasks, and file operation responses.
 func (h *Handler) packReq() (req *models.HeartBeatFromAgent) {
 	req = &models.HeartBeatFromAgent{
 		SeqId: h.seqId,
@@ -92,6 +112,18 @@ func (h *Handler) packReq() (req *models.HeartBeatFromAgent) {
 				})
 		}
 	}
+
+	// Add file operation responses
+	h.responsesMutex.Lock()
+	req.FileListResponses = make([]models.FileListResponse, len(h.fileListResponses))
+	copy(req.FileListResponses, h.fileListResponses)
+	h.fileListResponses = h.fileListResponses[:0]
+
+	req.FileGetResponses = make([]models.FileGetResponse, len(h.fileGetResponses))
+	copy(req.FileGetResponses, h.fileGetResponses)
+	h.fileGetResponses = h.fileGetResponses[:0]
+	h.responsesMutex.Unlock()
+
 	return
 }
 
