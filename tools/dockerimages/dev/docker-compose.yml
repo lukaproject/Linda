@@ -32,8 +32,6 @@ services:
     depends_on:
       redis:
         condition: service_started
-      fileservicefe:
-        condition: service_started
       postgresql:
         condition: service_healthy
     ports:
