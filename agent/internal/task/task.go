@@ -2,6 +2,7 @@ package task
 
 import (
 	"Linda/agent/internal/data"
+	"Linda/agent/internal/task/procs"
 	"Linda/agent/internal/utils"
 	"Linda/baselibs/abstractions/xctx"
 	"os"
@@ -40,6 +41,8 @@ type task struct {
 
 	stdoutFile *os.File
 	stderrFile *os.File
+
+	process procs.Process
 }
 
 func (t *task) GetName() string {
@@ -73,6 +76,9 @@ func (t *task) Start() (err error) {
 		t.cmd.Stderr = t.stderrFile
 
 		xerr.Must0(t.cmd.Start())
+		t.process.Record(t.cmd)
+
+		t.toRunning()
 	}()
 	return
 }
@@ -85,6 +91,7 @@ func (t *task) Wait() (err error) {
 	xctx.Close(t.stdoutFile)
 	xctx.Close(t.stderrFile)
 	t.isFinished = true
+	t.toFinished()
 	return err
 }
 
@@ -121,6 +128,18 @@ func (t *task) saveExitCode(err error) error {
 		logger.Errorf("not a exit code error, err is %v", err)
 	}
 	return err
+}
+
+func (t *task) toRunning() {
+	t.TaskData.Pid = t.process.Pid
+	t.TaskData.State = data.TaskState_Running
+	t.TaskData.Store()
+}
+
+func (t *task) toFinished() {
+	t.TaskData.Pid = -1
+	t.TaskData.State = data.TaskState_Finished
+	t.TaskData.Store()
 }
 
 func NewTask(
