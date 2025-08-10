@@ -41,6 +41,8 @@ type Mgr interface {
 type agentsmgr struct {
 	agents      map[string]Agent
 	agentsRWMut sync.RWMutex
+	// 如果为true则会有一个单独的corountine去清除那些已经Unusable的node
+	enableCleanup bool
 }
 
 func (mgr *agentsmgr) NewNode(nodeId string, w http.ResponseWriter, r *http.Request) {
@@ -58,8 +60,10 @@ func (mgr *agentsmgr) addNewNodeToMem(
 	r *http.Request,
 ) (agent Agent, err error) {
 	xctx.NewLocker(&mgr.agentsRWMut).Run(func() {
-		if _, exist := mgr.agents[nodeId]; exist {
-			panic(errno.ErrNodeIdExists)
+		if preAgent, exist := mgr.agents[nodeId]; exist {
+			logger.Warnf("nodeId duplicated, remove old one, nodeId %s", nodeId)
+			preAgent.Dispose()
+			mgr.unsafeRemoveNode(nodeId)
 		}
 		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
 		if err != nil {
@@ -73,13 +77,7 @@ func (mgr *agentsmgr) addNewNodeToMem(
 
 func (mgr *agentsmgr) RemoveNode(nodeId string) error {
 	xctx.NewLocker(&mgr.agentsRWMut).Run(func() {
-		if _, ok := mgr.agents[nodeId]; ok {
-			delete(mgr.agents, nodeId)
-			db.NewDBOperations().NodeInfos.Delete(nodeId)
-			logger.Debugf("node %s removed", nodeId)
-		} else {
-			logger.Debugf("node %s has been removed yet", nodeId)
-		}
+		mgr.unsafeRemoveNode(nodeId)
 	})
 	return nil
 }
@@ -130,8 +128,27 @@ func (mgr *agentsmgr) List(queryPacker abstractions.ListQueryPacker) (chan *mode
 	return db.NewDBOperations().NodeInfos.List(queryPacker), nil
 }
 
-func NewMgr() Mgr {
-	return &agentsmgr{
-		agents: make(map[string]Agent),
+func (mgr *agentsmgr) unsafeRemoveNode(nodeId string) {
+	if _, ok := mgr.agents[nodeId]; ok {
+		delete(mgr.agents, nodeId)
+		db.NewDBOperations().NodeInfos.Delete(nodeId)
+		logger.Debugf("node %s removed", nodeId)
+	} else {
+		logger.Debugf("node %s has been removed yet", nodeId)
 	}
+}
+
+func (mgr *agentsmgr) cleanupLoop() {
+	if mgr.enableCleanup {
+		logger.Info("Enabled clean-up unusable nodes loop")
+	}
+}
+
+func NewMgr() Mgr {
+	mgr := &agentsmgr{
+		agents:        make(map[string]Agent),
+		enableCleanup: false,
+	}
+	go mgr.cleanupLoop()
+	return mgr
 }
