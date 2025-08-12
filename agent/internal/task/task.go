@@ -2,7 +2,6 @@ package task
 
 import (
 	"Linda/agent/internal/data"
-	"Linda/agent/internal/task/procs"
 	"Linda/agent/internal/utils"
 	"Linda/baselibs/abstractions/xctx"
 	"os"
@@ -41,8 +40,6 @@ type task struct {
 
 	stdoutFile *os.File
 	stderrFile *os.File
-
-	process procs.Process
 }
 
 func (t *task) GetName() string {
@@ -76,9 +73,8 @@ func (t *task) Start() (err error) {
 		t.cmd.Stderr = t.stderrFile
 
 		xerr.Must0(t.cmd.Start())
-		t.process.Record(t.cmd)
 
-		t.toRunning()
+		t.do(toRunning)
 	}()
 	return
 }
@@ -91,7 +87,7 @@ func (t *task) Wait() (err error) {
 	xctx.Close(t.stdoutFile)
 	xctx.Close(t.stderrFile)
 	t.isFinished = true
-	t.toFinished()
+	t.do(toFinished)
 	return err
 }
 
@@ -130,15 +126,8 @@ func (t *task) saveExitCode(err error) error {
 	return err
 }
 
-func (t *task) toRunning() {
-	t.TaskData.Pid = t.process.Pid
-	t.TaskData.State = data.TaskState_Running
-	t.TaskData.Store()
-}
-
-func (t *task) toFinished() {
-	t.TaskData.Pid = -1
-	t.TaskData.State = data.TaskState_Finished
+func (t *task) do(callback func(taskItem *task)) {
+	callback(t)
 	t.TaskData.Store()
 }
 
@@ -148,9 +137,30 @@ func NewTask(
 	t := &task{
 		TaskData: taskData,
 	}
-
+	t.do(toStart)
 	cmds := t.GetCommands(utils.GetDefaultShell())
 	t.cmd = exec.Command(cmds[0], cmds[1:]...)
 	t.cmd.Dir = taskData.WorkingDir
 	return t
+}
+
+func RecoverFromDB(taskData data.TaskData) Task {
+	t := &task{TaskData: taskData}
+	return t
+}
+
+// Task transaction callback function
+
+func toStart(t *task) {
+	t.TaskData.State = data.TaskState_Waiting
+}
+
+func toRunning(t *task) {
+	t.TaskData.Pid = t.cmd.Process.Pid
+	t.TaskData.State = data.TaskState_Running
+}
+
+func toFinished(t *task) {
+	t.TaskData.Pid = -1
+	t.TaskData.State = data.TaskState_Finished
 }
