@@ -1,6 +1,7 @@
 package agents
 
 import (
+	"Linda/baselibs/abstractions/xctx"
 	"Linda/baselibs/testcommon/gen"
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
@@ -9,7 +10,6 @@ import (
 	"errors"
 	"runtime/debug"
 	"sync"
-	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -53,7 +53,8 @@ type agentHolder struct {
 	noUploadFiles    []models.FileDescription
 	noUploadFilesMut sync.Mutex
 
-	unusable atomic.Bool
+	unusable    bool
+	unusableMut sync.Mutex
 }
 
 func (ah *agentHolder) GetInfo() *models.NodeInfo {
@@ -133,7 +134,13 @@ func (ah *agentHolder) heartBeatProcess(msg *models.HeartBeatFromAgent) {
 func (ah *agentHolder) recoverWSPanic() {
 	if err := recover(); err != nil {
 		logger.Error(string(debug.Stack()), err)
-		ah.unusable.Store(true)
+		xctx.NewLocker(&ah.unusableMut).Run(func() {
+			if ah.unusable {
+				return
+			}
+			mgrInstance.RemoveNode(ah.nodeId)
+			ah.unusable = true
+		})
 	}
 }
 
@@ -262,7 +269,7 @@ func (ah *agentHolder) Dispose() {
 }
 
 func (ah *agentHolder) IsUnusable() bool {
-	return ah.unusable.Load()
+	return ah.unusable
 }
 
 func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
@@ -272,9 +279,8 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 		hbAgent:       make(chan *models.HeartBeatFromAgent, 1),
 		lastSeqId:     -1,
 		noUploadFiles: make([]models.FileDescription, 0),
-		unusable:      atomic.Bool{},
+		unusable:      false,
 	}
-	ah.unusable.Store(false)
 	hbStart := &models.HeartBeatStart{}
 	err := hbconn.ReadMessage(ah.conn, hbStart)
 	if err != nil {

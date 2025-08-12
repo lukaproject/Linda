@@ -61,9 +61,9 @@ func (mgr *agentsmgr) addNewNodeToMem(
 ) (agent Agent, err error) {
 	xctx.NewLocker(&mgr.agentsRWMut).Run(func() {
 		if preAgent, exist := mgr.agents[nodeId]; exist {
-			logger.Warnf("nodeId duplicated, remove old one, nodeId %s", nodeId)
+			logger.Warnf("nodeId duplicated, pls remove old one, nodeId %s", nodeId)
 			preAgent.Dispose()
-			mgr.unsafeRemoveNode(nodeId)
+			panic(errno.ErrNodeIdExists)
 		}
 		agent, err = NewAgent(nodeId, xerr.Must(upgrader.Upgrade(w, r, nil)))
 		if err != nil {
@@ -138,17 +138,10 @@ func (mgr *agentsmgr) unsafeRemoveNode(nodeId string) {
 	}
 }
 
-func (mgr *agentsmgr) cleanupLoop() {
-	if mgr.enableCleanup {
-		logger.Info("Enabled clean-up unusable nodes loop")
-	}
-}
-
 func NewMgr() Mgr {
 	mgr := &agentsmgr{
 		agents:        make(map[string]Agent),
 		enableCleanup: false,
 	}
-	go mgr.cleanupLoop()
 	return mgr
 }
