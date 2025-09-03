@@ -26,6 +26,8 @@ Class | Method | HTTP request | Description
 *AgentsApi* | [**AgentsJoinNodeIdPost**](docs/AgentsApi.md#agentsjoinnodeidpost) | **Post** /agents/join/{nodeId} | join free node to a bag
 *AgentsApi* | [**AgentsListGet**](docs/AgentsApi.md#agentslistget) | **Get** /agents/list | list nodes, return node infos by query
 *AgentsApi* | [**AgentsListidsGet**](docs/AgentsApi.md#agentslistidsget) | **Get** /agents/listids | list nodes, return node ids by query
+*AgentsApi* | [**AgentsNodeIdFilesGetPost**](docs/AgentsApi.md#agentsnodeidfilesgetpost) | **Post** /agents/{nodeId}/files/get | get file content from a node
+*AgentsApi* | [**AgentsNodeIdFilesListPost**](docs/AgentsApi.md#agentsnodeidfileslistpost) | **Post** /agents/{nodeId}/files/list | list files on a node
 *AgentsApi* | [**AgentsUploadfilesPost**](docs/AgentsApi.md#agentsuploadfilespost) | **Post** /agents/uploadfiles | upload files to nodes
 *BagsApi* | [**BagnodesBagNameGet**](docs/BagsApi.md#bagnodesbagnameget) | **Get** /bagnodes/{bagName} | list bag nodes
 *BagsApi* | [**BagsBagNameDelete**](docs/BagsApi.md#bagsbagnamedelete) | **Delete** /bags/{bagName} | delete bag
@@ -45,9 +47,15 @@ Class | Method | HTTP request | Description
  - [ApisAddTaskResp](docs/ApisAddTaskResp.md)
  - [ApisBag](docs/ApisBag.md)
  - [ApisDeleteBagResp](docs/ApisDeleteBagResp.md)
+ - [ApisFileContent](docs/ApisFileContent.md)
+ - [ApisFileInfo](docs/ApisFileInfo.md)
  - [ApisGetBagResp](docs/ApisGetBagResp.md)
+ - [ApisGetFileReq](docs/ApisGetFileReq.md)
+ - [ApisGetFileResp](docs/ApisGetFileResp.md)
  - [ApisGetTaskResp](docs/ApisGetTaskResp.md)
  - [ApisListBagNodesResp](docs/ApisListBagNodesResp.md)
+ - [ApisListFilesReq](docs/ApisListFilesReq.md)
+ - [ApisListFilesResp](docs/ApisListFilesResp.md)
  - [ApisNodeFreeReq](docs/ApisNodeFreeReq.md)
  - [ApisNodeInfo](docs/ApisNodeInfo.md)
  - [ApisNodeJoinReq](docs/ApisNodeJoinReq.md)

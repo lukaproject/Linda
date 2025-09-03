@@ -102,7 +102,7 @@ func getFiles(h *Handler, logger xlog.Logger, fileMgr filemanager.Mgr, files []m
 					responses[idx] = models.FileGetResponse{
 						OperationId: req.OperationId,
 						Error:       fmt.Sprintf("internal error: %v", r),
-						Content:     nil,
+						Content:     models.FileContent{},
 					}
 				}
 			}()
@@ -116,7 +116,7 @@ func getFiles(h *Handler, logger xlog.Logger, fileMgr filemanager.Mgr, files []m
 
 			responses[idx] = models.FileGetResponse{
 				OperationId: req.OperationId,
-				Content:     content,
+				Content:     *content,
 				Error:       errorMsg,
 			}
 		}(responses, id, f)

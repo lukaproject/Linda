@@ -9,6 +9,6 @@ type FileInfo struct {
 }
 
 type FileContent struct {
-	FileInfo FileInfo
+	FileInfo FileInfo `json:"fileInfo"`
 	Content  []byte
 }

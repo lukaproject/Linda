@@ -82,3 +82,42 @@ func (no *NodeOperations) joinBag(bagName, nodeId string) (statusCode int) {
 	statusCode = resp.StatusCode
 	return
 }
+
+func (no *NodeOperations) ListNodeFiles(nodeId, locationPath string) []swagger.ApisFileInfo {
+	resp, _ := xerr.Must2(no.cli.AgentsApi.AgentsNodeIdFilesListPost(
+		context.Background(), swagger.ApisListFilesReq{
+			LocationPath: locationPath,
+		}, nodeId))
+
+	return resp.Files
+}
+
+func (no *NodeOperations) GetNodeFile(nodeId, filePath string) swagger.ApisFileContent {
+	file, resp, err := no.cli.AgentsApi.AgentsNodeIdFilesGetPost(
+		context.Background(), swagger.ApisGetFileReq{
+			LocationPath: filePath,
+		}, nodeId)
+
+	if err != nil {
+		// Log the error instead of panicking
+		no.t.Logf("Error getting file %s from node %s: %v\n", filePath, nodeId, err)
+		no.t.Logf("Response status: %d", resp.StatusCode)
+		no.t.Logf("Response Content-Type: %s", resp.Header.Get("Content-Type"))
+		no.t.Logf("Response body: %q", resp.Body) // %q shows quotes and escape chars
+
+		// Check if it's valid JSON
+		// var jsonTest interface{}
+		// if json.Unmarshal(resp.Body, &jsonTest) != nil {
+		// 	no.t.Logf("Response is NOT valid JSON")
+		// } else {
+		// 	no.t.Logf("Response is valid JSON")
+		// }
+		return swagger.ApisFileContent{}
+	}
+
+	if file.FileContent == nil {
+		return swagger.ApisFileContent{}
+	}
+
+	return *file.FileContent
+}

@@ -9,6 +9,8 @@ Method | HTTP request | Description
 [**AgentsJoinNodeIdPost**](AgentsApi.md#AgentsJoinNodeIdPost) | **Post** /agents/join/{nodeId} | join free node to a bag
 [**AgentsListGet**](AgentsApi.md#AgentsListGet) | **Get** /agents/list | list nodes, return node infos by query
 [**AgentsListidsGet**](AgentsApi.md#AgentsListidsGet) | **Get** /agents/listids | list nodes, return node ids by query
+[**AgentsNodeIdFilesGetPost**](AgentsApi.md#AgentsNodeIdFilesGetPost) | **Post** /agents/{nodeId}/files/get | get file content from a node
+[**AgentsNodeIdFilesListPost**](AgentsApi.md#AgentsNodeIdFilesListPost) | **Post** /agents/{nodeId}/files/list | list files on a node
 [**AgentsUploadfilesPost**](AgentsApi.md#AgentsUploadfilesPost) | **Post** /agents/uploadfiles | upload files to nodes
 
 # **AgentsFreeNodeIdPost**
@@ -167,6 +169,64 @@ No authorization required
 ### HTTP request headers
 
  - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **AgentsNodeIdFilesGetPost**
+> ApisGetFileResp AgentsNodeIdFilesGetPost(ctx, body, nodeId)
+get file content from a node
+
+get file content from a specific node
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **body** | [**ApisGetFileReq**](ApisGetFileReq.md)| Get file request | 
+  **nodeId** | **string**| node id | 
+
+### Return type
+
+[**ApisGetFileResp**](apis.GetFileResp.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **AgentsNodeIdFilesListPost**
+> ApisListFilesResp AgentsNodeIdFilesListPost(ctx, body, nodeId)
+list files on a node
+
+list files in a directory on a specific node
+
+### Required Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **ctx** | **context.Context** | context for authentication, logging, cancellation, deadlines, tracing, etc.
+  **body** | [**ApisListFilesReq**](ApisListFilesReq.md)| List files request | 
+  **nodeId** | **string**| node id | 
+
+### Return type
+
+[**ApisListFilesResp**](apis.ListFilesResp.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
  - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

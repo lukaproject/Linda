@@ -78,7 +78,7 @@ type FinishedTaskResult struct {
 
 type FileListRequest struct {
 	OperationId string
-	Node        string `json:"nodes"`
+	Node        string `json:"node"`
 	DirPath     string
 }
 
@@ -90,12 +90,12 @@ type FileGetRequest struct {
 
 type FileListResponse struct {
 	OperationId string
-	Files       []FileInfo
+	Files       []FileInfo `json:"files"`
 	Error       string
 }
 
 type FileGetResponse struct {
 	OperationId string
-	Content     *FileContent
+	Content     FileContent `json:"content"`
 	Error       string
 }

@@ -247,26 +247,13 @@ func listNodeFiles(w http.ResponseWriter, r *http.Request) {
 	w.Write(models.Serialize(resp))
 }
 
-// get node file godoc
-//
-//	@Summary		get file content from a node
-//	@Description	get file content from a specific node
-//	@Tags			agents
-//	@Accept			json
-//	@Produce		json
-//	@Param			nodeId		path	string					true	"node id"
-//	@Param			getFileReq	body	apis.GetFileReq		true	"Get file request"
-//	@Success		200			{object}	apis.GetFileResp
-//	@Failure		500			{string}	string	"Internal server error"
-//	@Failure		408			{string}	string	"Request timeout"
-//	@Router			/agents/{nodeId}/files/get [post]
 func getNodeFile(w http.ResponseWriter, r *http.Request) {
 	nodeId := mux.Vars(r)["nodeId"]
 	req := GetFileReq{}
 	models.ReadJSON(r.Body, &req)
 
 	operationId := generateOperationId()
-
+	logger.Errorf("processing get file : %s", operationId)
 	err := agents.GetMgrInstance().CallAgent(nodeId, func(ag agents.Agent) error {
 		return ag.AddFileGetRequest(operationId, req.LocationPath)
 	})
@@ -286,11 +273,12 @@ func getNodeFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if response.Error != "" {
+		logger.Errorf("agent returned error for file get: %s", response.Error)
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(response.Error))
 		return
 	}
 
+	logger.Errorf("processed get file get: %s", operationId)
 	resp := GetFileResp{
 		Content: FileContent{
 			FileInfo: FileInfo{

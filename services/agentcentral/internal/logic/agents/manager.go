@@ -141,9 +141,9 @@ func (mgr *agentsmgr) WaitForFileListResponse(nodeId, operationId string, timeou
 	}
 
 	ah := agent.(*agentHolder)
-	ah.responsesMutex.Lock()
+	ah.responsesListMutex.Lock()
 	responseChan, exists := ah.pendingFileListOps[operationId]
-	ah.responsesMutex.Unlock()
+	ah.responsesListMutex.Unlock()
 
 	if !exists {
 		return models.FileListResponse{}, fmt.Errorf("operation %s not found", operationId)
@@ -158,9 +158,9 @@ func (mgr *agentsmgr) WaitForFileListResponse(nodeId, operationId string, timeou
 		}, nil
 	case <-time.After(timeout):
 		// Clean up pending operation
-		ah.responsesMutex.Lock()
+		ah.responsesListMutex.Lock()
 		delete(ah.pendingFileListOps, operationId)
-		ah.responsesMutex.Unlock()
+		ah.responsesListMutex.Unlock()
 		return models.FileListResponse{}, fmt.Errorf("timeout waiting for response")
 	}
 }
@@ -172,9 +172,9 @@ func (mgr *agentsmgr) WaitForFileGetResponse(nodeId, operationId string, timeout
 	}
 
 	ah := agent.(*agentHolder)
-	ah.responsesMutex.Lock()
+	ah.responsesGetMutex.Lock()
 	responseChan, exists := ah.pendingFileGetOps[operationId]
-	ah.responsesMutex.Unlock()
+	ah.responsesGetMutex.Unlock()
 
 	if !exists {
 		return nil, fmt.Errorf("operation %s not found", operationId)
@@ -185,9 +185,10 @@ func (mgr *agentsmgr) WaitForFileGetResponse(nodeId, operationId string, timeout
 		return &response, nil
 	case <-time.After(timeout):
 		// Clean up pending operation
-		ah.responsesMutex.Lock()
+		ah.responsesGetMutex.Lock()
 		delete(ah.pendingFileGetOps, operationId)
-		ah.responsesMutex.Unlock()
+		ah.responsesGetMutex.Unlock()
+		logger.Errorf("timeout waiting for file get response for operation %s on node %s", operationId, nodeId)
 		return nil, fmt.Errorf("timeout waiting for response")
 	}
 }
