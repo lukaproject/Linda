@@ -11,6 +11,94 @@ info:
 servers:
 - url: /api
 paths:
+  /agents/{nodeId}/files/get:
+    post:
+      tags:
+      - agents
+      summary: get file content from a node
+      description: get file content from a specific node
+      parameters:
+      - name: nodeId
+        in: path
+        description: node id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: Get file request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/apis.GetFileReq"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/apis.GetFileResp"
+        "408":
+          description: Request timeout
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+      x-codegen-request-body-name: getFileReq
+  /agents/{nodeId}/files/list:
+    post:
+      tags:
+      - agents
+      summary: list files on a node
+      description: list files in a directory on a specific node
+      parameters:
+      - name: nodeId
+        in: path
+        description: node id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: List files request
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/apis.ListFilesReq"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/apis.ListFilesResp"
+        "408":
+          description: Request timeout
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: string
+                x-content-type: application/json
+      x-codegen-request-body-name: request
   /agents/free/{nodeId}:
     post:
       tags:
@@ -580,6 +668,44 @@ components:
           type: string
       example:
         errorMsg: errorMsg
+    apis.FileContent:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            type: integer
+        files:
+          $ref: "#/components/schemas/apis.FileInfo"
+      example:
+        files:
+          path: path
+          size: 1
+          modTime: 6
+          name: name
+          isDir: true
+        content:
+        - 0
+        - 0
+    apis.FileInfo:
+      type: object
+      properties:
+        isDir:
+          type: boolean
+        modTime:
+          type: integer
+        name:
+          type: string
+        path:
+          type: string
+        size:
+          type: integer
+      example:
+        path: path
+        size: 1
+        modTime: 6
+        name: name
+        isDir: true
     apis.GetBagResp:
       type: object
       properties:
@@ -598,6 +724,28 @@ components:
         bagName: bagName
         bagDisplayName: bagDisplayName
         createTimeMs: 0
+    apis.GetFileReq:
+      type: object
+      properties:
+        locationPath:
+          type: string
+          description: File's location path in node
+    apis.GetFileResp:
+      type: object
+      properties:
+        fileContent:
+          $ref: "#/components/schemas/apis.FileContent"
+      example:
+        fileContent:
+          files:
+            path: path
+            size: 1
+            modTime: 6
+            name: name
+            isDir: true
+          content:
+          - 0
+          - 0
     apis.GetTaskResp:
       type: object
       properties:
@@ -653,6 +801,31 @@ components:
         nodeIds:
         - nodeIds
         - nodeIds
+    apis.ListFilesReq:
+      type: object
+      properties:
+        locationPath:
+          type: string
+          description: File's location path in node
+    apis.ListFilesResp:
+      type: object
+      properties:
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/apis.FileInfo"
+      example:
+        files:
+        - path: path
+          size: 1
+          modTime: 6
+          name: name
+          isDir: true
+        - path: path
+          size: 1
+          modTime: 6
+          name: name
+          isDir: true
     apis.NodeFreeReq:
       type: object
     apis.NodeInfo:

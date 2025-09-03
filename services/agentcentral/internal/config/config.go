@@ -2,14 +2,14 @@ package config
 
 type Config struct {
 	Env       string `xdefault:"debug" xenv:"env"`
-	PGSQL_DSN string `xdefault:"host=localhost user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai"`
+	PGSQL_DSN string `xdefault:"host=localhost user=dxyinme password=123456 dbname=linda port=5432 sslmode=disable TimeZone=Asia/Shanghai" xenv:"PGSQL_DSN"`
 	Port      int    `xdefault:"5883"`
 	Redis     *RedisConfig
 	SSL       *SSLConfig
 }
 
 type RedisConfig struct {
-	Addrs    []string `xdefault:"localhost:16379"`
+	Addrs    []string `xdefault:"host.docker.internal:16379"`
 	Db       int      `xdefault:"1"`
 	Password string   `xdefault:"123456"`
 }

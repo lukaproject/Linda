@@ -1,21 +1,28 @@
 package filemanager
 
+import "Linda/protocol/models"
+
 // MockMgr is a mock struct for filemanager.Mgr
 type MockMgr struct {
 	CallCount struct {
-		Download  int
-		Exists    int
-		Remove    int
-		ListFiles int
-		Initial   int
+		Download      int
+		Exists        int
+		Remove        int
+		ListFiles     int
+		ListFileInfos int
+		GetFile       int
+		Initial       int
 	}
 
 	MockFuncs struct {
-		Download  func(input DownloadInput) error
-		Exists    func(path string) bool
-		Remove    func(path string) error
-		ListFiles func(dirname string, filesCh chan string) error
-		Initial   func()
+		Download      func(input DownloadInput) error
+		Exists        func(path string) bool
+		Remove        func(path string) error
+		ListFiles     func(dirname string, filesCh chan string) error
+		ListFileInfos func(dirname string) ([]models.FileInfo, error)
+		GetFile       func(filePath string) (*models.FileContent, error)
+
+		Initial func()
 	}
 }
 
@@ -60,6 +67,24 @@ func (mkm *MockMgr) ListFiles(dirname string, filesCh chan string) error {
 		return mkm.MockFuncs.ListFiles(dirname, filesCh)
 	}
 	return nil
+}
+
+// ListFileInfos
+func (mkm *MockMgr) ListFileInfos(dirname string) ([]models.FileInfo, error) {
+	mkm.CallCount.ListFileInfos++
+	if mkm.MockFuncs.ListFileInfos != nil {
+		return mkm.MockFuncs.ListFileInfos(dirname)
+	}
+	return nil, nil
+}
+
+// GetFile
+func (mkm *MockMgr) GetFile(filePath string) (*models.FileContent, error) {
+	mkm.CallCount.GetFile++
+	if mkm.MockFuncs.GetFile != nil {
+		return mkm.MockFuncs.GetFile(filePath)
+	}
+	return nil, nil
 }
 
 func (mkm *MockMgr) Initial() {
