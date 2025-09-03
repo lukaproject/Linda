@@ -22,7 +22,7 @@ type BagsMgr interface {
 
 type bagsManager struct {
 	tasksMgrs map[string]TasksMgr
-	queCli    taskqueueclient.Client
+	queCli    taskqueueclient.QuesManageClient
 }
 
 func (mgr *bagsManager) Init() error {

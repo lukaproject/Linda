@@ -17,7 +17,7 @@ type TasksMgr interface {
 
 type tasksManager struct {
 	BagName string
-	queCli  taskqueueclient.Client
+	queCli  taskqueueclient.QuesManageClient
 }
 
 func (m *tasksManager) AddTask(task *models.Task) {
@@ -30,7 +30,7 @@ func (m *tasksManager) GetTask(taskName string) (task *models.Task) {
 	return
 }
 
-func NewTasksMgr(bagName string, queCli taskqueueclient.Client) TasksMgr {
+func NewTasksMgr(bagName string, queCli taskqueueclient.QuesManageClient) TasksMgr {
 	return &tasksManager{
 		BagName: bagName,
 		queCli:  queCli,

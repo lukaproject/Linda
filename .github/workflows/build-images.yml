@@ -18,5 +18,22 @@ jobs:
       name: Setup Docker Buildx
       uses: docker/setup-buildx-action@v3
     -
+      name: Login to ghcr
+      uses: docker/login-action@v3
+      with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+    -
+      name: Build And Push Base Images
+      uses: docker/build-push-action@v6
+      with:
+        context: .
+        push: true
+        tags: ghcr.io/lukaproject/linda/build-base-image:latest
+        build-args: |
+          PROXY=goproxy.io
+        file: tools/dockerimages/buildbase/Dockerfile.buildbase
+    -
       name: Build Images
       run: ./tools/builder/buildimage.sh ./tools/builder/subimages.txt "docker buildx"
