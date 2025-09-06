@@ -43,7 +43,8 @@ services:
   fileservicefe:
     image: linda-fileservicefe:latest
     restart: always
-    network_mode: host
+    ports:
+      - "5555:5555"
     deploy:
       resources:
         limits:

@@ -35,7 +35,11 @@ func (s *runTaskTestSuite) TestRunTask_ScriptPath() {
 		[]string{testNodeId},
 		[]struct{ Uri, LocationPath string }{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
+				Uri: fmt.Sprintf(
+					"http://%s:%d/files/%s",
+					stage.FileServiceFEDockerURL,
+					stage.FileServiceFEPort,
+					filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		})
@@ -97,7 +101,11 @@ func (s *runTaskTestSuite) TestRunTask_ScriptPath_ExitNonZero() {
 		[]string{testNodeId},
 		[]struct{ Uri, LocationPath string }{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
+				Uri: fmt.Sprintf(
+					"http://%s:%d/files/%s",
+					stage.FileServiceFEDockerURL,
+					stage.FileServiceFEPort,
+					filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		})
@@ -126,7 +134,11 @@ func (s *runTaskTestSuite) TestRunTask_GetFile() {
 		[]string{testNodeId},
 		[]struct{ Uri, LocationPath string }{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
+				Uri: fmt.Sprintf(
+					"http://%s:%d/files/%s",
+					stage.FileServiceFEDockerURL,
+					stage.FileServiceFEPort,
+					filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		})
