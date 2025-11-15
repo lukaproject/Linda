@@ -26,6 +26,13 @@ parser.add_argument(
     default=False,
     help="build fileservicefe",
 )
+parser.add_argument(
+    "--buildtool",
+    type=str,
+    choices=["buildx", "docker-buildx", "docker"],
+    default="docker-buildx",
+    help="build tool, default is 'docker-buildx'",
+)
 args = parser.parse_args()
 
 
