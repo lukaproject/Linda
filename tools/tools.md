@@ -59,7 +59,7 @@ docker pull swaggerapi/swagger-codegen-cli-v3
 Option 1:
 - [buildx release](https://github.com/docker/buildx/releases)
 
-1. 需要将下载下来的二进制重命名为docker-buildx后放入~/.docker/cli-plugins/
+1. 需要将下载下来的二进制重命名为docker-buildx后放入~/.docker/cli-plugins/, 或者使用 `sudo apt install docker-buildx-plugin`
 2. 需要修改docker配置文件, 增加experimental: "enabled"这条
 ```bash
 cat .docker/config.json
