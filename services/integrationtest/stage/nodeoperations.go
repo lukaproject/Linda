@@ -3,7 +3,9 @@ package stage
 import (
 	"Linda/baselibs/apiscall/swagger"
 	"context"
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -92,7 +94,7 @@ func (no *NodeOperations) ListNodeFiles(nodeId, locationPath string) []swagger.A
 	return resp.Files
 }
 
-func (no *NodeOperations) GetNodeFile(nodeId, filePath string) swagger.ApisFileContent {
+func (no *NodeOperations) GetNodeFile(nodeId, filePath string) (swagger.ApisFileContent, error) {
 	file, resp, err := no.cli.AgentsApi.AgentsNodeIdFilesGetPost(
 		context.Background(), swagger.ApisGetFileReq{
 			LocationPath: filePath,
@@ -106,18 +108,20 @@ func (no *NodeOperations) GetNodeFile(nodeId, filePath string) swagger.ApisFileC
 		no.t.Logf("Response body: %q", resp.Body) // %q shows quotes and escape chars
 
 		// Check if it's valid JSON
-		// var jsonTest interface{}
-		// if json.Unmarshal(resp.Body, &jsonTest) != nil {
-		// 	no.t.Logf("Response is NOT valid JSON")
-		// } else {
-		// 	no.t.Logf("Response is valid JSON")
-		// }
-		return swagger.ApisFileContent{}
+		var jsonTest any
+		errorContent := xerr.Must(io.ReadAll(resp.Body))
+		if err := json.Unmarshal(errorContent, &jsonTest); err != nil {
+			no.t.Logf("Response is NOT valid JSON")
+			return swagger.ApisFileContent{}, err
+		} else {
+			no.t.Logf("Response is valid JSON")
+		}
+		return swagger.ApisFileContent{}, err
 	}
 
 	if file.FileContent == nil {
-		return swagger.ApisFileContent{}
+		return swagger.ApisFileContent{}, nil
 	}
 
-	return *file.FileContent
+	return *file.FileContent, nil
 }
