@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       testdatabase:
-        image: docker.io/bitnami/postgresql:15
+        image: docker.io/bitnami/postgresql:latest
         ports:
           - 5432:5432
         env:

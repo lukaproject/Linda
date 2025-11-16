@@ -34,6 +34,9 @@ type Agent interface {
 	Dispose()
 
 	IsUnusable() bool
+	// Add new file operation methods
+	AddFileListRequest(operationId, path string) error
+	AddFileGetRequest(operationId, filePath string) error
 }
 
 type agentHolder struct {
@@ -55,6 +58,17 @@ type agentHolder struct {
 
 	unusable    bool
 	unusableMut sync.Mutex
+	// Add file operation request queues
+	fileListRequests      []models.FileListRequest
+	fileGetRequests       []models.FileGetRequest
+	fileListRequestsMutex sync.Mutex
+	fileGetRequestsMutex  sync.Mutex
+
+	// Add response waiting maps
+	pendingFileListOps map[string]chan models.FileListResponse
+	pendingFileGetOps  map[string]chan models.FileGetResponse
+	responsesListMutex sync.Mutex
+	responsesGetMutex  sync.Mutex
 }
 
 func (ah *agentHolder) GetInfo() *models.NodeInfo {
@@ -73,6 +87,47 @@ func (ah *agentHolder) AddFilesUploadToNode(files []models.FileDescription) {
 	ah.noUploadFilesMut.Lock()
 	defer ah.noUploadFilesMut.Unlock()
 	ah.noUploadFiles = append(ah.noUploadFiles, files...)
+}
+
+func (ah *agentHolder) AddFileListRequest(operationId, path string) error {
+	ah.fileListRequestsMutex.Lock()
+
+	ah.fileListRequests = append(ah.fileListRequests, models.FileListRequest{
+		OperationId: operationId,
+		DirPath:     path,
+	})
+
+	ah.fileListRequestsMutex.Unlock()
+
+	// Add to pending operations
+	ah.responsesListMutex.Lock()
+	if ah.pendingFileListOps == nil {
+		ah.pendingFileListOps = make(map[string]chan models.FileListResponse)
+	}
+	ah.pendingFileListOps[operationId] = make(chan models.FileListResponse, 1)
+	ah.responsesListMutex.Unlock()
+
+	return nil
+}
+
+func (ah *agentHolder) AddFileGetRequest(operationId, filePath string) error {
+	ah.fileGetRequestsMutex.Lock()
+
+	ah.fileGetRequests = append(ah.fileGetRequests, models.FileGetRequest{
+		OperationId: operationId,
+		FilePath:    filePath,
+	})
+	ah.fileGetRequestsMutex.Unlock()
+
+	// Add to pending operations
+	ah.responsesGetMutex.Lock()
+	if ah.pendingFileGetOps == nil {
+		ah.pendingFileGetOps = make(map[string]chan models.FileGetResponse)
+	}
+	ah.pendingFileGetOps[operationId] = make(chan models.FileGetResponse, 1)
+	ah.responsesGetMutex.Unlock()
+
+	return nil
 }
 
 func (ah *agentHolder) Join(bagName string) (err error) {
@@ -124,6 +179,7 @@ func (ah *agentHolder) heartBeatProcess(msg *models.HeartBeatFromAgent) {
 		ah.lastHBTime = time.Now()
 		hbFromServer := ah.packHeartBeatResponse(msg)
 		ah.processFinishedTask(ah.nodeStates.BagName, msg)
+		ah.processFileResponses(msg)
 		xerr.Must0(hbconn.WriteMessage(ah.conn, hbFromServer))
 	}()
 	if err != nil {
@@ -173,6 +229,7 @@ func (ah *agentHolder) packHeartBeatResponse(
 	}
 	ah.scheduleTasks(hbFromAgent, hb)
 	ah.addUploadFilesToHB(hb)
+	ah.addFileRequestsToHB(hb)
 	return hb
 }
 
@@ -226,6 +283,26 @@ func (ah *agentHolder) addUploadFilesToHB(
 	}
 }
 
+func (ah *agentHolder) addFileRequestsToHB(hb *models.HeartBeatFromServer) {
+	ah.fileListRequestsMutex.Lock()
+	// Add file list requests
+	if len(ah.fileListRequests) > 0 {
+		hb.FileListRequests = ah.fileListRequests
+		logger.Infof("add file list requests to hb, %v", hb.FileListRequests)
+		ah.fileListRequests = make([]models.FileListRequest, 0) // Clear queue
+	}
+	ah.fileListRequestsMutex.Unlock()
+
+	ah.fileGetRequestsMutex.Lock()
+	// Add file get requests
+	if len(ah.fileGetRequests) > 0 {
+		hb.FileGetRequests = ah.fileGetRequests
+		logger.Infof("add file get requests to hb, %v", hb.FileGetRequests)
+		ah.fileGetRequests = make([]models.FileGetRequest, 0) // Clear queue
+	}
+	ah.fileGetRequestsMutex.Unlock()
+}
+
 func (ah *agentHolder) processFinishedTask(bagName string, msg *models.HeartBeatFromAgent) (err error) {
 	if bagName == emptyBagName {
 		return nil
@@ -246,6 +323,44 @@ func (ah *agentHolder) processScheduledTask(bagName string, scheduledTasks []mod
 			PersistScheduledTasks(bagName, scheduledTasks, ah.nodeId)
 	}
 	return
+}
+
+// Process file operation responses from agent
+func (ah *agentHolder) processFileResponses(hbFromAgent *models.HeartBeatFromAgent) {
+	ah.responsesListMutex.Lock()
+
+	// Process file list responses
+	for _, response := range hbFromAgent.FileListResponses {
+		if responseChan, exists := ah.pendingFileListOps[response.OperationId]; exists {
+			select {
+			case responseChan <- response:
+				logger.Infof("file list response sent for operation %s", response.OperationId)
+			default:
+				logger.Warnf("failed to send file list response for operation %s", response.OperationId)
+			}
+			delete(ah.pendingFileListOps, response.OperationId)
+		} else {
+			logger.Warnf("received file list response for unknown operation %s", response.OperationId)
+		}
+	}
+	ah.responsesListMutex.Unlock()
+
+	ah.responsesGetMutex.Lock()
+	// Process file get responses
+	for _, response := range hbFromAgent.FileGetResponses {
+		if responseChan, exists := ah.pendingFileGetOps[response.OperationId]; exists {
+			select {
+			case responseChan <- response:
+				logger.Infof("file get response sent for operation %s", response.OperationId)
+			default:
+				logger.Warnf("failed to send file get response for operation %s", response.OperationId)
+			}
+			delete(ah.pendingFileGetOps, response.OperationId)
+		} else {
+			logger.Warnf("received file get response for unknown operation %s", response.OperationId)
+		}
+	}
+	ah.responsesGetMutex.Unlock()
 }
 
 func (ah *agentHolder) persistNodeInfo() (success bool) {
@@ -280,6 +395,12 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 		lastSeqId:     -1,
 		noUploadFiles: make([]models.FileDescription, 0),
 		unusable:      false,
+
+		// Initialize file operation fields
+		fileListRequests:   make([]models.FileListRequest, 0),
+		fileGetRequests:    make([]models.FileGetRequest, 0),
+		pendingFileListOps: make(map[string]chan models.FileListResponse),
+		pendingFileGetOps:  make(map[string]chan models.FileGetResponse),
 	}
 	hbStart := &models.HeartBeatStart{}
 	err := hbconn.ReadMessage(ah.conn, hbStart)

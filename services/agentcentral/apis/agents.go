@@ -5,8 +5,11 @@ import (
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/apis/validator"
 	"Linda/services/agentcentral/internal/logic/agents"
+	"fmt"
 	"net/http"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/gorilla/mux"
 )
 
@@ -17,6 +20,8 @@ func EnableAgents(r *mux.Router) {
 	r.HandleFunc("/api/agents/listids", listNodeIds).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/list", listNodes).Methods(http.MethodGet)
 	r.HandleFunc("/api/agents/uploadfiles", uploadFilesToNodes).Methods(http.MethodPost)
+	r.HandleFunc("/api/agents/{nodeId}/files/list", listNodeFiles).Methods(http.MethodPost)
+	r.HandleFunc("/api/agents/{nodeId}/files/get", getNodeFile).Methods(http.MethodPost)
 }
 
 // node join godoc
@@ -174,4 +179,123 @@ func uploadFilesToNodes(w http.ResponseWriter, r *http.Request) {
 			return nil
 		})
 	}
+}
+
+// Request Phase: A file operation is requested via API
+// Queueing Phase: The request is queued to be sent to the agent
+// Transmission Phase: Request is sent via heartbeat protocol
+// Waiting Phase: The manager waits for a response (this is where your selected code runs)
+// Response Phase: Agent processes and responds
+// list node files godoc
+//
+//	@Summary		list files on a node
+//	@Description	list files in a directory on a specific node
+//	@Tags			agents
+//	@Accept			json
+//	@Produce		json
+//	@Param			nodeId		path	string					true	"node id"
+//	@Param			request		body	apis.ListFilesReq		true	"List files request"
+//	@Success		200			{object}	apis.ListFilesResp
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Failure		408			{string}	string	"Request timeout"
+//	@Router			/agents/{nodeId}/files/list [post]
+func listNodeFiles(w http.ResponseWriter, r *http.Request) {
+	nodeId := mux.Vars(r)["nodeId"]
+	req := ListFilesReq{}
+	models.ReadJSON(r.Body, &req)
+
+	operationId := generateOperationId()
+
+	err := agents.GetMgrInstance().CallAgent(nodeId, func(ag agents.Agent) error {
+		return ag.AddFileListRequest(operationId, req.LocationPath)
+	})
+
+	if err != nil {
+		logger.Errorf("failed to request file list from node %s: %v", nodeId, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Wait for response (implement with timeout)
+	response, err := agents.GetMgrInstance().WaitForFileListResponse(nodeId, operationId, 30*time.Second)
+	if err != nil {
+		logger.Errorf("timeout waiting for file list response from node %s: %v", nodeId, err)
+		w.WriteHeader(http.StatusRequestTimeout)
+		return
+	}
+
+	if response.Error != "" {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(response.Error))
+		return
+	}
+
+	resp := ListFilesResp{
+		Files: make([]FileInfo, len(response.Files)),
+	}
+
+	for i, file := range response.Files {
+		resp.Files[i] = FileInfo{
+			Name:    file.Name,
+			Path:    file.Path,
+			Size:    file.Size,
+			ModTime: file.ModTime,
+			IsDir:   file.IsDir,
+		}
+	}
+
+	w.Write(models.Serialize(resp))
+}
+
+func getNodeFile(w http.ResponseWriter, r *http.Request) {
+	nodeId := mux.Vars(r)["nodeId"]
+	req := GetFileReq{}
+	models.ReadJSON(r.Body, &req)
+
+	operationId := generateOperationId()
+	logger.Errorf("processing get file : %s", operationId)
+	err := agents.GetMgrInstance().CallAgent(nodeId, func(ag agents.Agent) error {
+		return ag.AddFileGetRequest(operationId, req.LocationPath)
+	})
+
+	if err != nil {
+		logger.Errorf("failed to request file from node %s: %v", nodeId, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	// Wait for response (implement with timeout)
+	response, err := agents.GetMgrInstance().WaitForFileGetResponse(nodeId, operationId, 30*time.Second)
+	if err != nil {
+		logger.Errorf("timeout waiting for file response from node %s: %v", nodeId, err)
+		w.WriteHeader(http.StatusRequestTimeout)
+		return
+	}
+
+	if response.Error != "" {
+		logger.Errorf("agent returned error for file get: %s", response.Error)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	logger.Errorf("processed get file get: %s", operationId)
+	resp := GetFileResp{
+		Content: FileContent{
+			FileInfo: FileInfo{
+				Name:    response.Content.FileInfo.Name,
+				Path:    response.Content.FileInfo.Path,
+				Size:    response.Content.FileInfo.Size,
+				ModTime: response.Content.FileInfo.ModTime,
+				IsDir:   response.Content.FileInfo.IsDir,
+			},
+			Content: response.Content.Content,
+		},
+	}
+
+	w.Write(models.Serialize(resp))
+}
+
+func generateOperationId() string {
+	id := uuid.New()
+	return fmt.Sprintf("op-%s", id.String())
 }

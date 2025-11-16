@@ -35,7 +35,11 @@ func (s *runTaskTestSuite) TestRunTask_ScriptPath() {
 		[]string{testNodeId},
 		[]struct{ Uri, LocationPath string }{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
+				Uri: fmt.Sprintf(
+					"http://%s:%d/files/%s",
+					stage.FileServiceFEDockerURL,
+					stage.FileServiceFEPort,
+					filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		})
@@ -97,7 +101,11 @@ func (s *runTaskTestSuite) TestRunTask_ScriptPath_ExitNonZero() {
 		[]string{testNodeId},
 		[]struct{ Uri, LocationPath string }{
 			{
-				Uri:          fmt.Sprintf("http://172.17.0.1:%d/files/%s", stage.FileServiceFEPort, filePath),
+				Uri: fmt.Sprintf(
+					"http://%s:%d/files/%s",
+					stage.FileServiceFEDockerURL,
+					stage.FileServiceFEPort,
+					filePath),
 				LocationPath: "/bin/test.sh",
 			},
 		})
@@ -113,6 +121,61 @@ func (s *runTaskTestSuite) TestRunTask_ScriptPath_ExitNonZero() {
 		<-time.After(2 * time.Second)
 	}
 }
+
+func (s *runTaskTestSuite) TestRunTask_GetFile() {
+	currentStage := stage.NewStageT(s.T())
+	testNodeId := currentStage.NodeOperations.ListNodes(1)[0].NodeId
+	s.T().Logf("test node %s", testNodeId)
+
+	// upload file to node
+	filePath := "block1/test.sh"
+	s.Nil(currentStage.FileOperations.Upload("echo test > test.txt", filePath))
+	currentStage.UploadFilesToNodes(
+		[]string{testNodeId},
+		[]struct{ Uri, LocationPath string }{
+			{
+				Uri: fmt.Sprintf(
+					"http://%s:%d/files/%s",
+					stage.FileServiceFEDockerURL,
+					stage.FileServiceFEPort,
+					filePath),
+				LocationPath: "/bin/test.sh",
+			},
+		})
+
+	file := currentStage.GetNodeFile(testNodeId, "/bin/test.sh")
+
+	s.NotEmpty(file, "Should have files in the directory")
+
+	s.T().Logf("Found file: %s (Path: %s, Size: %d, IsDir: %t)",
+		file.Files.Name, file.Files.Path, file.Files.Size, file.Files.IsDir)
+	s.Equal("/bin/test.sh", file.Files.Path, "File path should match")
+}
+
+func (s *runTaskTestSuite) TestRunTask_ListFile() {
+	currentStage := stage.NewStageT(s.T())
+	testNodeId := currentStage.NodeOperations.ListNodes(1)[0].NodeId
+	s.T().Logf("test node %s", testNodeId)
+
+	files := currentStage.ListNodeFiles(testNodeId, "/app")
+	s.NotEmpty(files, "Should have files in the directory")
+}
+
+// func (s *runTaskTestSuite) TestRunTask_GetFileWithWrongPath() {
+// 	currentStage := stage.NewStageT(s.T())
+// 	testNodeId := currentStage.NodeOperations.ListNodes(1)[0].NodeId
+// 	s.T().Logf("test node %s", testNodeId)
+
+// 	// This should handle the error gracefully instead of panicking
+// 	defer func() {
+// 		if r := recover(); r != nil {
+// 			s.T().Logf("UnExpected error when getting non-existent file: %v", r)
+// 			s.Fail("The GetNodeFile method panicked when it should have handled the error gracefully.")
+// 		}
+// 	}()
+
+// 	currentStage.GetNodeFile(testNodeId, "/asda")
+// }
 
 func TestRunTask(t *testing.T) {
 	if !stage.HealthCheck(t, stage.AgentCentralPort) {

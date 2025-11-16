@@ -83,6 +83,28 @@ definitions:
       errorMsg:
         type: string
     type: object
+  apis.FileContent:
+    properties:
+      content:
+        items:
+          type: integer
+        type: array
+      files:
+        $ref: '#/definitions/apis.FileInfo'
+    type: object
+  apis.FileInfo:
+    properties:
+      isDir:
+        type: boolean
+      modTime:
+        type: integer
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+    type: object
   apis.GetBagResp:
     properties:
       bagDisplayName:
@@ -95,6 +117,17 @@ definitions:
       updateTimeMs:
         format: int64
         type: integer
+    type: object
+  apis.GetFileReq:
+    properties:
+      locationPath:
+        description: File's location path in node
+        type: string
+    type: object
+  apis.GetFileResp:
+    properties:
+      fileContent:
+        $ref: '#/definitions/apis.FileContent'
     type: object
   apis.GetTaskResp:
     properties:
@@ -132,6 +165,19 @@ definitions:
       nodeIds:
         items:
           type: string
+        type: array
+    type: object
+  apis.ListFilesReq:
+    properties:
+      locationPath:
+        description: File's location path in node
+        type: string
+    type: object
+  apis.ListFilesResp:
+    properties:
+      files:
+        items:
+          $ref: '#/definitions/apis.FileInfo'
         type: array
     type: object
   apis.NodeFreeReq:
@@ -210,6 +256,76 @@ info:
   title: AgentCentral API
   version: 0.dev
 paths:
+  /agents/{nodeId}/files/get:
+    post:
+      consumes:
+      - application/json
+      description: get file content from a specific node
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: Get file request
+        in: body
+        name: getFileReq
+        required: true
+        schema:
+          $ref: '#/definitions/apis.GetFileReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.GetFileResp'
+        "408":
+          description: Request timeout
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: get file content from a node
+      tags:
+      - agents
+  /agents/{nodeId}/files/list:
+    post:
+      consumes:
+      - application/json
+      description: list files in a directory on a specific node
+      parameters:
+      - description: node id
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: List files request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/apis.ListFilesReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/apis.ListFilesResp'
+        "408":
+          description: Request timeout
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: list files on a node
+      tags:
+      - agents
   /agents/free/{nodeId}:
     post:
       consumes:
