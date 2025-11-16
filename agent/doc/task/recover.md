@@ -1,0 +1,4 @@
+# Recover
+
+在agent重启或者进程被杀的时候，task的process也会被杀掉。我们在agent重启之后需要将被杀掉的task重新拉起。
+每个task的PID需要被记录在localdb中。
