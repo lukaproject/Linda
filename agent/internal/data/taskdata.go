@@ -12,7 +12,7 @@ import (
 
 const (
 	_Slash         = "/"
-	BucketTaskData = ""
+	BucketTaskData = "tasks"
 )
 
 type TaskState int
@@ -33,9 +33,10 @@ type TaskData struct {
 
 	// script running dir
 	WorkingDir string
-	// task data located dir, such as stdout / stderr or others.
+	// task located dir, such as stdout / stderr or others.
 	TaskDir string
 	State   TaskState
+	Pid     int
 }
 
 func (t *TaskData) FromTaskModel(taskModel *models.Task) {

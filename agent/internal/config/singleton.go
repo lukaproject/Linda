@@ -12,7 +12,8 @@ import (
 
 var (
 	c          *Config = nil
-	configFile *string = flag.String("f", "", "config file")
+	configFile         = flag.String("f", "", "config file")
+	nodeIdFile         = flag.String("node_id_file", "/etc/linda/nodeid.txt", "node_id local file")
 )
 
 func Instance() *Config {
