@@ -143,7 +143,8 @@ func (s *runTaskTestSuite) TestRunTask_GetFile() {
 			},
 		})
 
-	file := currentStage.GetNodeFile(testNodeId, "/bin/test.sh")
+	file, err := currentStage.GetNodeFile(testNodeId, "/bin/test.sh")
+	s.Nil(err)
 
 	s.NotEmpty(file, "Should have files in the directory")
 
@@ -161,21 +162,22 @@ func (s *runTaskTestSuite) TestRunTask_ListFile() {
 	s.NotEmpty(files, "Should have files in the directory")
 }
 
-// func (s *runTaskTestSuite) TestRunTask_GetFileWithWrongPath() {
-// 	currentStage := stage.NewStageT(s.T())
-// 	testNodeId := currentStage.NodeOperations.ListNodes(1)[0].NodeId
-// 	s.T().Logf("test node %s", testNodeId)
+func (s *runTaskTestSuite) TestRunTask_GetFileWithWrongPath() {
+	currentStage := stage.NewStageT(s.T())
+	testNodeId := currentStage.NodeOperations.ListNodes(1)[0].NodeId
+	s.T().Logf("test node %s", testNodeId)
 
-// 	// This should handle the error gracefully instead of panicking
-// 	defer func() {
-// 		if r := recover(); r != nil {
-// 			s.T().Logf("UnExpected error when getting non-existent file: %v", r)
-// 			s.Fail("The GetNodeFile method panicked when it should have handled the error gracefully.")
-// 		}
-// 	}()
+	// This should handle the error gracefully instead of panicking
+	defer func() {
+		if r := recover(); r != nil {
+			s.T().Logf("UnExpected error when getting non-existent file: %v", r)
+			s.Fail("The GetNodeFile method panicked when it should have handled the error gracefully.")
+		}
+	}()
 
-// 	currentStage.GetNodeFile(testNodeId, "/asda")
-// }
+	_, err := currentStage.GetNodeFile(testNodeId, "/asda")
+	s.NotNil(err)
+}
 
 func TestRunTask(t *testing.T) {
 	if !stage.HealthCheck(t, stage.AgentCentralPort) {

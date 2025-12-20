@@ -73,6 +73,8 @@ func (t *task) Start() (err error) {
 		t.cmd.Stderr = t.stderrFile
 
 		xerr.Must0(t.cmd.Start())
+
+		t.do(toRunning)
 	}()
 	return
 }
@@ -85,6 +87,7 @@ func (t *task) Wait() (err error) {
 	xctx.Close(t.stdoutFile)
 	xctx.Close(t.stderrFile)
 	t.isFinished = true
+	t.do(toFinished)
 	return err
 }
 
@@ -123,15 +126,43 @@ func (t *task) saveExitCode(err error) error {
 	return err
 }
 
+func (t *task) do(callback func(taskItem *task)) {
+	callback(t)
+	t.TaskData.Store()
+}
+
 func NewTask(
 	taskData data.TaskData,
 ) Task {
 	t := &task{
 		TaskData: taskData,
 	}
-
+	t.do(toStart)
 	cmds := t.GetCommands(utils.GetDefaultShell())
 	t.cmd = exec.Command(cmds[0], cmds[1:]...)
 	t.cmd.Dir = taskData.WorkingDir
 	return t
+}
+
+func RecoverFromDB(taskData data.TaskData) Task {
+	t := &task{TaskData: taskData}
+	return t
+}
+
+// Task transaction callback function
+
+func toStart(t *task) {
+	t.TaskData.State = data.TaskState_Waiting
+}
+
+func toRunning(t *task) {
+	t.TaskData.Pid = t.cmd.Process.Pid
+	t.TaskData.State = data.TaskState_Running
+	data.GetRunningTasksContainerInstance().ToRunning(t.TaskData.Name)
+}
+
+func toFinished(t *task) {
+	t.TaskData.Pid = -1
+	t.TaskData.State = data.TaskState_Finished
+	data.GetRunningTasksContainerInstance().ToFinished(t.TaskData.Name)
 }
