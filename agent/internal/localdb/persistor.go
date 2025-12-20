@@ -4,6 +4,7 @@ import (
 	"Linda/baselibs/abstractions"
 	"Linda/baselibs/abstractions/xlog"
 
+	"github.com/lukaproject/xerr"
 	"github.com/nutsdb/nutsdb"
 )
 
@@ -30,6 +31,20 @@ func (p *Persistor[K, V]) Get(k K, v V) (err error) {
 	result, err := p.ldb.Get(p.bucket, k.Serialize())
 	v.Deserialize(result)
 	return err
+}
+
+func (p *Persistor[K, V]) GetKeys() (keys []K) {
+	keysBytes, err := p.ldb.GetKeys(p.bucket)
+	if err != nil {
+		logger.Error(err)
+	}
+	keys = make([]K, 0)
+	for _, keyBytes := range keysBytes {
+		var key K
+		xerr.Must0(key.Deserialize(keyBytes))
+		keys = append(keys, key)
+	}
+	return
 }
 
 func GetPersistor[K, V abstractions.Serializable](bucket string) (p *Persistor[K, V], err error) {

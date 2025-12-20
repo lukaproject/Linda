@@ -158,9 +158,11 @@ func toStart(t *task) {
 func toRunning(t *task) {
 	t.TaskData.Pid = t.cmd.Process.Pid
 	t.TaskData.State = data.TaskState_Running
+	data.GetRunningTasksContainerInstance().ToRunning(t.TaskData.Name)
 }
 
 func toFinished(t *task) {
 	t.TaskData.Pid = -1
 	t.TaskData.State = data.TaskState_Finished
+	data.GetRunningTasksContainerInstance().ToFinished(t.TaskData.Name)
 }

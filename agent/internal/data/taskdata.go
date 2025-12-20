@@ -60,8 +60,8 @@ func (t *TaskData) GetCommands(defaultShell string) []string {
 	return strings.Split(t.Script, " ")
 }
 
-func (t *TaskData) getPersistor() (p *localdb.Persistor[*KeyType, *TaskData]) {
-	p, err := localdb.GetPersistor[*KeyType, *TaskData](BucketTaskData)
+func (t *TaskData) getPersistor() (p *localdb.Persistor[*StringType, *TaskData]) {
+	p, err := localdb.GetPersistor[*StringType, *TaskData](BucketTaskData)
 	if err != nil {
 		logger.Errorf("get %s persistor failed, err %v", BucketTaskData, err)
 		panic(err)
@@ -77,7 +77,7 @@ func (t *TaskData) Deserialize(b []byte) error {
 	return json.Unmarshal(b, t)
 }
 
-func (t *TaskData) key() *KeyType {
+func (t *TaskData) key() *StringType {
 	return NewKey(t.Bag + _Slash + t.Name)
 }
 
