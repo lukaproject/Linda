@@ -15,7 +15,7 @@ const BucketRunningTaskData = "running_tasks"
 
 var rtc *RunningTasksContainer = nil
 
-func InitialRunningTasksContainer() {
+func initialRunningTasksContainer() {
 	rtc = NewRunningTasksContainer()
 }
 
@@ -27,12 +27,17 @@ type RunningTasksContainer struct {
 	mut       sync.RWMutex
 	taskIds   map[string]any
 	persistor *localdb.Persistor[*StringType, *StringType]
+
+	recovered       bool
+	recoveryTaskIds []string
 }
 
 func NewRunningTasksContainer() *RunningTasksContainer {
 	return &RunningTasksContainer{
-		taskIds:   make(map[string]any),
-		persistor: xerr.Must(localdb.GetPersistor[*StringType, *StringType](BucketRunningTaskData)),
+		taskIds:         make(map[string]any),
+		persistor:       xerr.Must(localdb.GetPersistor[*StringType, *StringType](BucketRunningTaskData)),
+		recovered:       false,
+		recoveryTaskIds: make([]string, 0),
 	}
 }
 
@@ -42,8 +47,17 @@ func (c *RunningTasksContainer) Init() {
 			keys := c.persistor.GetKeys()
 			for _, k := range keys {
 				c.taskIds[k.Key] = k.Key
+				c.recoveryTaskIds = append(c.recoveryTaskIds, k.Key)
 			}
 		})
+}
+
+func (c *RunningTasksContainer) LoadRecoveryTaskIds() []string {
+	if !c.recovered {
+		c.recovered = true
+		return c.recoveryTaskIds
+	}
+	return nil
 }
 
 func (c *RunningTasksContainer) ListAll() []string {

@@ -104,6 +104,23 @@ func (m *Mgr) newTaskDir(taskData *data.TaskData) string {
 	return taskDir
 }
 
+func (m *Mgr) recovery() {
+	logger.Info("start recovery...")
+	recoveryTaskIds := data.GetRunningTasksContainerInstance().LoadRecoveryTaskIds()
+	logger.Info("number of recover task ids %v", recoveryTaskIds)
+	go func(taskNames []string) {
+		for _, taskName := range taskNames {
+			logger.Infof("recover task %s", taskName)
+			taskData := &data.TaskData{
+				Name: taskName,
+			}
+			taskData.Load()
+			m.taskRunner.AddTask(NewTask(*taskData))
+		}
+		logger.Info("recover finished")
+	}(recoveryTaskIds)
+}
+
 func NewMgr() IMgr {
 	runnerIniter := RunnerIniter{
 		MaxResourceCount: 1,
@@ -112,5 +129,6 @@ func NewMgr() IMgr {
 		taskRunner: NewRunner(runnerIniter),
 	}
 	mgr.taskRunner.initial()
+	mgr.recovery()
 	return mgr
 }

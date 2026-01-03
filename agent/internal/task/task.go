@@ -144,11 +144,6 @@ func NewTask(
 	return t
 }
 
-func RecoverFromDB(taskData data.TaskData) Task {
-	t := &task{TaskData: taskData}
-	return t
-}
-
 // Task transaction callback function
 
 func toStart(t *task) {
