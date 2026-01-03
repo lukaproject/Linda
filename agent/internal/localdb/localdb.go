@@ -22,11 +22,15 @@ type LocalDB struct {
 }
 
 func New() (ldb *LocalDB) {
+	return NewWithLocalDBDir(config.Instance().LocalDBDir)
+}
+
+func NewWithLocalDBDir(localDBDir string) (ldb *LocalDB) {
 	ldb = &LocalDB{}
 	ldb.db = xerr.Must(
 		nutsdb.Open(
 			nutsdb.DefaultOptions,
-			nutsdb.WithDir(config.Instance().LocalDBDir)))
+			nutsdb.WithDir(localDBDir)))
 	return
 }
 
@@ -61,6 +65,17 @@ func (ldb *LocalDB) Get(bucket string, k []byte) (v []byte, err error) {
 			v = bytev
 			return nil
 		})
+	return
+}
+
+func (ldb *LocalDB) GetKeys(bucket string) (keys [][]byte, err error) {
+	err = ldb.db.View(func(tx *nutsdb.Tx) error {
+		keys, err = tx.GetKeys(bucket)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 	return
 }
 

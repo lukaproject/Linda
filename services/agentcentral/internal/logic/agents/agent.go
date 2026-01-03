@@ -1,11 +1,13 @@
 package agents
 
 import (
+	"Linda/baselibs/abstractions/xctx"
 	"Linda/baselibs/testcommon/gen"
 	"Linda/protocol/hbconn"
 	"Linda/protocol/models"
 	"Linda/services/agentcentral/internal/db"
 	"Linda/services/agentcentral/internal/logic/comm"
+	"errors"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -29,6 +31,9 @@ type Agent interface {
 
 	GetInfo() *models.NodeInfo
 
+	Dispose()
+
+	IsUnusable() bool
 	// Add new file operation methods
 	AddFileListRequest(operationId, path string) error
 	AddFileGetRequest(operationId, filePath string) error
@@ -40,6 +45,8 @@ type agentHolder struct {
 	nodeName   string
 	nodeStates *nodeStates
 
+	nodeInfo *models.NodeInfo
+
 	lastHBTime      time.Time
 	lastSeqId       int64
 	maxRunningTasks int
@@ -49,6 +56,8 @@ type agentHolder struct {
 	noUploadFiles    []models.FileDescription
 	noUploadFilesMut sync.Mutex
 
+	unusable    bool
+	unusableMut sync.Mutex
 	// Add file operation request queues
 	fileListRequests      []models.FileListRequest
 	fileGetRequests       []models.FileGetRequest
@@ -134,18 +143,22 @@ func (ah *agentHolder) serveLoop() {
 	defer ah.recoverWSPanic()
 	for {
 		select {
-		case msg := <-ah.hbAgent:
+		case msg, ok := <-ah.hbAgent:
 			{
+				if !ok {
+					goto end
+				}
 				ah.heartBeatProcess(msg)
 			}
 		case <-time.After(15 * time.Second):
 			{
 				logger.Errorf("hb timeout, nodeId %s", ah.nodeId)
-				mgrInstance.RemoveNode(ah.nodeId)
-				return
+				goto end
 			}
 		}
 	}
+end:
+	panic(errors.New("serveLoop terminated"))
 }
 
 func (ah *agentHolder) readHBLoop() {
@@ -177,7 +190,13 @@ func (ah *agentHolder) heartBeatProcess(msg *models.HeartBeatFromAgent) {
 func (ah *agentHolder) recoverWSPanic() {
 	if err := recover(); err != nil {
 		logger.Error(string(debug.Stack()), err)
-		mgrInstance.RemoveNode(ah.nodeId)
+		xctx.NewLocker(&ah.unusableMut).Run(func() {
+			if ah.unusable {
+				return
+			}
+			mgrInstance.RemoveNode(ah.nodeId)
+			ah.unusable = true
+		})
 	}
 }
 
@@ -345,18 +364,27 @@ func (ah *agentHolder) processFileResponses(hbFromAgent *models.HeartBeatFromAge
 }
 
 func (ah *agentHolder) persistNodeInfo() (success bool) {
-	nodeInfo := &models.NodeInfo{
+	ah.nodeInfo = &models.NodeInfo{
 		NodeId:          ah.nodeId,
 		NodeName:        ah.nodeName,
 		BagName:         ah.nodeStates.GetBagName(),
 		MaxRunningTasks: ah.maxRunningTasks,
 	}
-	err := db.NewDBOperations().NodeInfos.Create(nodeInfo)
+	err := db.NewDBOperations().NodeInfos.Create(ah.nodeInfo)
 	if err != nil {
 		logger.Error(err)
 		return false
 	}
 	return true
+}
+
+func (ah *agentHolder) Dispose() {
+	// serveLoop + readHBLoop
+	close(ah.hbAgent)
+}
+
+func (ah *agentHolder) IsUnusable() bool {
+	return ah.unusable
 }
 
 func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
@@ -366,6 +394,7 @@ func NewAgent(nodeId string, conn *websocket.Conn) (Agent, error) {
 		hbAgent:       make(chan *models.HeartBeatFromAgent, 1),
 		lastSeqId:     -1,
 		noUploadFiles: make([]models.FileDescription, 0),
+		unusable:      false,
 
 		// Initialize file operation fields
 		fileListRequests:   make([]models.FileListRequest, 0),

@@ -62,3 +62,19 @@ func Touch(path string) error {
 	f.Close()
 	return nil
 }
+
+// WriteToFile
+// create file path, and save content into this file.
+func WriteToFile(path string, content string) error {
+	err := Touch(path)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(path, os.O_RDWR, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	_, err = f.WriteString(content)
+	return err
+}

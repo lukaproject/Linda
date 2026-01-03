@@ -2,6 +2,7 @@ package config
 
 import (
 	"Linda/baselibs/abstractions/xlog"
+	"Linda/baselibs/abstractions/xos"
 	"fmt"
 	"io"
 	"net/http"
@@ -71,8 +72,18 @@ func (c *Config) getNodeId() {
 }
 
 func (c *Config) SetupNodeId() {
+	// Load from local file
+	if xos.PathExists(*nodeIdFile) {
+		c.NodeId = xos.ReadStringFromFile(*nodeIdFile)
+		if c.NodeId == "" {
+			logger.Warn("load node id from local but local node id is empty")
+		} else {
+			logger.Infof("load node id from local, node id is %s", c.NodeId)
+		}
+	}
 	if c.NodeId == "" {
 		logger.Warn("didn't set env variable LINDA_NODE_ID yet, ask for node id from service.")
 		c.getNodeId()
+		xerr.Must0(xos.WriteToFile(*nodeIdFile, c.NodeId))
 	}
 }

@@ -20,6 +20,7 @@ func Initial() {
 		NodeData: &NodeData{},
 	}
 	iMgrInstance.NodeData.SetUp()
+	initialRunningTasksContainer()
 }
 
 func Instance() *InstanceManager {
